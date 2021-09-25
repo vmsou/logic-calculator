@@ -7,6 +7,7 @@ ts = TokenStream(cin)
 variables = {}
 
 truth_str = {True: "V", False: "F"}
+truth_bool = {"V": True, "F": False}
 
 
 def define_var(var, value):
@@ -95,19 +96,60 @@ def get_variables(expr: str):
 
 
 def generate_variables(expr_vars):
-    size = 2 ** len(expr_vars)
-    half = size
+    length = len(expr_vars)
+    size = length
     vars_table = {}
-    for var in expr_vars:
-        curr_vars = []
-        half //= 2
-        actual = True
-        for j in range(1, size + 1):
-            curr_vars.append(truth_str[actual])
-            if j % half == 0:
-                actual = not actual
-        vars_table[var] = curr_vars
+
+    if length:
+        size = 2 ** length
+        half = size
+
+        for var in expr_vars:
+            curr_vars = []
+            half //= 2
+            actual = True
+            for j in range(1, size + 1):
+                curr_vars.append(truth_str[actual])
+                if j % half == 0:
+                    actual = not actual
+            vars_table[var] = curr_vars
     return vars_table, size
+
+
+def result():
+    try:
+        return expression()
+    except Exception as e:
+        print("[Error]", e)
+        ts.clean()
+
+
+def update_variables(vars_values, row):
+    vars_names = []
+    for var in vars_values:
+        value = vars_values[var][row]
+        define_var(var, truth_bool[value])
+        vars_names.append(value)
+    return vars_names
+
+
+def calculate(expr):
+    expr_vars = get_variables(expr)
+    vars_values, size = generate_variables(expr_vars)
+
+    if size:
+        print(" ".join(expr_vars), "\t", expr)
+        for row in range(size):
+            cin.buffer = expr
+            vars_names = update_variables(vars_values, row)
+            print(" ".join(vars_names), end='\t')
+            res = result()
+            print("\t", truth_str[res])
+    else:
+        print(expr)
+        res = result()
+        if res is not None:
+            print(truth_str[res])
 
 
 def main():
@@ -121,28 +163,14 @@ def main():
     while True:
         print(">", end=' ')
         cin.input()
-        define_var("p", True)
-        define_var("q", False)
-        try:
-            res = expression()
-            print("Resultado:", res)
-        except Exception as e:
-            print("[Error]", e)
-            ts.clean()
+        calculate(cin.buffer)
+        print()
 
 
 if __name__ == '__main__':
-    # main()
+    main()
 
-    expr = "p | q"
-    expr_vars = get_variables(expr)
-    vars_values, size = generate_variables(expr_vars)
 
-    print(" ".join(expr_vars))
-    for row in range(size):
-        for var, values in vars_values.items():
-            print(values[row], end=' ')
-        print()
 
 
 
