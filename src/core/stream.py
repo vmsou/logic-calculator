@@ -1,11 +1,41 @@
+from enum import Enum
+
 from src.core.exceptions import BadToken, FullBuffer
 
 whitespace = (' ', '\n')
-operators = ('!', '&', '|', '(', ')')
+
+
+class Logic(Enum):
+    CONSTANT = 0
+    NOT = 1
+    AND = 2
+    OR = 3
+    CONDITIONAL = 4,
+    BICONDITIONAL = 5,
+    OPEN = 6
+    CLOSE = 7
+
+
+logicMap = {
+    Logic.CONSTANT: ['V', 'F', 'T'],
+    Logic.CONSTANT.NOT: ['!'],
+    Logic.AND: ['&', '.'],
+    Logic.OR: ['|', '+'],
+    Logic.OPEN: ['('],
+    Logic.CLOSE: [')']
+}
+
+equivalent = {}
+
+for key, val in logicMap.items():
+    for i in val:
+        equivalent[i] = key
+
+operators = [key for key, val in equivalent.items() if val != Logic.CONSTANT]
 
 
 class Token:
-    def __init__(self, kind="", value=None):
+    def __init__(self, kind=None, value=None):
         self.kind = kind
         self.value = value
 
@@ -19,33 +49,33 @@ class Token:
 class InputStream:
     def __init__(self, source=input):
         self.source = source
-        self.line = ""
+        self.buffer = ""
 
     def __bool__(self):
-        return bool(self.line)
+        return bool(self.buffer)
 
     def get(self):
         return self.char_tokenize()
 
     def putback(self, val):
-        self.line = val + self.line
+        self.buffer = val + self.buffer
 
     def input(self):
-        self.line = self.source()
+        self.buffer = self.source()
 
     def empty(self):
-        return len(self.line) <= 0
+        return len(self.buffer) <= 0
 
     def char_tokenize(self):
         index = 0
-        size = len(self.line)
+        size = len(self.buffer)
         value = ""
-        if self.line:
-            while index < size and self.line[index] in whitespace:
+        if self.buffer:
+            while index < size and self.buffer[index] in whitespace:
                 index += 1
-            while index < size and self.line[index] not in whitespace:
-                value = self.line[index]
-                self.line = self.line[index + 1:]
+            while index < size and self.buffer[index] not in whitespace:
+                value = self.buffer[index]
+                self.buffer = self.buffer[index + 1:]
                 return value
 
         return value
@@ -61,21 +91,23 @@ class TokenStream:
             self.full = False
             return self.buffer
 
-        ch = cin.get()
+        ch = cin.get().upper()
 
+        # Compare characters
         if ch in operators:
-            return Token(ch)
+            return Token(equivalent[ch], ch)
 
         elif ch == 'V':
-            t = Token('c', True)
-            return t
+            return Token(equivalent[ch], True)
 
         elif ch == 'F':
-            t = Token('c', False)
-            return t
+            return Token(equivalent[ch], False)
 
         elif ch == "":
             return Token()
+
+        # Compare words
+        cin.putback(ch)
 
         raise BadToken("Bad Token: char="+ch)
 
