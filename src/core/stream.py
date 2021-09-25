@@ -10,21 +10,21 @@ class Logic(Enum):
     NOT = 1
     AND = 2
     OR = 3
-    CONDITIONAL = 4,
-    BICONDITIONAL = 5,
-    OPEN = 6
+    IMPLICATION = 4,
+    EQUIVALENCE = 5,
+    OPEN = 6,
     CLOSE = 7
 
 
 logicMap = {
     Logic.CONSTANT: ['V', 'F'],
-    Logic.NOT: ['!'],
-    Logic.AND: ['&', '.'],
-    Logic.OR: ['|', '+'],
-    Logic.CONDITIONAL: ['->'],
-    Logic.BICONDITIONAL: ['<->'],
+    Logic.NOT: ['!', '~', '¬'],
+    Logic.AND: ['&', '.', '∧'],
+    Logic.OR: ['|', '+', '∨', '||'],
+    Logic.IMPLICATION: ['->', '→'],
+    Logic.EQUIVALENCE: ['<->', '⟷'],
     Logic.OPEN: ['('],
-    Logic.CLOSE: [')']
+    Logic.CLOSE: [')'],
 }
 
 equivalent = {}
@@ -34,6 +34,7 @@ for key, val in logicMap.items():
         equivalent[i] = key
 
 operators = [key for key, val in equivalent.items() if val != Logic.CONSTANT]
+ignore = logicMap[Logic.CONSTANT] + logicMap[Logic.OPEN] + logicMap[Logic.CLOSE]
 
 
 class Token:
@@ -112,7 +113,7 @@ class TokenStream:
         else:
             if ch:
                 s = ""
-                while ch not in logicMap[Logic.CONSTANT]:
+                while ch and ch not in ignore:
                     s += ch
                     ch = self.source.get()
                 self.source.putback(ch)

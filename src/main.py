@@ -30,7 +30,7 @@ def term():
     t = ts.get()
 
     while True:
-        if t.kind == Logic.CONDITIONAL:
+        if t.kind == Logic.IMPLICATION:
             right = primary()
             if not left:
                 left = True
@@ -39,7 +39,7 @@ def term():
             else:
                 left = False
             t = ts.get()
-        elif t.kind == Logic.BICONDITIONAL:
+        elif t.kind == Logic.EQUIVALENCE:
             right = primary()
             if left and right:
                 left = True
@@ -80,7 +80,7 @@ def main():
     print("Operadores Unários: ")
     print("NOT = '!'")
     print("Operadores Binários: ")
-    print("AND = '&', OR = '|'\n")
+    print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'\n")
 
     while True:
         print(">", end=' ')
