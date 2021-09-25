@@ -40,7 +40,14 @@ def term():
                 left = False
             t = ts.get()
         elif t.kind == Logic.BICONDITIONAL:
-            pass
+            right = primary()
+            if left and right:
+                left = True
+            elif not left and not right:
+                left = True
+            else:
+                left = False
+            t = ts.get()
         else:
             ts.putback(t)
             return left

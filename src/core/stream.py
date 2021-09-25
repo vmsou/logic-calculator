@@ -18,7 +18,7 @@ class Logic(Enum):
 
 logicMap = {
     Logic.CONSTANT: ['V', 'F'],
-    Logic.CONSTANT.NOT: ['!'],
+    Logic.NOT: ['!'],
     Logic.AND: ['&', '.'],
     Logic.OR: ['|', '+'],
     Logic.CONDITIONAL: ['->'],
