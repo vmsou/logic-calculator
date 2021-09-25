@@ -17,7 +17,7 @@ class Logic(Enum):
 
 
 logicMap = {
-    Logic.CONSTANT: ['V', 'F', 'T'],
+    Logic.CONSTANT: ['V', 'F'],
     Logic.CONSTANT.NOT: ['!'],
     Logic.AND: ['&', '.'],
     Logic.OR: ['|', '+'],
@@ -126,5 +126,10 @@ class TokenStream:
         if t.kind:
             self.buffer = t
             self.full = True
+
+    def clean(self):
+        self.buffer = Token()
+        self.full = False
+
 
 

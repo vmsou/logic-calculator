@@ -58,6 +58,10 @@ def expression():
         elif t.kind == Logic.OR:
             left |= term()
             t = ts.get()
+        elif t.kind == Logic.CONSTANT:
+            raise ExpectedToken('Illegal:' + t.value)
+        elif t.kind == Logic.OPEN:
+            raise ExpectedToken('Illegal: ' + t.value)
         else:
             ts.putback(t)
             return left
@@ -79,6 +83,7 @@ def main():
             print("Resultado:", res)
         except Exception as e:
             print("[Error]", e)
+            ts.clean()
 
 
 if __name__ == '__main__':
