@@ -4,12 +4,9 @@ from src.core.exceptions import ExpectedToken, PrimaryExpected
 cin = InputStream(input)
 ts = TokenStream(cin)
 
-row = 0
+variables = {}
 
-variables = {
-    "p": [True],
-    "q": [False]
-}
+truth_str = {True: "V", False: "F"}
 
 
 def define_var(var, value):
@@ -30,7 +27,7 @@ def primary():
         return val
 
     elif t.kind == Logic.VAR:
-        return bool(variables[t.value][row])
+        return bool(variables[t.value])
 
     elif t.kind == Logic.CONSTANT:
         return bool(t.value)
@@ -106,11 +103,11 @@ def generate_variables(expr_vars):
         half //= 2
         actual = True
         for j in range(1, size + 1):
-            curr_vars.append(actual)
+            curr_vars.append(truth_str[actual])
             if j % half == 0:
                 actual = not actual
         vars_table[var] = curr_vars
-    return vars_table
+    return vars_table, size
 
 
 def main():
@@ -139,8 +136,15 @@ if __name__ == '__main__':
 
     expr = "p | q"
     expr_vars = get_variables(expr)
-    vars_values = generate_variables(expr_vars)
-    print(vars_values)
+    vars_values, size = generate_variables(expr_vars)
+
+    print(" ".join(expr_vars))
+    for row in range(size):
+        for var, values in vars_values.items():
+            print(values[row], end=' ')
+        print()
+
+
 
 
 
