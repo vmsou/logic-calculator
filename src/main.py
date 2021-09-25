@@ -4,6 +4,11 @@ from src.core.exceptions import ExpectedToken, PrimaryExpected
 cin = InputStream(input)
 ts = TokenStream(cin)
 
+variables = {
+    "p": True,
+    "q": False
+}
+
 
 def primary():
     """Retorna o resultado numérico de uma expressão ou termo"""
@@ -17,6 +22,9 @@ def primary():
         if t.kind != Logic.CLOSE:
             raise ExpectedToken(f"Token expected: ')'")
         return val
+
+    elif t.kind == Logic.VAR:
+        return bool(variables[t.value])
 
     elif t.kind == Logic.CONSTANT:
         return bool(t.value)
@@ -94,4 +102,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    print(">", end=' ')
+    cin.input()
+    res = expression()
+    print("=", res)
+
+

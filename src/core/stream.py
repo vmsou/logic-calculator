@@ -13,7 +13,8 @@ class Logic(Enum):
     IMPLICATION = 4,
     EQUIVALENCE = 5,
     OPEN = 6,
-    CLOSE = 7
+    CLOSE = 7,
+    VAR = 8
 
 
 logicMap = {
@@ -25,6 +26,7 @@ logicMap = {
     Logic.EQUIVALENCE: ['<->', '⟷'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
+    Logic.VAR: ['p', 'q', 'r', 's']
 }
 
 equivalent = {}
