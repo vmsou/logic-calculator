@@ -1,5 +1,8 @@
-from src.core.stream import cin, ts, Logic
+from src.core.stream import InputStream, TokenStream, Logic
 from src.core.exceptions import ExpectedToken, PrimaryExpected
+
+cin = InputStream(input)
+ts = TokenStream(cin)
 
 
 def primary():
@@ -28,7 +31,13 @@ def term():
 
     while True:
         if t.kind == Logic.CONDITIONAL:
-            left *= primary()
+            right = primary()
+            if not left:
+                left = True
+            elif left and right:
+                left = True
+            else:
+                left = False
             t = ts.get()
         elif t.kind == Logic.BICONDITIONAL:
             pass
@@ -50,6 +59,7 @@ def expression():
             left |= term()
             t = ts.get()
         else:
+            ts.putback(t)
             return left
 
 

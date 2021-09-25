@@ -21,6 +21,8 @@ logicMap = {
     Logic.CONSTANT.NOT: ['!'],
     Logic.AND: ['&', '.'],
     Logic.OR: ['|', '+'],
+    Logic.CONDITIONAL: ['->'],
+    Logic.BICONDITIONAL: ['<->'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')']
 }
@@ -82,7 +84,8 @@ class InputStream:
 
 
 class TokenStream:
-    def __init__(self):
+    def __init__(self, source: InputStream):
+        self.source = source
         self.full = False
         self.buffer = Token()
 
@@ -91,7 +94,7 @@ class TokenStream:
             self.full = False
             return self.buffer
 
-        ch = cin.get().upper()
+        ch = self.source.get()
 
         # Compare characters
         if ch in operators:
@@ -103,21 +106,25 @@ class TokenStream:
         elif ch == 'F':
             return Token(equivalent[ch], False)
 
-        elif ch == "":
-            return Token()
+        elif ch == '':
+            return Token("", "")
 
-        # Compare words
-        cin.putback(ch)
+        else:
+            if ch:
+                s = ""
+                while ch not in logicMap[Logic.CONSTANT]:
+                    s += ch
+                    ch = self.source.get()
+                self.source.putback(ch)
+                return Token(equivalent[s], s)
 
         raise BadToken("Bad Token: char="+ch)
 
     def putback(self, t: Token):
         if self.full:
             raise FullBuffer("Full Buffer:", t)
-        if t.kind != '':
+        if t.kind:
             self.buffer = t
             self.full = True
 
 
-cin = InputStream()
-ts = TokenStream()
