@@ -1,17 +1,23 @@
-from src.core.stream import InputStream, TokenStream, Logic
+from src.core.stream import InputStream, TokenStream, Logic, logicMap
 from src.core.exceptions import ExpectedToken, PrimaryExpected
 
 cin = InputStream(input)
 ts = TokenStream(cin)
 
+row = 0
+
 variables = {
-    "p": True,
-    "q": False
+    "p": [True],
+    "q": [False]
 }
 
 
+def define_var(var, value):
+    variables[var] = value
+
+
 def primary():
-    """Retorna o resultado numérico de uma expressão ou termo"""
+    """Retorna o resultado booleano de uma expressão ou termo"""
     t = ts.get()
     if t.kind == Logic.NOT:
         return not expression()
@@ -24,7 +30,7 @@ def primary():
         return val
 
     elif t.kind == Logic.VAR:
-        return bool(variables[t.value])
+        return bool(variables[t.value][row])
 
     elif t.kind == Logic.CONSTANT:
         return bool(t.value)
@@ -82,6 +88,31 @@ def expression():
             return left
 
 
+def get_variables(expr: str):
+    sample_vars = logicMap[Logic.VAR]
+    found_vars = set()
+    for i in expr:
+        if i in sample_vars:
+            found_vars.add(i)
+    return sorted(found_vars)
+
+
+def generate_variables(expr_vars):
+    size = 2 ** len(expr_vars)
+    half = size
+    vars_table = {}
+    for var in expr_vars:
+        curr_vars = []
+        half //= 2
+        actual = True
+        for j in range(1, size + 1):
+            curr_vars.append(actual)
+            if j % half == 0:
+                actual = not actual
+        vars_table[var] = curr_vars
+    return vars_table
+
+
 def main():
     print("Constantes: ")
     print("True = 'V', False = 'F'")
@@ -93,6 +124,8 @@ def main():
     while True:
         print(">", end=' ')
         cin.input()
+        define_var("p", True)
+        define_var("q", False)
         try:
             res = expression()
             print("Resultado:", res)
@@ -103,9 +136,12 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    print(">", end=' ')
-    cin.input()
-    res = expression()
-    print("=", res)
+
+    expr = "p | q"
+    expr_vars = get_variables(expr)
+    vars_values = generate_variables(expr_vars)
+    print(vars_values)
+
+
 
 
