@@ -7,14 +7,14 @@ whitespace = (' ', '\n')
 
 class Logic(Enum):
     EOF = -1
-    EQUIVALENCE = 0,
-    IMPLICATION = 1,
+    EQUIVALENCE = 0
+    IMPLICATION = 1
     OR = 2
     AND = 3
     NOT = 4
-    CLOSE = 5,
-    OPEN = 6,
-    VAR = 7,
+    CLOSE = 5
+    OPEN = 6
+    VAR = 7
     CONSTANT = 8
 
 

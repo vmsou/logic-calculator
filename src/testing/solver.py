@@ -40,7 +40,6 @@ def parse(expr: str) -> dict[str, Any]:
                 raise ParseError("Esperava variável, constante, ou parênteses.")
         else:
             if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.EOF):
-                # Evaluate higher priority
                 while True:
                     if len(operators) == 0:
                         break
@@ -48,6 +47,7 @@ def parse(expr: str) -> dict[str, Any]:
                         break
                     if priority(last(operators)) <= priority(t):
                         break
+
 
                     operator: Token = operators.pop()
                     rhs: Operand = operands.pop()
@@ -89,7 +89,7 @@ def parse(expr: str) -> dict[str, Any]:
         assert mismatched_op.kind == Logic.OPEN
         raise ParseError(f"Nenhum parêntese de fechamento {mismatched_op}.")
 
-    return dict(res=operands.pop(), variables=check_result["variables"])
+    return dict(op=operands.pop(), variables=check_result["variables"])
 
 
 def to_operand(token: Token) -> Operand:
@@ -117,22 +117,22 @@ def add_operand(expr: Expression, operands, operators):
     operands.append(expr)
 
 
-def last(tokens: list[Token]):
+def last(tokens: list):
     length = len(tokens)
     assert length != 0
     return tokens[length - 1]
 
 
 def priority(token: Token):
-    if isinstance(token.kind.value, tuple):
-        return token.kind.value[0]
     return token.kind.value
 
 
 if __name__ == '__main__':
-    res = parse("p -> q -> r")
-    op = res["res"]
-    v = res["variables"]
-
+    expr = "p -> q & p -> r -> p"
+    correct = "(((p -> (q & p)) -> r) -> p)"
+    res = parse(correct)
+    op: Operand = res["op"]
+    v = dict(p=False, q=True, r=True)
     print(res)
     print(op.evaluate(v))
+    print(op.stringify(dict(p='p', q='q', r='r')))
