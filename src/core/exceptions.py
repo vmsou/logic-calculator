@@ -12,3 +12,7 @@ class PrimaryExpected(Exception):
 
 class ExpectedToken(Exception):
     pass
+
+
+class ParseError(Exception):
+    pass

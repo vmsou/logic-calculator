@@ -22,10 +22,8 @@ def preliminary(tokens):
     for t in tokens:
         if t.kind == Logic.VAR:
             var_dict[t.value] = True
-    return {"tokens": tokens, "var_dict": var_dict}
-
-
+    return {"tokens": tokens, "variables": var_dict}
 
 
 if __name__ == "__main__":
-    check_expr("p | q adf")
+    print(check("p | q"))

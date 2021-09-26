@@ -5,17 +5,17 @@ from src.core.exceptions import BadToken, FullBuffer
 whitespace = (' ', '\n')
 
 
-class Logic(Enum):
-    CONSTANT = 0
-    NOT = 1
-    AND = 2
-    OR = 3
-    IMPLICATION = 4,
-    EQUIVALENCE = 5,
+class Logic(Enum):  # Priority
+    EOF = -1
+    EQUIVALENCE = 0,
+    IMPLICATION = 1,
+    OR = 2
+    AND = 3
+    CONSTANT = 4
+    NOT = 5
     OPEN = 6,
     CLOSE = 7,
     VAR = 8,
-    EOF = 9
 
 
 logicMap = {
