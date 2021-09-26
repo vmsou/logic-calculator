@@ -1,12 +1,7 @@
 class Node:
-    def evaluate(self, assign):
-        return None
+    def __repr__(self):
+        return f"{type(self).__name__}()"
 
-    def stringify(self, variables):
-        return ""
-
-
-class Operator(Node):
     def evaluate(self, assign):
         return None
 
@@ -42,6 +37,9 @@ class VarOperand(Operand):
     def __init__(self, var):
         self.var = var
 
+    def __repr__(self):
+        return f"{type(self).__name__}({self.var})"
+
     def evaluate(self, assign):
         return assign[self.var]
 
@@ -49,9 +47,12 @@ class VarOperand(Operand):
         return variables[self.var]
 
 
-class UnaryOperator(Operator):
-    def __init__(self, operand: Operator):
+class UnaryOperand(Operand):
+    def __init__(self, operand: Operand):
         self.operand = operand
+
+    def __repr__(self):
+        return f"{type(self).__name__}({self.operand})"
 
     def evaluate(self, assign):
         return None
@@ -60,8 +61,8 @@ class UnaryOperator(Operator):
         return self.operand.stringify(variables)
 
 
-class NegateNode(UnaryOperator):
-    def __init__(self, operand: Operator):
+class NegateOperand(UnaryOperand):
+    def __init__(self, operand: Operand):
         super().__init__(operand)
 
     def evaluate(self, assign):
@@ -71,10 +72,13 @@ class NegateNode(UnaryOperator):
         return "!" + self.operand.stringify(variables)
 
 
-class BinaryOperator(Operator):
-    def __init__(self, lhs: Operator, rhs: Operator):
+class BinaryOperand(Operand):
+    def __init__(self, lhs: Operand, rhs: Operand):
         self.lhs = lhs
         self.rhs = rhs
+
+    def __repr__(self):
+        return f"{type(self).__name__}({self.lhs}, {self.rhs})"
 
     def evaluate(self, assign):
         return None
@@ -83,8 +87,8 @@ class BinaryOperator(Operator):
         return f"({self.lhs.stringify(variables)} {self.rhs.stringify(variables)})"
 
 
-class AndOperator(BinaryOperator):
-    def __init__(self, lhs: Operator, rhs: Operator):
+class AndOperand(BinaryOperand):
+    def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign):
@@ -94,8 +98,8 @@ class AndOperator(BinaryOperator):
         return f"({self.lhs.stringify(variables)} & {self.rhs.stringify(variables)})"
 
 
-class OrOperator(BinaryOperator):
-    def __init__(self, lhs: Operator, rhs: Operator):
+class OrOperand(BinaryOperand):
+    def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign):
@@ -105,8 +109,8 @@ class OrOperator(BinaryOperator):
         return f"({self.lhs.stringify(variables)} | {self.rhs.stringify(variables)})"
 
 
-class ImplicationOperator(BinaryOperator):
-    def __init__(self, lhs: Operator, rhs: Operator):
+class ImplicationOperand(BinaryOperand):
+    def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign):
@@ -116,8 +120,8 @@ class ImplicationOperator(BinaryOperator):
         return f"({self.lhs.stringify(variables)} -> {self.rhs.stringify(variables)})"
 
 
-class EquivalenceOperator(BinaryOperator):
-    def __init__(self, lhs: Operator, rhs: Operator):
+class EquivalenceOperand(BinaryOperand):
+    def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign):

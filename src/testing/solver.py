@@ -11,6 +11,8 @@ def parse(expr):
     operators = []
     operands = []
 
+    print(TrueOperand())
+
     expect_operand = True
 
     for t in tokens:
@@ -30,7 +32,7 @@ def parse(expr):
             else:
                 raise ParseError("Expecting a variable, constant or parenthesis here")
         else:
-            if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE) or t.kind == Logic.EOF:
+            if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.EOF):
                 # Evaluate higher priority
                 while True:
                     if len(operators) == 0: break
@@ -53,7 +55,7 @@ def parse(expr):
                         raise ParseError("No matching open parenthesis", t)
                     curr_op = operators.pop()
 
-                    if curr_op.kind in Logic.OPEN: break
+                    if curr_op.kind == Logic.OPEN: break
                     if curr_op.kind == Logic.NOT:
                         raise ParseError("No operand to negate.", curr_op)
 
@@ -85,18 +87,18 @@ def to_operand(token: Token) -> Operand:
     raise Exception(f"{token} não é um operando")
 
 
-def to_operator(lhs, token: Token, rhs) -> Operator:
-    if token.kind == Logic.EQUIVALENCE: return EquivalenceOperator(lhs, rhs)
-    if token.kind == Logic.IMPLICATION: return ImplicationOperator(lhs, rhs)
-    if token.kind == Logic.OR: return OrOperator(lhs, rhs)
-    if token.kind == Logic.AND: return AndOperator(lhs, rhs)
+def to_operator(lhs, token: Token, rhs) -> Operand:
+    if token.kind == Logic.EQUIVALENCE: return EquivalenceOperand(lhs, rhs)
+    if token.kind == Logic.IMPLICATION: return ImplicationOperand(lhs, rhs)
+    if token.kind == Logic.OR: return OrOperand(lhs, rhs)
+    if token.kind == Logic.AND: return AndOperand(lhs, rhs)
     raise Exception(f"{token} não é um operador")
 
 
 def add_operand(node: Node, operands, operators):
     while len(operators) > 0 and top_of(operators).kind == Logic.NOT:
         operators.pop()
-        node = NegateNode(node)
+        node = NegateOperand(node)
 
     operands.append(node)
 
@@ -112,6 +114,6 @@ def priority(token):
 
 
 if __name__ == '__main__':
-    res = parse("V | F")
+    res = parse("(V & V) & V")
     op = res["ast"]
     print(op.evaluate("o"))
