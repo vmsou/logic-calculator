@@ -45,7 +45,7 @@ class Token:
         self.value = value
 
     def __str__(self):
-        return f"{type(self).__name__}(kind='{self.kind}', value='{self.value}')"
+        return f"{type(self).__name__}(kind={self.kind}, value={self.value})"
 
     def __repr__(self):
         return str(self)
@@ -92,6 +92,14 @@ class TokenStream:
         self.full = False
         self.buffer = Token()
 
+    def tokenize(self):
+        tokens = []
+        ch = self.get()
+        while ch.kind != "":
+            tokens.append(ch)
+            ch = self.get()
+        return tokens
+
     def get(self):
         if self.full:
             self.full = False
@@ -115,9 +123,10 @@ class TokenStream:
         else:
             if ch:
                 s = ""
-                while ch and ch not in ignore:
+                while ch and s not in operators:
                     s += ch
                     ch = self.source.get()
+
                 self.source.putback(ch)
                 return Token(equivalent[s], s)
 
@@ -133,6 +142,4 @@ class TokenStream:
     def clean(self):
         self.buffer = Token()
         self.full = False
-
-
 

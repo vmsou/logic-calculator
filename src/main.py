@@ -8,6 +8,7 @@ variables = {}
 
 truth_str = {True: "V", False: "F"}
 truth_bool = {"V": True, "F": False}
+current = {}
 
 
 def define_var(var, value):
@@ -44,21 +45,13 @@ def term():
     while True:
         if t.kind == Logic.IMPLICATION:
             right = primary()
-            if not left:
-                left = True
-            elif left and right:
-                left = True
-            else:
-                left = False
+            left = not left or right
             t = ts.get()
+
         elif t.kind == Logic.EQUIVALENCE:
             right = primary()
-            if left and right:
-                left = True
-            elif not left and not right:
-                left = True
-            else:
-                left = False
+            left = (not left or right) and (not right or left)
+
             t = ts.get()
         else:
             ts.putback(t)
@@ -78,9 +71,9 @@ def expression():
             left |= term()
             t = ts.get()
         elif t.kind == Logic.CONSTANT:
-            raise ExpectedToken('Illegal:' + t.value)
+            raise ExpectedToken(f'Illegal: {t.value}')
         elif t.kind == Logic.OPEN:
-            raise ExpectedToken('Illegal: ' + t.value)
+            raise ExpectedToken(f'Illegal: {t.value}')
         else:
             ts.putback(t)
             return left
@@ -133,25 +126,6 @@ def update_variables(vars_values, row):
     return vars_names
 
 
-def calculate(expr):
-    expr_vars = get_variables(expr)
-    vars_values, size = generate_variables(expr_vars)
-
-    if size:
-        print(" ".join(expr_vars), "\t", expr)
-        for row in range(size):
-            cin.buffer = expr
-            vars_names = update_variables(vars_values, row)
-            print(" ".join(vars_names), end='\t')
-            res = result()
-            print("\t", truth_str[res])
-    else:
-        print(expr)
-        res = result()
-        if res is not None:
-            print(truth_str[res])
-
-
 def main():
     print("Constantes: ")
     print("True = 'V', False = 'F'")
@@ -163,17 +137,9 @@ def main():
     while True:
         print(">", end=' ')
         cin.input()
-        calculate(cin.buffer)
-        print()
+        res = expression()
+        print("=", res)
 
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
