@@ -30,7 +30,7 @@ def parse(expr):
             elif t.kind == Logic.EOF:
                 if len(operators) == 0:
                     raise ParseError("Parse Error")
-                elif top_of(operators).kind == Logic.OPEN:
+                elif last(operators).kind == Logic.OPEN:
                     raise ParseError("Open Parenthesis has no matching close parenthesis", operators)
 
                 raise ParseError("This operators is missing an operand", operators)
@@ -41,8 +41,8 @@ def parse(expr):
                 # Evaluate higher priority
                 while True:
                     if len(operators) == 0: break
-                    if top_of(operators).kind == Logic.OPEN: break
-                    if priority(top_of(operators)) <= priority(t): break
+                    if last(operators).kind == Logic.OPEN: break
+                    if priority(last(operators)) <= priority(t): break
 
                     operator = operators.pop()
                     rhs = operands.pop()
@@ -87,11 +87,12 @@ def parse(expr):
 
 
 def to_operand(token: Token) -> Operand:
-    if token.value:
-        return TrueOperand()
-    if not token.value:
-        return FalseOperand()
-    if token.kind == Logic.VAR:
+    if token.kind == Logic.CONSTANT:
+        if token.value:
+            return TrueOperand()
+        elif not token.value:
+            return FalseOperand()
+    elif token.kind == Logic.VAR:
         return VarOperand(token.value)
     raise BadToken(f"{token} não é um operando")
 
@@ -103,14 +104,14 @@ def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
 
 
 def add_operand(node: Node, operands, operators):
-    while len(operators) > 0 and top_of(operators).kind == Logic.NOT:
+    while len(operators) > 0 and last(operators).kind == Logic.NOT:
         operators.pop()
         node = NegateOperator(node)
 
     operands.append(node)
 
 
-def top_of(arr):
+def last(arr):
     length = len(arr)
     assert length != 0
     return arr[length - 1]
@@ -123,6 +124,9 @@ def priority(token):
 
 
 if __name__ == '__main__':
-    res = parse("F -> V -> V -> F & V")
+    res = parse("p -> q -> r")
     op = res["res"]
-    print(op.evaluate("res"))
+    v = dict(p=True, q=False, r=True)
+    print(op)
+    print(v)
+    print(op.evaluate(v))
