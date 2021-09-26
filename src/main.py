@@ -49,9 +49,7 @@ def term():
             t = ts.get()
 
         elif t.kind == Logic.EQUIVALENCE:
-            right = primary()
-            left = (not left or right) and (not right or left)
-
+            left = left == primary()
             t = ts.get()
         else:
             ts.putback(t)
