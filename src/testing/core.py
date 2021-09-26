@@ -1,4 +1,4 @@
-class Operator:
+class Node:
     def evaluate(self, assign):
         return None
 
@@ -6,7 +6,23 @@ class Operator:
         return ""
 
 
-class TrueNode(Operator):
+class Operator(Node):
+    def evaluate(self, assign):
+        return None
+
+    def stringify(self, variables):
+        return ""
+
+
+class Operand(Node):
+    def evaluate(self, assign):
+        return None
+
+    def stringify(self, variables):
+        return ""
+
+
+class TrueOperand(Operand):
     def evaluate(self, assign):
         return True
 
@@ -14,12 +30,23 @@ class TrueNode(Operator):
         return "V"
 
 
-class FalseNode(Operator):
+class FalseOperand(Operand):
     def evaluate(self, assign):
         return False
 
     def stringify(self, variables):
         return "F"
+
+
+class VarOperand(Operand):
+    def __init__(self, var):
+        self.var = var
+
+    def evaluate(self, assign):
+        return assign[self.var]
+
+    def stringify(self, variables):
+        return variables[self.var]
 
 
 class UnaryOperator(Operator):
