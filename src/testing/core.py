@@ -47,7 +47,15 @@ class VarOperand(Operand):
         return variables[self.var]
 
 
-class UnaryOperand(Operand):
+class Operator(Node):
+    def evaluate(self, assign):
+        return None
+
+    def stringify(self, variables):
+        return ""
+
+
+class UnaryOperator(Operator):
     def __init__(self, operand: Operand):
         self.operand = operand
 
@@ -61,7 +69,7 @@ class UnaryOperand(Operand):
         return self.operand.stringify(variables)
 
 
-class NegateOperand(UnaryOperand):
+class NegateOperator(UnaryOperator):
     def __init__(self, operand: Operand):
         super().__init__(operand)
 
@@ -72,7 +80,7 @@ class NegateOperand(UnaryOperand):
         return "!" + self.operand.stringify(variables)
 
 
-class BinaryOperand(Operand):
+class BinaryOperator(Operator):
     def __init__(self, lhs: Operand, rhs: Operand):
         self.lhs = lhs
         self.rhs = rhs
@@ -87,7 +95,7 @@ class BinaryOperand(Operand):
         return f"({self.lhs.stringify(variables)} {self.rhs.stringify(variables)})"
 
 
-class AndOperand(BinaryOperand):
+class AndOperator(BinaryOperator):
     def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 
@@ -98,7 +106,7 @@ class AndOperand(BinaryOperand):
         return f"({self.lhs.stringify(variables)} & {self.rhs.stringify(variables)})"
 
 
-class OrOperand(BinaryOperand):
+class OrOperator(BinaryOperator):
     def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 
@@ -109,7 +117,7 @@ class OrOperand(BinaryOperand):
         return f"({self.lhs.stringify(variables)} | {self.rhs.stringify(variables)})"
 
 
-class ImplicationOperand(BinaryOperand):
+class ImplicationOperator(BinaryOperator):
     def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 
@@ -120,7 +128,7 @@ class ImplicationOperand(BinaryOperand):
         return f"({self.lhs.stringify(variables)} -> {self.rhs.stringify(variables)})"
 
 
-class EquivalenceOperand(BinaryOperand):
+class EquivalenceOperator(BinaryOperator):
     def __init__(self, lhs: Operand, rhs: Operand):
         super().__init__(lhs, rhs)
 

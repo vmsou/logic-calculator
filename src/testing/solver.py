@@ -1,7 +1,14 @@
-from src.core.exceptions import ParseError
+from src.core.exceptions import ParseError, BadToken
 from src.core.stream import Logic, Token
 from core import *
 from verify import check
+
+operator_map = {
+    Logic.AND: AndOperator,
+    Logic.OR: OrOperator,
+    Logic.EQUIVALENCE: EquivalenceOperator,
+    Logic.IMPLICATION: ImplicationOperator
+}
 
 
 def parse(expr):
@@ -10,8 +17,6 @@ def parse(expr):
 
     operators = []
     operands = []
-
-    print(TrueOperand())
 
     expect_operand = True
 
@@ -55,7 +60,8 @@ def parse(expr):
                         raise ParseError("No matching open parenthesis", t)
                     curr_op = operators.pop()
 
-                    if curr_op.kind == Logic.OPEN: break
+                    if curr_op.kind == Logic.OPEN:
+                        break
                     if curr_op.kind == Logic.NOT:
                         raise ParseError("No operand to negate.", curr_op)
 
@@ -67,7 +73,7 @@ def parse(expr):
                 ex = operands.pop()
                 add_operand(ex, operands, operators)
             else:
-                raise ParseError(f"Expecting close parenthesis. {curr_op}")
+                raise ParseError(f"Expecting close parenthesis. {t}")
 
     assert len(operators) != 0
     assert operators.pop().kind == Logic.EOF
@@ -77,28 +83,29 @@ def parse(expr):
         assert mismatched_op.kind == Logic.OPEN
         raise ParseError(f"No matching close parenthesis. {mismatched_op}")
 
-    return dict(ast=operands.pop(), variables=check_result["variables"])
+    return dict(res=operands.pop(), variables=check_result["variables"])
 
 
 def to_operand(token: Token) -> Operand:
-    if token.value: return TrueOperand()
-    if not token.value: return FalseOperand()
-    if token.kind == Logic.VAR: return VarOperand(token.value)
-    raise Exception(f"{token} não é um operando")
+    if token.value:
+        return TrueOperand()
+    if not token.value:
+        return FalseOperand()
+    if token.kind == Logic.VAR:
+        return VarOperand(token.value)
+    raise BadToken(f"{token} não é um operando")
 
 
-def to_operator(lhs, token: Token, rhs) -> Operand:
-    if token.kind == Logic.EQUIVALENCE: return EquivalenceOperand(lhs, rhs)
-    if token.kind == Logic.IMPLICATION: return ImplicationOperand(lhs, rhs)
-    if token.kind == Logic.OR: return OrOperand(lhs, rhs)
-    if token.kind == Logic.AND: return AndOperand(lhs, rhs)
-    raise Exception(f"{token} não é um operador")
+def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
+    if token.kind in operator_map:
+        return operator_map[token.kind](lhs, rhs)
+    raise BadToken(f"{token} não é um operador")
 
 
 def add_operand(node: Node, operands, operators):
     while len(operators) > 0 and top_of(operators).kind == Logic.NOT:
         operators.pop()
-        node = NegateOperand(node)
+        node = NegateOperator(node)
 
     operands.append(node)
 
@@ -110,10 +117,12 @@ def top_of(arr):
 
 
 def priority(token):
+    if isinstance(token.kind.value, tuple):
+        return token.kind.value[0]
     return token.kind.value
 
 
 if __name__ == '__main__':
-    res = parse("(V & V) & V")
-    op = res["ast"]
-    print(op.evaluate("o"))
+    res = parse("F -> V -> V -> F & V")
+    op = res["res"]
+    print(op.evaluate("res"))
