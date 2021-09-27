@@ -1,11 +1,8 @@
 from solver import parse
-from core import current
 
 
 def generate_variables(expr_vars):
     length = len(expr_vars)
-    vars_table = []
-
     size = 2 ** length
     vars_table = [{} for _ in range(size)]
     half = size
@@ -26,16 +23,18 @@ def calculate(expr):
     op = res["op"]
     v = res["variables"]
     repeat_dict = {k: k for k in v}
-    table = generate_variables(v)
+    truth = generate_variables(v)
 
-    print(op.stringify(repeat_dict), '\n')
-    for var in table:
-        print(var)
-        current.clear()
-        op.evaluate(var)
-        for k, v in current.items():
-            print(k, v, sep=' ')
-        print()
+    header = [k for k in sorted(v)]
+    header.append(op.stringify(repeat_dict))
+    table = [header]
+
+    for var in truth:
+        row = [var[key] for key in sorted(var)]
+        row.append(op.evaluate(var))
+        table.append(row)
+
+    return table
 
 
 def gen_table(res):
@@ -46,8 +45,10 @@ def gen_table(res):
 
 def main():
     expr = "p -> q & r"
-    calculate(expr)
+    table = calculate(expr)
 
+    for i in table:
+        print(i)
 
 
 if __name__ == '__main__':
