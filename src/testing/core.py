@@ -1,10 +1,14 @@
-current = []
+current = {}
 
 
-def log_eval(func):
-    def wrapper(*args, **kwargs):
-        res = func(*args, **kwargs)
-        current.append(res)
+def log_eval(result, string):
+    current[string] = result
+
+
+def log_eval2(func, stringify):
+    def wrapper():
+        res = func()
+        current[stringify] = res
         return res
     return wrapper
 
@@ -59,15 +63,11 @@ class VarOperand(Operand):
     def __repr__(self):
         return f"{type(self).__name__}({self.var})"
 
-    @log_eval
     def evaluate(self, assign: dict):
         return assign[self.var]
 
     def stringify(self, variables: dict):
-        res = variables[self.var]
-        if res:
-            return "V"
-        return "F"
+        return variables[self.var]
 
 
 class UnaryOperator(Operator):
@@ -88,8 +88,9 @@ class NegateOperator(UnaryOperator):
     def __init__(self, operand: Expression):
         super().__init__(operand)
 
-    @log_eval
     def evaluate(self, assign: dict):
+        res = not self.operand.evaluate(assign)
+        log_eval(res, self.stringify(assign))
         return not self.operand.evaluate(assign)
 
     def stringify(self, variables: dict):
@@ -104,7 +105,6 @@ class BinaryOperator(Operator):
     def __repr__(self):
         return f"{type(self).__name__}({self.lhs}, {self.rhs})"
 
-    @log_eval
     def evaluate(self, assign: dict):
         return None
 
@@ -116,9 +116,10 @@ class AndOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
-    @log_eval
     def evaluate(self, assign: dict):
-        return self.lhs.evaluate(assign) and self.rhs.evaluate(assign)
+        res = self.lhs.evaluate(assign) and self.rhs.evaluate(assign)
+        log_eval(res, self.stringify(assign))
+        return res
 
     def stringify(self, variables: dict):
         return f"({self.lhs.stringify(variables)} & {self.rhs.stringify(variables)})"
@@ -128,9 +129,10 @@ class OrOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
-    @log_eval
     def evaluate(self, assign: dict):
-        return self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
+        res = self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
+        log_eval(res, self.stringify(assign))
+        return res
 
     def stringify(self, variables: dict):
         return f"({self.lhs.stringify(variables)} | {self.rhs.stringify(variables)})"
@@ -140,9 +142,10 @@ class ImplicationOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
-    @log_eval
     def evaluate(self, assign: dict):
-        return not self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
+        res = not self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
+        log_eval(res, self.stringify(assign))
+        return res
 
     def stringify(self, variables: dict):
         return f"({self.lhs.stringify(variables)} -> {self.rhs.stringify(variables)})"
@@ -152,9 +155,10 @@ class EquivalenceOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
-    @log_eval
     def evaluate(self, assign: dict):
-        return not self.lhs.evaluate(assign) == self.rhs.evaluate(assign)
+        res = not self.lhs.evaluate(assign) == self.rhs.evaluate(assign)
+        log_eval(res, self.stringify(assign))
+        return res
 
     def stringify(self, variables: dict):
         return f"({self.lhs.stringify(variables)} <-> {self.rhs.stringify(variables)})"

@@ -1,4 +1,5 @@
 from solver import parse
+from core import current
 
 
 def generate_variables(expr_vars):
@@ -29,7 +30,10 @@ def calculate(expr):
 
     print(op.stringify(repeat_dict))
     for var in table:
+        current.clear()
         print(op.stringify(var), end=' ')
+        for k, v in current.items():
+            print(k, v, sep='\n')
         print(op.evaluate(var))
 
 
@@ -40,18 +44,9 @@ def gen_table(res):
 
 
 def main():
-    expr = "V & F -> F & F -> V"
-    parsed = parse(expr)
-    v = parsed["variables"]
-    op = parsed["op"]
+    expr = "p -> q & r"
+    calculate(expr)
 
-    var_dict = {k: k for k in v}
-    print(op.stringify(var_dict))
-
-    res = op.evaluate(dict)
-    print(res)
-
-    # gen_table(parse(expr))
 
 
 if __name__ == '__main__':
