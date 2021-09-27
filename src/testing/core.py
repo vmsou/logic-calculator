@@ -52,7 +52,11 @@ class VarOperand(Operand):
         return assign[self.var]
 
     def stringify(self, variables: dict):
-        return variables[self.var]
+        res = variables[self.var]
+        if res:
+            return "V"
+        return "F"
+
 
 
 class UnaryOperator(Operator):

@@ -17,8 +17,6 @@ def parse(expr: str) -> dict[str, Any]:
     check_result: dict[str, Optional[Operand, dict]] = check(expr)
     tokens: list[Token] = check_result["tokens"]
 
-    print(tokens)
-
     operators: list[Token] = []
     operands: list[Operand] = []
 
@@ -130,10 +128,7 @@ def priority(token: Token):
 
 
 if __name__ == '__main__':
-    expr = "p -> q & p -> r -> p"
-    correct = "(((p -> (q & p)) -> r) -> p)"
-    res = parse("!V")
+    expr = "p | q"
+    res = parse(expr)
     op: Operand = res["op"]
-    v = res["variables"]
     print(op)
-    print(op.stringify(v))
