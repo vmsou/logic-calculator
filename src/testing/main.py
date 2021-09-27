@@ -28,13 +28,14 @@ def calculate(expr):
     repeat_dict = {k: k for k in v}
     table = generate_variables(v)
 
-    print(op.stringify(repeat_dict))
+    print(op.stringify(repeat_dict), '\n')
     for var in table:
+        print(var)
         current.clear()
-        print(op.stringify(var), end=' ')
+        op.evaluate(var)
         for k, v in current.items():
-            print(k, v, sep='\n')
-        print(op.evaluate(var))
+            print(k, v, sep=' ')
+        print()
 
 
 def gen_table(res):
