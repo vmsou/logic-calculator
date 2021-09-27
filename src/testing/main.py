@@ -33,9 +33,25 @@ def calculate(expr):
         print(op.evaluate(var))
 
 
+def gen_table(res):
+    tokens = res["tokens"]
+    header = [str(i.value) for i in tokens if i.value is not None]
+    print(header)
+
+
 def main():
-    expr = "q | !q -> p & !p"
-    calculate(expr)
+    expr = "V & F -> F & F -> V"
+    parsed = parse(expr)
+    v = parsed["variables"]
+    op = parsed["op"]
+
+    var_dict = {k: k for k in v}
+    print(op.stringify(var_dict))
+
+    res = op.evaluate(dict)
+    print(res)
+
+    # gen_table(parse(expr))
 
 
 if __name__ == '__main__':

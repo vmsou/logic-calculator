@@ -89,7 +89,7 @@ def parse(expr: str) -> dict[str, Any]:
         assert mismatched_op.kind == Logic.OPEN
         raise ParseError(f"Nenhum parêntese de fechamento {mismatched_op}.")
 
-    return dict(op=operands.pop(), variables=check_result["variables"])
+    return dict(tokens=tokens, op=operands.pop(), variables=check_result["variables"])
 
 
 def to_operand(token: Token) -> Operand:

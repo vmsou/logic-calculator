@@ -1,3 +1,14 @@
+current = []
+
+
+def log_eval(func):
+    def wrapper(*args, **kwargs):
+        res = func(*args, **kwargs)
+        current.append(res)
+        return res
+    return wrapper
+
+
 class Expression:
     def __repr__(self):
         return f"{type(self).__name__}()"
@@ -48,6 +59,7 @@ class VarOperand(Operand):
     def __repr__(self):
         return f"{type(self).__name__}({self.var})"
 
+    @log_eval
     def evaluate(self, assign: dict):
         return assign[self.var]
 
@@ -56,7 +68,6 @@ class VarOperand(Operand):
         if res:
             return "V"
         return "F"
-
 
 
 class UnaryOperator(Operator):
@@ -77,6 +88,7 @@ class NegateOperator(UnaryOperator):
     def __init__(self, operand: Expression):
         super().__init__(operand)
 
+    @log_eval
     def evaluate(self, assign: dict):
         return not self.operand.evaluate(assign)
 
@@ -92,6 +104,7 @@ class BinaryOperator(Operator):
     def __repr__(self):
         return f"{type(self).__name__}({self.lhs}, {self.rhs})"
 
+    @log_eval
     def evaluate(self, assign: dict):
         return None
 
@@ -103,6 +116,7 @@ class AndOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
+    @log_eval
     def evaluate(self, assign: dict):
         return self.lhs.evaluate(assign) and self.rhs.evaluate(assign)
 
@@ -114,6 +128,7 @@ class OrOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
+    @log_eval
     def evaluate(self, assign: dict):
         return self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
 
@@ -125,6 +140,7 @@ class ImplicationOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
+    @log_eval
     def evaluate(self, assign: dict):
         return not self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
 
@@ -136,6 +152,7 @@ class EquivalenceOperator(BinaryOperator):
     def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
+    @log_eval
     def evaluate(self, assign: dict):
         return not self.lhs.evaluate(assign) == self.rhs.evaluate(assign)
 
