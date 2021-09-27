@@ -1,4 +1,12 @@
+import tabulate
+
 from solver import parse
+
+
+def bool_to_str(boolean):
+    if boolean:
+        return "V"
+    return "F"
 
 
 def generate_variables(expr_vars):
@@ -30,8 +38,8 @@ def calculate(expr):
     table = [header]
 
     for var in truth:
-        row = [var[key] for key in sorted(var)]
-        row.append(op.evaluate(var))
+        row = [bool_to_str(var[key]) for key in sorted(var)]
+        row.append(bool_to_str(op.evaluate(var)))
         table.append(row)
 
     return table
@@ -44,11 +52,10 @@ def gen_table(res):
 
 
 def main():
-    expr = "p -> q & r"
+    expr = "p -> q -> r & p"
     table = calculate(expr)
 
-    for i in table:
-        print(i)
+    print(tabulate.tabulate(table, tablefmt='fancy_grid', stralign='center'))
 
 
 if __name__ == '__main__':
