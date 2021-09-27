@@ -22,7 +22,7 @@ def generate_variables(expr_vars):
 
 
 def main():
-    expr = "p -> q -> r & p"
+    expr = "!p | p"
     res = parse(expr)
     op = res["op"]
     v = res["variables"]
@@ -31,9 +31,7 @@ def main():
 
     print(op.stringify(repeat_dict))
     for var in table:
-        print(op.stringify(var))
         print(op.evaluate(var))
-
 
 
 if __name__ == '__main__':

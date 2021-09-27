@@ -76,12 +76,12 @@ class NegateOperator(UnaryOperator):
     def evaluate(self, assign: dict):
         return not self.operand.evaluate(assign)
 
-    def to_string(self, variables: dict):
-        return "!" + self.operand.stringify(variables)
+    def stringify(self, variables: dict):
+        return f"!{self.operand.stringify(variables)}"
 
 
 class BinaryOperator(Operator):
-    def __init__(self, lhs: Operand, rhs: Operand):
+    def __init__(self, lhs: Expression, rhs: Expression):
         self.lhs = lhs
         self.rhs = rhs
 
@@ -96,7 +96,7 @@ class BinaryOperator(Operator):
 
 
 class AndOperator(BinaryOperator):
-    def __init__(self, lhs: Operand, rhs: Operand):
+    def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign: dict):
@@ -107,7 +107,7 @@ class AndOperator(BinaryOperator):
 
 
 class OrOperator(BinaryOperator):
-    def __init__(self, lhs: Operand, rhs: Operand):
+    def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign: dict):
@@ -118,7 +118,7 @@ class OrOperator(BinaryOperator):
 
 
 class ImplicationOperator(BinaryOperator):
-    def __init__(self, lhs: Operand, rhs: Operand):
+    def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign: dict):
@@ -129,7 +129,7 @@ class ImplicationOperator(BinaryOperator):
 
 
 class EquivalenceOperator(BinaryOperator):
-    def __init__(self, lhs: Operand, rhs: Operand):
+    def __init__(self, lhs: Expression, rhs: Expression):
         super().__init__(lhs, rhs)
 
     def evaluate(self, assign: dict):

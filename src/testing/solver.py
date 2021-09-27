@@ -17,6 +17,8 @@ def parse(expr: str) -> dict[str, Any]:
     check_result: dict[str, Optional[Operand, dict]] = check(expr)
     tokens: list[Token] = check_result["tokens"]
 
+    print(tokens)
+
     operators: list[Token] = []
     operands: list[Operand] = []
 
@@ -45,9 +47,9 @@ def parse(expr: str) -> dict[str, Any]:
                         break
                     if last(operators).kind == Logic.OPEN:
                         break
-                    if priority(last(operators)) <= priority(t):
-                        break
 
+                    if priority(last(operators)) < priority(t):
+                        break
 
                     operator: Token = operators.pop()
                     rhs: Operand = operands.pop()
@@ -130,9 +132,8 @@ def priority(token: Token):
 if __name__ == '__main__':
     expr = "p -> q & p -> r -> p"
     correct = "(((p -> (q & p)) -> r) -> p)"
-    res = parse(correct)
+    res = parse("!V")
     op: Operand = res["op"]
-    v = dict(p=False, q=True, r=True)
-    print(res)
-    print(op.evaluate(v))
-    print(op.stringify(dict(p='p', q='q', r='r')))
+    v = res["variables"]
+    print(op)
+    print(op.stringify(v))
