@@ -5,25 +5,24 @@ cin = InputStream(text_stream)
 ts = TokenStream(cin)
 
 
-def check(expr):
-    tokens = check_expr(expr)
-    return preliminary(tokens)
+def setup(expr):
+    tokens = tokenize(expr)
+    return get_vars(tokens)
 
 
-def check_expr(expr):
+def tokenize(expr):
     text_stream.text = expr
     cin.input()
-    tokens = ts.tokenize()
-    return tokens
+    return ts.tokenize()
 
 
-def preliminary(tokens):
+def get_vars(tokens):
     var_dict = {}
     for t in tokens:
         if t.kind == Logic.VAR:
             var_dict[t.value] = True
-    return {"tokens": tokens, "variables": var_dict}
+    return {"tokens": tokens, "vars": var_dict}
 
 
 if __name__ == "__main__":
-    print(check("p | q"))
+    print(setup("p | q"))

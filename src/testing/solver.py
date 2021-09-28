@@ -1,9 +1,9 @@
-from typing import Optional, Any
+from typing import  Any
 
 from src.core.exceptions import ParseError, BadToken
 from src.core.stream import Logic, Token
 from core import *
-from verify import check
+from verify import setup
 
 operator_map = {
     Logic.AND: AndOperator,
@@ -14,8 +14,8 @@ operator_map = {
 
 
 def parse(expr: str) -> dict[str, Any]:
-    check_result: dict[str, Optional[Operand, dict]] = check(expr)
-    tokens: list[Token] = check_result["tokens"]
+    setup_result = setup(expr)
+    tokens: list[Token] = setup_result["tokens"]
 
     operators: list[Token] = []
     operands: list[Operand] = []
@@ -33,7 +33,7 @@ def parse(expr: str) -> dict[str, Any]:
                 if len(operators) == 0:
                     raise ParseError("Erro de Parse")
                 elif last(operators).kind == Logic.OPEN:
-                    raise ParseError(f"Parêntese aberto não possui fechamento {operators}.")
+                    raise ParseError(f"Parêntese aberto não possui fechamento para token: {t}.")
 
                 raise ParseError(f"Falta operandos para esse operadores {operators}.")
             else:
@@ -45,15 +45,14 @@ def parse(expr: str) -> dict[str, Any]:
                         break
                     if last(operators).kind == Logic.OPEN:
                         break
-
                     if priority(last(operators)) < priority(t):
                         break
 
                     operator: Token = operators.pop()
-                    rhs: Operand = operands.pop()
-                    lhs: Operand = operands.pop()
+                    left: Operand = operands.pop()
+                    right: Operand = operands.pop()
 
-                    add_operand(to_operator(lhs, operator, rhs), operands, operators)
+                    add_operand(to_operator(left, operator, right), operands, operators)
 
                 operators.append(t)
                 expect_operand = True
@@ -64,17 +63,17 @@ def parse(expr: str) -> dict[str, Any]:
                 while True:
                     if len(operators) == 0:
                         raise ParseError(f"Não possui parêntese de abertura {t}.")
-                    curr_op: Token = operators.pop()
+                    operator: Token = operators.pop()
 
-                    if curr_op.kind == Logic.OPEN:
+                    if operator.kind == Logic.OPEN:
                         break
-                    if curr_op.kind == Logic.NOT:
-                        raise ParseError("Nenhum operando para negar.", curr_op)
+                    if operator.kind == Logic.NOT:
+                        raise ParseError("Nenhum operando para negar.", operator)
 
-                    rhs: Operand = operands.pop()
-                    lhs: Operand = operands.pop()
+                    left: Operand = operands.pop()
+                    right: Operand = operands.pop()
 
-                    add_operand(to_operator(lhs, curr_op, rhs), operands, operators)
+                    add_operand(to_operator(left, operator, right), operands, operators)
 
                 ex: Operand = operands.pop()
                 add_operand(ex, operands, operators)
@@ -89,7 +88,7 @@ def parse(expr: str) -> dict[str, Any]:
         assert mismatched_op.kind == Logic.OPEN
         raise ParseError(f"Nenhum parêntese de fechamento {mismatched_op}.")
 
-    return dict(tokens=tokens, op=operands.pop(), variables=check_result["variables"])
+    return dict(tokens=tokens, operand=operands.pop(), vars=setup_result["vars"])
 
 
 def to_operand(token: Token) -> Operand:
@@ -109,12 +108,12 @@ def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
     raise BadToken(f"{token} não é um operador.")
 
 
-def add_operand(expr: Expression, operands, operators):
-    while len(operators) > 0 and last(operators).kind == Logic.NOT:
+def add_operand(ex: Expression, operands, operators):
+    while len(operators) and last(operators).kind == Logic.NOT:
         operators.pop()
-        expr = NegateOperator(expr)
+        ex = NegateOperator(ex)
 
-    operands.append(expr)
+    operands.append(ex)
 
 
 def last(tokens: list):
@@ -128,7 +127,10 @@ def priority(token: Token):
 
 
 if __name__ == '__main__':
-    expr = "p | q"
+    expr = "p -> q"
     res = parse(expr)
-    op: Operand = res["op"]
+    op: Operand = res["operand"]
+    var: dict[str, bool] = res["vars"]
     print(op)
+    print(var)
+    print(op.evaluate(var))
