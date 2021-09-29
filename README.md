@@ -24,7 +24,7 @@ Se você ter acesso a um terminal
 cd src
 ```
 ```bash
-python main.py
+python main2.py
 ```
 
 ## Status

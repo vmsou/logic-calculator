@@ -29,7 +29,6 @@ def generate_variables(expr_vars):
 def calculate(expr):
     res = parse(expr)
     op = res["operand"]
-    print(op)
     v = res["vars"]
     repeat_dict = {k: k for k in v}
     truth = generate_variables(v)
@@ -46,19 +45,5 @@ def calculate(expr):
     return table
 
 
-def gen_table(res):
-    tokens = res["tokens"]
-    header = [str(i.value) for i in tokens if i.value is not None]
-    print(header)
-
-
-def main():
-    while True:
-        expr = input("> ")
-        table = calculate(expr)
-        print(tabulate.tabulate(table, tablefmt='fancy_grid', stralign='center'))
-        print()
-
-
-if __name__ == '__main__':
-    main()
+def show_table(data):
+    print(tabulate.tabulate(data, tablefmt='fancy_grid', stralign='center'))

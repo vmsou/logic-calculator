@@ -1,3 +1,6 @@
+"""Basic Templates"""
+
+
 class Expression:
     def __repr__(self):
         return f"{type(self).__name__}()"
@@ -23,6 +26,9 @@ class Operator(Expression):
 
     def stringify(self, variables: dict):
         return ""
+
+
+"""Constants"""
 
 
 class TrueOperand(Operand):
@@ -55,6 +61,9 @@ class VarOperand(Operand):
         return variables[self.var]
 
 
+"""Unary Operators"""
+
+
 class UnaryOperator(Operator):
     def __init__(self, operand: Expression):
         self.operand = operand
@@ -80,60 +89,63 @@ class NegateOperator(UnaryOperator):
         return f"!{self.operand.stringify(variables)}"
 
 
+"""Binary Operators"""
+
+
 class BinaryOperator(Operator):
-    def __init__(self, lhs: Expression, rhs: Expression):
-        self.lhs = lhs
-        self.rhs = rhs
+    def __init__(self, left: Expression, right: Expression):
+        self.left = left
+        self.right = right
 
     def __repr__(self):
-        return f"{type(self).__name__}({self.lhs}, {self.rhs})"
+        return f"{type(self).__name__}({self.left}, {self.right})"
 
     def evaluate(self, assign: dict):
         return None
 
     def stringify(self, variables: dict):
-        return f"({self.lhs.stringify(variables)} {self.rhs.stringify(variables)})"
+        return f"({self.left.stringify(variables)} {self.right.stringify(variables)})"
 
 
 class AndOperator(BinaryOperator):
-    def __init__(self, lhs: Expression, rhs: Expression):
-        super().__init__(lhs, rhs)
+    def __init__(self, left: Expression, right: Expression):
+        super().__init__(left, right)
 
     def evaluate(self, assign: dict):
-        return self.lhs.evaluate(assign) and self.rhs.evaluate(assign)
+        return self.left.evaluate(assign) and self.right.evaluate(assign)
 
     def stringify(self, variables: dict):
-        return f"({self.lhs.stringify(variables)} & {self.rhs.stringify(variables)})"
+        return f"({self.left.stringify(variables)} & {self.right.stringify(variables)})"
 
 
 class OrOperator(BinaryOperator):
-    def __init__(self, lhs: Expression, rhs: Expression):
-        super().__init__(lhs, rhs)
+    def __init__(self, left: Expression, right: Expression):
+        super().__init__(left, right)
 
     def evaluate(self, assign: dict):
-        return self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
+        return self.left.evaluate(assign) or self.right.evaluate(assign)
 
     def stringify(self, variables: dict):
-        return f"({self.lhs.stringify(variables)} | {self.rhs.stringify(variables)})"
+        return f"({self.left.stringify(variables)} | {self.right.stringify(variables)})"
 
 
 class ImplicationOperator(BinaryOperator):
-    def __init__(self, lhs: Expression, rhs: Expression):
-        super().__init__(lhs, rhs)
+    def __init__(self, left: Expression, right: Expression):
+        super().__init__(left, right)
 
     def evaluate(self, assign: dict):
-        return not self.lhs.evaluate(assign) or self.rhs.evaluate(assign)
+        return not self.left.evaluate(assign) or self.right.evaluate(assign)
 
     def stringify(self, variables: dict):
-        return f"({self.lhs.stringify(variables)} -> {self.rhs.stringify(variables)})"
+        return f"({self.left.stringify(variables)} -> {self.right.stringify(variables)})"
 
 
 class EquivalenceOperator(BinaryOperator):
-    def __init__(self, lhs: Expression, rhs: Expression):
-        super().__init__(lhs, rhs)
+    def __init__(self, left: Expression, right: Expression):
+        super().__init__(left, right)
 
     def evaluate(self, assign: dict):
-        return not self.lhs.evaluate(assign) == self.rhs.evaluate(assign)
+        return not self.left.evaluate(assign) == self.right.evaluate(assign)
 
     def stringify(self, variables: dict):
-        return f"({self.lhs.stringify(variables)} <-> {self.rhs.stringify(variables)})"
+        return f"({self.left.stringify(variables)} <-> {self.right.stringify(variables)})"
