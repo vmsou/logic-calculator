@@ -10,6 +10,9 @@ class Expression:
 
     def stringify(self, variables: dict):
         return ""
+    
+    def simplify(self, assign: dict):
+        return None
 
 
 class Operand(Expression):
@@ -18,6 +21,9 @@ class Operand(Expression):
 
     def stringify(self, variables: dict):
         return ""
+    
+    def simplify(self, assign: dict):
+        return None
 
 
 class Operator(Expression):
@@ -26,6 +32,9 @@ class Operator(Expression):
 
     def stringify(self, variables: dict):
         return ""
+    
+    def simplify(self, assign: dict):
+        return None
 
 
 """Constants"""
@@ -37,6 +46,9 @@ class TrueOperand(Operand):
 
     def stringify(self, variables: dict):
         return "V"
+    
+    def simplify(self, assign: dict):
+        return True
 
 
 class FalseOperand(Operand):
@@ -45,6 +57,9 @@ class FalseOperand(Operand):
 
     def stringify(self, variables: dict):
         return "F"
+    
+    def simplify(self, assign: dict):
+        return False
 
 
 class VarOperand(Operand):
@@ -59,6 +74,9 @@ class VarOperand(Operand):
 
     def stringify(self, variables: dict):
         return variables[self.var]
+    
+    def simplify(self, assign: dict):
+        return assign[self.var]
 
 
 """Unary Operators"""
@@ -76,6 +94,9 @@ class UnaryOperator(Operator):
 
     def stringify(self, variables: dict):
         return self.operand.stringify(variables)
+    
+    def simplify(self, assign: dict):
+        return None
 
 
 class NegateOperator(UnaryOperator):
@@ -87,6 +108,16 @@ class NegateOperator(UnaryOperator):
 
     def stringify(self, variables: dict):
         return f"!{self.operand.stringify(variables)}"
+    
+    def simplify(self, assign: dict):
+        return self
+
+    def equivalences(self):
+        equiv = [
+            NegateOperator(AndOperator(self.operand, self.operand)),
+            NegateOperator(OrOperator(self.operand, self.operand))
+        ]
+        return equiv
 
 
 """Binary Operators"""
@@ -139,6 +170,16 @@ class ImplicationOperator(BinaryOperator):
     def stringify(self, variables: dict):
         return f"({self.left.stringify(variables)} -> {self.right.stringify(variables)})"
 
+    def simplify(self, assign: dict):
+        return OrOperator(NegateOperator(self.left), self.right)
+
+    def equivalences(self):
+        equiv = [
+            OrOperator(NegateOperator(self.left), self.right),
+            NegateOperator(AndOperator(self.left, NegateOperator(self.right)))
+        ]
+        return equiv
+
 
 class EquivalenceOperator(BinaryOperator):
     def __init__(self, left: Expression, right: Expression):
@@ -149,3 +190,9 @@ class EquivalenceOperator(BinaryOperator):
 
     def stringify(self, variables: dict):
         return f"({self.left.stringify(variables)} <-> {self.right.stringify(variables)})"
+
+    def equivalences(self):
+        equiv = [
+            AndOperator(EquivalenceOperator(self.left, self.right), EquivalenceOperator(self.right, self.left)),
+        ]
+        return equiv
