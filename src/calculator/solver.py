@@ -9,7 +9,10 @@ operator_map = {
     Logic.AND: AndOperator,
     Logic.OR: OrOperator,
     Logic.EQUIVALENCE: EquivalenceOperator,
-    Logic.IMPLICATION: ImplicationOperator
+    Logic.IMPLICATION: ImplicationOperator,
+    Logic.XOR: XorOperator,
+    Logic.NOR: NorOperator,
+    Logic.NAND: NandOperator,
 }
 
 
@@ -39,7 +42,7 @@ def parse(expr: str) -> dict[str, Any]:
             else:
                 raise ParseError("Esperava variável, constante, ou parênteses.")
         else:
-            if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.EOF):
+            if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                 while True:
                     if len(operators) == 0:
                         break

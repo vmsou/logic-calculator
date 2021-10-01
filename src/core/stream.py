@@ -16,18 +16,24 @@ class Logic(Enum):
     OPEN = 6
     VAR = 7
     CONSTANT = 8
+    XOR = 9
+    NAND = 10
+    NOR = 11
 
 
 logicMap = {
     Logic.CONSTANT: ['V', 'F'],
-    Logic.NOT: ['!', '~', '¬'],
-    Logic.AND: ['&', '.', '∧'],
-    Logic.OR: ['|', '+', '∨', '||'],
+    Logic.NOT: ['NOT', '!', '~', '¬'],
+    Logic.AND: ['AND', '&', '.', '∧'],
+    Logic.OR: ['OR', '|', '+', '∨', '||'],
     Logic.IMPLICATION: ['->', '→'],
     Logic.EQUIVALENCE: ['<->', '⟷'],
+    Logic.XOR: ['XOR', '⊻'],
+    Logic.NAND: ['NAND', '↑'],
+    Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r', 's', 'a', 'b', 'c', 'x', 'y', 'z']
+    Logic.VAR: ['p', 'q', 'r', 's', 'a', 'b', 'c', 'x', 'y', 'z'],
 }
 
 equivalent = {}

@@ -137,6 +137,9 @@ class BinaryOperator(Operator):
     def stringify(self, variables: dict):
         return f"({self.left.stringify(variables)} {self.right.stringify(variables)})"
 
+    def equivalences(self):
+        return []
+
 
 class AndOperator(BinaryOperator):
     def __init__(self, left: Expression, right: Expression):
@@ -246,7 +249,7 @@ class XorOperator(BinaryOperator):
 
     def equivalences(self):
         equiv = [
-            NotOperator(ImplicationOperator(self.left, self.right)),
-            AndOperator(AndOperator(self.left, self.right), NotOperator(AndOperator(self.left, self.right)))
+            NotOperator(EquivalenceOperator(self.left, self.right)),
+            AndOperator(OrOperator(self.left, self.right), NotOperator(AndOperator(self.left, self.right)))
         ]
         return equiv
