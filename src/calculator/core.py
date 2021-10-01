@@ -214,3 +214,21 @@ class NandOperator(BinaryOperator):
             OrOperator(NotOperator(self.left), NotOperator(self.right))
         ]
         return equiv
+
+
+class NorOperator(BinaryOperator):
+    def __init__(self, left: Expression, right: Expression):
+        super().__init__(left, right)
+
+    def evaluate(self, assign: dict):
+        return not (self.left.evaluate(assign) or self.right.evaluate(assign))
+
+    def stringify(self, variables: dict):
+        return f"({self.left.stringify(variables)} ↓ {self.right.stringify(variables)})"
+
+    def equivalences(self):
+        equiv = [
+            NotOperator(OrOperator(self.left, self.right)),
+            AndOperator(NotOperator(self.left), NotOperator(self.right))
+        ]
+        return equiv
