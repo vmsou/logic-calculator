@@ -114,8 +114,8 @@ class NotOperator(UnaryOperator):
 
     def equivalences(self):
         equiv = [
-            NotOperator(AndOperator(self.operand, self.operand)),
-            NotOperator(OrOperator(self.operand, self.operand))
+            NandOperator(self.operand, self.operand),
+            NorOperator(self.operand, self.operand)
         ]
         return equiv
 
@@ -230,5 +230,23 @@ class NorOperator(BinaryOperator):
         equiv = [
             NotOperator(OrOperator(self.left, self.right)),
             AndOperator(NotOperator(self.left), NotOperator(self.right))
+        ]
+        return equiv
+
+
+class XorOperator(BinaryOperator):
+    def __init__(self, left: Expression, right: Expression):
+        super().__init__(left, right)
+
+    def evaluate(self, assign: dict):
+        return not (self.left.evaluate(assign) == self.right.evaluate(assign))
+
+    def stringify(self, variables: dict):
+        return f"({self.left.stringify(variables)} ⊻ {self.right.stringify(variables)})"
+
+    def equivalences(self):
+        equiv = [
+            NotOperator(ImplicationOperator(self.left, self.right)),
+            AndOperator(AndOperator(self.left, self.right), NotOperator(AndOperator(self.left, self.right)))
         ]
         return equiv
