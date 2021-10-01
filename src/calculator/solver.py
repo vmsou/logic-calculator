@@ -112,7 +112,7 @@ def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
 def add_operand(expr: Expression, operands, operators):
     while len(operators) > 0 and last(operators).kind == Logic.NOT:
         operators.pop()
-        expr = NegateOperator(expr)
+        expr = NotOperator(expr)
 
     operands.append(expr)
 
