@@ -1,11 +1,13 @@
-from table import calculate, show_table
+from logic_parser import Parser
 
 
 def main():
+    parser = Parser()
     while True:
-        expr = input("> ")
-        table = calculate(expr)
-        show_table(table)
+        parser.set_expr(input("> "))
+        parser.parse()
+        if parser.valid:
+            parser.show_table()
         print()
 
 

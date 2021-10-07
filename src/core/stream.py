@@ -22,7 +22,7 @@ class Logic(Enum):
 
 
 logicMap = {
-    Logic.CONSTANT: ['V', 'F'],
+    Logic.CONSTANT: ['V', 'F', 'T'],
     Logic.NOT: ['NOT', '!', '~', '¬'],
     Logic.AND: ['AND', '&', '.', '∧'],
     Logic.OR: ['OR', '|', '+', '∨', '||'],
@@ -130,7 +130,7 @@ class TokenStream:
         if ch in operators:
             return Token(equivalent[ch], ch)
 
-        elif ch == 'V':
+        elif ch in ('V', 'T'):
             return Token(equivalent[ch], True)
 
         elif ch == 'F':
