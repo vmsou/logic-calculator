@@ -15,6 +15,8 @@ operator_map = {
     Logic.NAND: NandOperator,
 }
 
+fbf_permitted = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
+
 
 def to_operand(token: Token) -> Operand:
     if token.kind == Logic.CONSTANT:
@@ -158,6 +160,12 @@ class LogicParser:
 
         self.valid = True
         self.res = tokens, self.operands.pop(), setup_result[1]
+
+    def is_fbf(self):
+        for i in self.res[0]:
+            if i.kind not in fbf_permitted:
+                return False
+        return True
 
     def calculate(self):
         op = self.res[1]

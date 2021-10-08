@@ -21,6 +21,7 @@ def main():
         parser.expr = input("> ")
         try:
             parser.parse()
+            print(f"Fórmula Bem Formada (FBF): {parser.is_fbf()}")
         except Exception as e:
             print(f"Error: {e}\n", file=sys.stderr)
         if parser.valid:
