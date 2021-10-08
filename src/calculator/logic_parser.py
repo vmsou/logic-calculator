@@ -28,7 +28,7 @@ def generate_variables(expr_vars):
     return vars_table
 
 
-class Parser:
+class LogicParser:
     def __init__(self):
         self.expr = None
         self.res = None
@@ -36,6 +36,7 @@ class Parser:
 
     def set_expr(self, expr):
         self.expr = expr
+        self.parse()
 
     def parse(self):
         try:
@@ -46,8 +47,8 @@ class Parser:
             self.valid = False
 
     def calculate(self):
-        op = self.res["operand"]
-        v = self.res["vars"]
+        op = self.res[1]
+        v = self.res[2]
         repeat_dict = {k: k for k in v}
         truth = generate_variables(v)
 

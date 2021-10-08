@@ -21,7 +21,7 @@ def get_vars(tokens):
     for t in tokens:
         if t.kind == Logic.VAR:
             var_dict[t.value] = True
-    return {"tokens": tokens, "vars": var_dict}
+    return tokens, var_dict
 
 
 if __name__ == "__main__":

@@ -1,11 +1,22 @@
-from logic_parser import Parser
+from logic_parser import LogicParser
+
+
+def header():
+    print(" [Calculadora Lógica] ".center(60, '-'))
+    print("Constantes: ")
+    print("True = 'V', False = 'F'")
+    print("Operadores Unários: ")
+    print("NOT = '!'")
+    print("Operadores Binários: ")
+    print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'\n")
 
 
 def main():
-    parser = Parser()
+    parser = LogicParser()
+    header()
     while True:
-        parser.set_expr(input("> "))
-        parser.parse()
+        expr = input("> ")
+        parser.set_expr(expr)
         if parser.valid:
             parser.show_table()
         print()

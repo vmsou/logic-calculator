@@ -16,9 +16,9 @@ operator_map = {
 }
 
 
-def parse(expr: str) -> dict[str, Any]:
-    setup_result: dict[str, Optional[Operand, dict]] = setup(expr)
-    tokens: list[Token] = setup_result["tokens"]
+def parse(expr: str) -> tuple:
+    setup_result: list = setup(expr)
+    tokens: list[Token] = setup_result[0]
 
     operators: list[Token] = []
     operands: list[Operand] = []
@@ -36,11 +36,11 @@ def parse(expr: str) -> dict[str, Any]:
                 if len(operators) == 0:
                     raise ParseError("Erro de Parse")
                 elif last(operators).kind == Logic.OPEN:
-                    raise ParseError(f"Parêntese aberto não possui fechamento {operators}.")
+                    raise ParseError(f"Parêntese aberto não possui fechamento {t}.")
 
-                raise ParseError(f"Falta operandos para esse operadores {operators}.")
+                raise ParseError(f"Falta operandos para esse operadores {t}.")
             else:
-                raise ParseError(f"Esperava variável, constante, ou parênteses. {operators}")
+                raise ParseError(f"Esperava variável, constante, ou parênteses. {t}")
         else:
             if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                 while True:
@@ -92,7 +92,7 @@ def parse(expr: str) -> dict[str, Any]:
         assert mismatched_op.kind == Logic.OPEN
         raise ParseError(f"Nenhum parêntese de fechamento {mismatched_op}.")
 
-    return dict(tokens=tokens, operand=operands.pop(), vars=setup_result["vars"])
+    return tokens, operands.pop(), setup_result[1]
 
 
 def to_operand(token: Token) -> Operand:
@@ -133,7 +133,7 @@ def priority(token: Token):
 def main():
     expr = "p | q"
     res = parse(expr)
-    op: Operand = res["operand"]
+    op: Operand = res[0]
     print(op)
 
 
