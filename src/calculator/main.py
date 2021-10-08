@@ -17,6 +17,7 @@ def main():
     while True:
         expr = input("> ")
         parser.set_expr(expr)
+        parser.parse()
         if parser.valid:
             parser.show_table()
         print()

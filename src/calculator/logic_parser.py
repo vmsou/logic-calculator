@@ -2,7 +2,47 @@ import sys
 
 import tabulate
 
-from solver import parse
+from src.stream.exceptions import ParseError, BadToken
+from src.stream.stream import Logic, Token
+from core import *
+from verify import setup
+
+operator_map = {
+    Logic.AND: AndOperator,
+    Logic.OR: OrOperator,
+    Logic.EQUIVALENCE: EquivalenceOperator,
+    Logic.IMPLICATION: ImplicationOperator,
+    Logic.XOR: XorOperator,
+    Logic.NOR: NorOperator,
+    Logic.NAND: NandOperator,
+}
+
+
+def to_operand(token: Token) -> Operand:
+    if token.kind == Logic.CONSTANT:
+        if token.value:
+            return TrueOperand()
+        elif not token.value:
+            return FalseOperand()
+    elif token.kind == Logic.VAR:
+        return VarOperand(token.value)
+    raise BadToken(f"{token} não é um operando.")
+
+
+def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
+    if token.kind in operator_map:
+        return operator_map[token.kind](lhs, rhs)
+    raise BadToken(f"{token} não é um operador.")
+
+
+def last(tokens: list):
+    length = len(tokens)
+    assert length != 0
+    return tokens[length - 1]
+
+
+def priority(token: Token):
+    return token.kind.value
 
 
 def bool_to_str(boolean):
@@ -32,19 +72,91 @@ class LogicParser:
     def __init__(self):
         self.expr = None
         self.res = None
+        self.operators = []
+        self.operands = []
         self.valid = False
 
     def set_expr(self, expr):
+        self.valid = False
         self.expr = expr
-        self.parse()
+        self.operators = []
+        self.operands = []
 
     def parse(self):
-        try:
-            self.res = parse(self.expr)
-            self.valid = True
-        except Exception as e:
-            print(e, '\n', file=sys.stderr)
-            self.valid = False
+        setup_result: list = setup(self.expr)
+        tokens: list[Token] = setup_result[0]
+
+        expect_operand = True
+
+        for t in tokens:
+            if expect_operand:
+                if t.kind in (Logic.CONSTANT, Logic.VAR):
+                    self.add_operand(to_operand(t))
+                    expect_operand = False
+                elif t.kind == Logic.OPEN or t.kind == Logic.NOT:
+                    self.operators.append(t)
+                elif t.kind == Logic.EOF:
+                    if len(self.operators) == 0:
+                        raise ParseError("Erro de Parse")
+                    elif last(self.operators).kind == Logic.OPEN:
+                        raise ParseError(f"Parêntese aberto não possui fechamento {t}.")
+
+                    raise ParseError(f"Falta operandos para esse operadores {t}.")
+                else:
+                    raise ParseError(f"Esperava variável, constante, ou parênteses. {t}")
+            else:
+                if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
+                    while True:
+                        if len(self.operators) == 0:
+                            break
+                        if last(self.operators).kind == Logic.OPEN:
+                            break
+
+                        if priority(last(self.operators)) < priority(t):
+                            break
+
+                        operator: Token = self.operators.pop()
+                        rhs: Operand = self.operands.pop()
+                        lhs: Operand = self.operands.pop()
+
+                        self.add_operand(to_operator(lhs, operator, rhs))
+
+                    self.operators.append(t)
+                    expect_operand = True
+                    if t.kind == Logic.EOF:
+                        break
+
+                elif t.kind == Logic.CLOSE:
+                    while True:
+                        if len(self.operators) == 0:
+                            raise ParseError(f"Não possui parêntese de abertura {t}.")
+                        curr_op: Token = self.operators.pop()
+
+                        if curr_op.kind == Logic.OPEN:
+                            break
+                        if curr_op.kind == Logic.NOT:
+                            raise ParseError("Nenhum operando para negar.", curr_op)
+
+                        rhs: Operand = self.operands.pop()
+                        lhs: Operand = self.operands.pop()
+
+                        self.add_operand(to_operator(lhs, curr_op, rhs))
+
+                    ex: Operand = self.operands.pop()
+                    self.add_operand(ex)
+                else:
+                    raise ParseError(f"Esperando parêntese de fechada ou operador. {t}")
+
+        assert len(self.operators) != 0
+        assert self.operators.pop().kind == Logic.EOF
+
+        if len(self.operators) != 0:
+            mismatched_op: Token = self.operators.pop()
+            assert mismatched_op.kind == Logic.OPEN
+            raise ParseError(f"Nenhum parêntese de fechamento {mismatched_op}.")
+
+        self.valid = True
+        self.res = tokens, self.operands.pop(), setup_result[1]
 
     def calculate(self):
         op = self.res[1]
@@ -66,3 +178,10 @@ class LogicParser:
     def show_table(self):
         data = self.calculate()
         print(tabulate.tabulate(data, tablefmt='fancy_grid', stralign='center'))
+
+    def add_operand(self, expr: Expression):
+        while len(self.operators) > 0 and last(self.operators).kind == Logic.NOT:
+            self.operators.pop()
+            expr = NotOperator(expr)
+
+        self.operands.append(expr)
