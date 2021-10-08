@@ -2,6 +2,7 @@
 
 
 class Expression:
+    """Expressão que represanta ambos Operadores e Operandos."""
     def __repr__(self):
         return f"{type(self).__name__}()"
 
@@ -16,6 +17,7 @@ class Expression:
 
 
 class Operand(Expression):
+    """Representa um operando."""
     def evaluate(self, assign: dict):
         return None
 
@@ -27,6 +29,7 @@ class Operand(Expression):
 
 
 class Operator(Expression):
+    """Representa um operador."""
     def evaluate(self, assign: dict):
         return None
 
@@ -39,6 +42,7 @@ class Operator(Expression):
 
 """Constants"""
 class TrueOperand(Operand):
+    """Representa uma constante Verdade."""
     def evaluate(self, assign: dict):
         return True
 
@@ -50,6 +54,7 @@ class TrueOperand(Operand):
 
 
 class FalseOperand(Operand):
+    """Representa uma constante Falso."""
     def evaluate(self, assign: dict):
         return False
 
@@ -61,6 +66,7 @@ class FalseOperand(Operand):
 
 
 class VarOperand(Operand):
+    """Representa uma Variável."""
     def __init__(self, var):
         self.var = var
 
@@ -87,6 +93,7 @@ class VarOperand(Operand):
 
 """Unary Operators"""
 class UnaryOperator(Operator):
+    """Representa um Operador unário."""
     def __init__(self, operand: Expression):
         self.operand = operand
 
@@ -104,6 +111,7 @@ class UnaryOperator(Operator):
 
 
 class NotOperator(UnaryOperator):
+    """Representa um Operador unário de negação."""
     def __init__(self, operand: Expression):
         super().__init__(operand)
 
@@ -126,6 +134,7 @@ class NotOperator(UnaryOperator):
 
 """Binary Operators"""
 class BinaryOperator(Operator):
+    """Representa um Operador binário."""
     def __init__(self, left: Expression, right: Expression):
         self.left = left
         self.right = right
@@ -144,6 +153,7 @@ class BinaryOperator(Operator):
 
 
 class AndOperator(BinaryOperator):
+    """Representa um Operador binário de conjunção."""
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -155,6 +165,7 @@ class AndOperator(BinaryOperator):
 
 
 class OrOperator(BinaryOperator):
+    """Representa um Operador binário de disjunção."""
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -166,6 +177,7 @@ class OrOperator(BinaryOperator):
 
 
 class ImplicationOperator(BinaryOperator):
+    """Representa um Operador binário de implicação."""
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -187,6 +199,7 @@ class ImplicationOperator(BinaryOperator):
 
 
 class EquivalenceOperator(BinaryOperator):
+    """Representa um Operador binário de equivalência."""
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -204,6 +217,7 @@ class EquivalenceOperator(BinaryOperator):
 
 
 class NandOperator(BinaryOperator):
+    """Representa um Operador binário de negação de conjunção."""
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -222,6 +236,7 @@ class NandOperator(BinaryOperator):
 
 
 class NorOperator(BinaryOperator):
+    """Representa um Operador binário de negação de disjunção."""
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -240,6 +255,7 @@ class NorOperator(BinaryOperator):
 
 
 class XorOperator(BinaryOperator):
+    """Representa um Operador binário de disjunção exclusiva."""
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 

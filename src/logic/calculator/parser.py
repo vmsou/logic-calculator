@@ -90,6 +90,7 @@ class LogicParser:
 
     @expr.setter
     def expr(self, value):
+        """Limpa os recursos quando expressão for escolhida."""
         self.valid = False
         self._expr = value
         self.operators = []
@@ -105,7 +106,7 @@ class LogicParser:
         for t in tokens:
             if expect_operand:
                 if t.kind in (Logic.CONSTANT, Logic.VAR):
-                    self.add_operand(to_operand(t))
+                    self.append_operand(to_operand(t))
                     expect_operand = False
                 elif t.kind == Logic.OPEN or t.kind == Logic.NOT:
                     self.operators.append(t)
@@ -133,7 +134,7 @@ class LogicParser:
                         rhs: Operand = self.operands.pop()
                         lhs: Operand = self.operands.pop()
 
-                        self.add_operand(to_operator(lhs, operator, rhs))
+                        self.append_operand(to_operator(lhs, operator, rhs))
 
                     self.operators.append(t)
                     expect_operand = True
@@ -154,10 +155,10 @@ class LogicParser:
                         rhs: Operand = self.operands.pop()
                         lhs: Operand = self.operands.pop()
 
-                        self.add_operand(to_operator(lhs, curr_op, rhs))
+                        self.append_operand(to_operator(lhs, curr_op, rhs))
 
                     ex: Operand = self.operands.pop()
-                    self.add_operand(ex)
+                    self.append_operand(ex)
                 else:
                     raise ParseError(f"Esperando parêntese de fechada ou operador. {t}")
 
@@ -204,7 +205,7 @@ class LogicParser:
         data = self.calculate()
         print(tabulate.tabulate(data, tablefmt='fancy_grid', stralign='center'))
 
-    def add_operand(self, expr: Expression):
+    def append_operand(self, expr: Expression):
         """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
         while len(self.operators) > 0 and last(self.operators).kind == Logic.NOT:
             self.operators.pop()
