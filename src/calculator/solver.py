@@ -40,7 +40,7 @@ def parse(expr: str) -> dict[str, Any]:
 
                 raise ParseError(f"Falta operandos para esse operadores {operators}.")
             else:
-                raise ParseError("Esperava variável, constante, ou parênteses.")
+                raise ParseError(f"Esperava variável, constante, ou parênteses. {operators}")
         else:
             if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                 while True:

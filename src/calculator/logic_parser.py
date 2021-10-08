@@ -42,7 +42,7 @@ class Parser:
             self.res = parse(self.expr)
             self.valid = True
         except Exception as e:
-            print(e, file=sys.stderr)
+            print(e, '\n', file=sys.stderr)
             self.valid = False
 
     def calculate(self):

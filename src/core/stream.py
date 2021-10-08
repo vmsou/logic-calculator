@@ -118,6 +118,19 @@ class TokenStream:
         tokens.append(Token(Logic.EOF))
         return tokens
 
+    def match(self, expect: str):
+        ch = self.source.get()
+        word = str(ch)
+        while expect.startswith(word):
+            word += self.source.get()
+
+        if word == expect:
+            return True
+        else:
+            for c in word:
+                self.source.putback(c)
+            return False
+
     def get(self):
         if self.full:
             self.full = False
@@ -130,7 +143,7 @@ class TokenStream:
         if ch in operators:
             return Token(equivalent[ch], ch)
 
-        elif ch in ('V', 'T'):
+        elif ch == 'V':
             return Token(equivalent[ch], True)
 
         elif ch == 'F':
@@ -142,7 +155,7 @@ class TokenStream:
         else:
             if ch:
                 s = ""
-                while ch and s not in operators:
+                while ch and s not in operators and ch not in operators:
                     s += ch
                     ch = self.source.get()
 
