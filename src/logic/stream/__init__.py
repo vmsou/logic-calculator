@@ -1,6 +1,6 @@
 from enum import Enum
 
-from src.stream.exceptions import BadToken, FullBuffer
+from logic.stream.exceptions import BadToken, FullBuffer
 
 whitespace = (' ', '\n')
 

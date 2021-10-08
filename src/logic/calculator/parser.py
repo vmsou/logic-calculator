@@ -1,8 +1,8 @@
 import tabulate
 
-from src.stream.exceptions import ParseError, BadToken
-from src.stream.stream import Logic, Token
 from core import *
+from logic.stream import Logic, Token
+from logic.stream.exceptions import ParseError, BadToken
 from verify import setup
 
 operator_map = {
@@ -143,13 +143,13 @@ class LogicParser:
                 elif t.kind == Logic.CLOSE:
                     while True:
                         if len(self.operators) == 0:
-                            raise ParseError(f"Não possui parêntese de abertura {t}.")
+                            raise ParseError(f"Não possui parêntese de abertura. {t}")
                         curr_op: Token = self.operators.pop()
 
                         if curr_op.kind == Logic.OPEN:
                             break
                         if curr_op.kind == Logic.NOT:
-                            raise ParseError("Nenhum operando para negar.", curr_op)
+                            raise ParseError(f"Nenhum operando para negar. {curr_op}")
 
                         rhs: Operand = self.operands.pop()
                         lhs: Operand = self.operands.pop()

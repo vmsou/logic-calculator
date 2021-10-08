@@ -1,6 +1,6 @@
 import sys
 
-from parser import LogicParser
+from logic.calculator.parser import LogicParser
 
 
 def header():
@@ -22,7 +22,7 @@ def main():
             parser.parse()
             print(f"Fórmula Bem Formada (FBF): {parser.is_fbf()}")
         except Exception as e:
-            print(f"Error: {e}\n", file=sys.stderr)
+            print(f"\nError: {e}\n", file=sys.stderr)
         if parser.valid:
             parser.show_table()
         print()
