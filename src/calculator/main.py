@@ -18,8 +18,7 @@ def main():
     parser = LogicParser()
     header()
     while True:
-        expr = input("> ")
-        parser.set_expr(expr)
+        parser.expr = input("> ")
         try:
             parser.parse()
         except Exception as e:

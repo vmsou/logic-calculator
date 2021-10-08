@@ -72,9 +72,14 @@ class LogicParser:
         self.operands = []
         self.valid = False
 
-    def set_expr(self, expr):
+    @property
+    def expr(self):
+        return self._expr
+
+    @expr.setter
+    def expr(self, value):
         self.valid = False
-        self.expr = expr
+        self._expr = value
         self.operators = []
         self.operands = []
 
@@ -99,7 +104,7 @@ class LogicParser:
 
                     raise ParseError(f"Falta operandos para esse operadores {t}.")
                 else:
-                    raise ParseError(f"Esperava variável, constante, ou parênteses. {t}")
+                    raise ParseError(f"Esperava variável ou constante. {t}")
             else:
                 if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     while True:
@@ -147,9 +152,9 @@ class LogicParser:
         assert self.operators.pop().kind == Logic.EOF
 
         if len(self.operators) != 0:
-            mismatched_op: Token = self.operators.pop()
-            assert mismatched_op.kind == Logic.OPEN
-            raise ParseError(f"Nenhum parêntese de fechamento {mismatched_op}.")
+            lone_open: Token = self.operators.pop()
+            assert lone_open.kind == Logic.OPEN
+            raise ParseError(f"Nenhum parêntese de fechamento. {lone_open}.")
 
         self.valid = True
         self.res = tokens, self.operands.pop(), setup_result[1]
