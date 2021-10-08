@@ -11,11 +11,15 @@ Essa é uma lista dos recursos utilizados para fazer esse projeto
 
 ## Principais Funcionalidades
 ### Cálculo
+- [X] VARIABLES
 - [x] NOT
 - [x] AND
 - [x] OR
 - [x] IMPLICATION
 - [x] EQUIVALENCE
+- [X] XOR
+- [X] NOR
+- [X] NAND
 
 ## Pacotes
 ```bash
@@ -36,7 +40,6 @@ python main.py
 </h4>
 
 ## Para fazer:
-- [ ] XOR
-- [ ] VARIABLES
 - [ ] SIMPLIFICATION
+- [ ] EQUIVALENCES
 

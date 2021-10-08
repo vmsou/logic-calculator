@@ -1,4 +1,4 @@
-from LogicParser import LogicParser
+from logicParser import LogicParser
 
 
 def header():
