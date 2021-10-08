@@ -17,14 +17,17 @@ Essa é uma lista dos recursos utilizados para fazer esse projeto
 - [x] IMPLICATION
 - [x] EQUIVALENCE
 
-
+## Pacotes
+```bash
+pip install -r requirements.txt
+```
 ## Como executa-lo
 Se você ter acesso a um terminal
 ```bash
-cd src
+cd src/calculator
 ```
 ```bash
-python main2.py
+python main.py
 ```
 
 ## Status
