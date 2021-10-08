@@ -1,4 +1,7 @@
+import sys
+
 from logicParser import LogicParser
+from stream.exceptions import ParseError
 
 
 def header():
@@ -17,7 +20,10 @@ def main():
     while True:
         expr = input("> ")
         parser.set_expr(expr)
-        parser.parse()
+        try:
+            parser.parse()
+        except Exception as e:
+            print(f"Error: {e}\n", file=sys.stderr)
         if parser.valid:
             parser.show_table()
         print()

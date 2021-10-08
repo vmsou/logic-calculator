@@ -1,5 +1,3 @@
-import sys
-
 import tabulate
 
 from src.stream.exceptions import ParseError, BadToken
@@ -36,9 +34,7 @@ def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
 
 
 def last(tokens: list):
-    length = len(tokens)
-    assert length != 0
-    return tokens[length - 1]
+    return tokens[-1]
 
 
 def priority(token: Token):

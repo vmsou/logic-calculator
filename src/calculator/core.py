@@ -189,7 +189,7 @@ class EquivalenceOperator(BinaryOperator):
         super().__init__(left, right)
 
     def evaluate(self, assign: dict):
-        return not self.left.evaluate(assign) == self.right.evaluate(assign)
+        return self.left.evaluate(assign) == self.right.evaluate(assign)
 
     def stringify(self, variables: dict):
         return f"({self.left.stringify(variables)} ⟷ {self.right.stringify(variables)})"
