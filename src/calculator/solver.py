@@ -1,7 +1,5 @@
-from typing import Optional, Any
-
-from src.core.exceptions import ParseError, BadToken
-from src.core.stream import Logic, Token
+from src.stream.exceptions import ParseError, BadToken
+from src.stream.stream import Logic, Token
 from core import *
 from verify import setup
 
@@ -82,7 +80,7 @@ def parse(expr: str) -> tuple:
                 ex: Operand = operands.pop()
                 add_operand(ex, operands, operators)
             else:
-                raise ParseError(f"Esperando parêntese de fechada {t}.")
+                raise ParseError(f"Esperando parêntese de fechada ou operador. {t}")
 
     assert len(operators) != 0
     assert operators.pop().kind == Logic.EOF

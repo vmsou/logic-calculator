@@ -1,6 +1,6 @@
 from enum import Enum
 
-from src.core.exceptions import BadToken, FullBuffer
+from src.stream.exceptions import BadToken, FullBuffer
 
 whitespace = (' ', '\n')
 
@@ -25,7 +25,7 @@ logicMap = {
     Logic.CONSTANT: ['V', 'F', 'T'],
     Logic.NOT: ['NOT', '!', '~', '¬'],
     Logic.AND: ['AND', '&', '.', '∧'],
-    Logic.OR: ['OR', '|', '+', '∨', '||'],
+    Logic.OR: ['OR', '|', '+', '∨'],
     Logic.IMPLICATION: ['->', '→'],
     Logic.EQUIVALENCE: ['<->', '⟷'],
     Logic.XOR: ['XOR', '⊻'],

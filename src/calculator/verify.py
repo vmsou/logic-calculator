@@ -1,4 +1,4 @@
-from src.core.stream import ReturnString, InputStream, TokenStream, Logic
+from src.stream.stream import ReturnString, InputStream, TokenStream, Logic
 
 text_stream = ReturnString()
 cin = InputStream(text_stream)

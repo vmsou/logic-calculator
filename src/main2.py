@@ -1,5 +1,5 @@
-from src.core.stream import InputStream, TokenStream, Logic, logicMap
-from src.core.exceptions import ExpectedToken, PrimaryExpected
+from src.stream.stream import InputStream, TokenStream, Logic, logicMap
+from src.stream.exceptions import ExpectedToken, PrimaryExpected
 
 cin = InputStream(input)
 ts = TokenStream(cin)

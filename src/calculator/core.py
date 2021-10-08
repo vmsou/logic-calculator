@@ -107,7 +107,7 @@ class NotOperator(UnaryOperator):
         return not self.operand.evaluate(assign)
 
     def stringify(self, variables: dict):
-        return f"¬{self.operand.stringify(variables)}"
+        return f"(¬{self.operand.stringify(variables)})"
     
     def simplify(self, assign: dict):
         return self
