@@ -19,6 +19,7 @@ fbf_permitted = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, 
 
 
 def to_operand(token: Token) -> Operand:
+    """Converte Token para Operand"""
     if token.kind == Logic.CONSTANT:
         if token.value:
             return TrueOperand()
@@ -30,26 +31,31 @@ def to_operand(token: Token) -> Operand:
 
 
 def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
+    """Construi um Operator a partir de um Token e seus Operands"""
     if token.kind in operator_map:
         return operator_map[token.kind](lhs, rhs)
     raise BadToken(f"{token} não é um operador.")
 
 
 def last(tokens: list):
+    """Retorna o último item sem remove-lo"""
     return tokens[-1]
 
 
 def priority(token: Token):
+    """Retorna a prioridade de um Token"""
     return token.kind.value
 
 
-def bool_to_str(boolean):
+def bool_to_str(boolean: bool):
+    """Converte um elemento booleano em uma string V ou F"""
     if boolean:
         return "V"
     return "F"
 
 
 def generate_variables(expr_vars):
+    """Gera árvore verdade a partir de varaiveis"""
     length = len(expr_vars)
     size = 2 ** length
     vars_table = [{} for _ in range(size)]
@@ -67,6 +73,10 @@ def generate_variables(expr_vars):
 
 
 class LogicParser:
+    """
+    Utilizado para ser intermediario entre as entradas do úsuario e seus retornos.
+    Essa classe transforma a entrada em Tokens e depois converte os Tokens em Operandos
+    """
     def __init__(self):
         self.expr = None
         self.res = None
@@ -86,6 +96,7 @@ class LogicParser:
         self.operands = []
 
     def parse(self):
+        """Função principal para conversão da entrada em Tokens e depois para Operandos"""
         setup_result: list = setup(self.expr)
         tokens: list[Token] = setup_result[0]
 
@@ -162,12 +173,16 @@ class LogicParser:
         self.res = tokens, self.operands.pop(), setup_result[1]
 
     def is_fbf(self):
-        for i in self.res[0]:
-            if i.kind not in fbf_permitted:
-                return False
-        return True
+        """Verifica se os tokens constroem uma Fórmula Bem Formada"""
+        if self.res:
+            for i in self.res[0]:
+                if i.kind not in fbf_permitted:
+                    return False
+            return True
+        return False
 
     def calculate(self):
+        """Gera a tabela a partir dos resultados do parse"""
         op = self.res[1]
         v = self.res[2]
         repeat_dict = {k: k for k in v}
@@ -185,10 +200,12 @@ class LogicParser:
         return table
 
     def show_table(self):
+        """Usa o módulo tabulate para monstrar a tabela"""
         data = self.calculate()
         print(tabulate.tabulate(data, tablefmt='fancy_grid', stralign='center'))
 
     def add_operand(self, expr: Expression):
+        """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
         while len(self.operators) > 0 and last(self.operators).kind == Logic.NOT:
             self.operators.pop()
             expr = NotOperator(expr)

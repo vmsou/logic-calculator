@@ -1,7 +1,6 @@
 import sys
 
-from logicParser import LogicParser
-from stream.exceptions import ParseError
+from parser import LogicParser
 
 
 def header():
