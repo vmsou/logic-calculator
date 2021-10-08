@@ -38,8 +38,6 @@ class Operator(Expression):
 
 
 """Constants"""
-
-
 class TrueOperand(Operand):
     def evaluate(self, assign: dict):
         return True
@@ -69,19 +67,25 @@ class VarOperand(Operand):
     def __repr__(self):
         return f"{type(self).__name__}({self.var})"
 
-    def evaluate(self, assign: dict):
-        return assign[self.var]
+    def evaluate(self, assign: dict = None):
+        if assign is None:
+            assign = dict()
+        if self.var in assign:
+            return assign[self.var]
+        return True
 
-    def stringify(self, variables: dict):
-        return variables[self.var]
+    def stringify(self, variables: dict = None):
+        if variables is None:
+            assign = dict()
+        if self.var in variables:
+            return variables[self.var]
+        return self.var
     
     def simplify(self, assign: dict):
         return assign[self.var]
 
 
 """Unary Operators"""
-
-
 class UnaryOperator(Operator):
     def __init__(self, operand: Expression):
         self.operand = operand
@@ -121,8 +125,6 @@ class NotOperator(UnaryOperator):
 
 
 """Binary Operators"""
-
-
 class BinaryOperator(Operator):
     def __init__(self, left: Expression, right: Expression):
         self.left = left
@@ -253,3 +255,13 @@ class XorOperator(BinaryOperator):
             AndOperator(OrOperator(self.left, self.right), NotOperator(AndOperator(self.left, self.right)))
         ]
         return equiv
+
+
+def main():
+    op = ImplicationOperator(AndOperator(VarOperand('p'), VarOperand('q')), TrueOperand())
+    print(op.stringify(dict(p='TESTE')))
+    print(op.evaluate(dict()))
+
+
+if __name__ == '__main__':
+    main()
