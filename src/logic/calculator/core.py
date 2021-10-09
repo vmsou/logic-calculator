@@ -9,6 +9,9 @@ class Expression:
     def __repr__(self):
         return f"{type(self).__name__}()"
 
+    def __str__(self):
+        return self.stringify(dict())
+
     def evaluate(self, assign: dict):
         """Calcula o resultado de forma encadeada"""
         return None
@@ -19,7 +22,7 @@ class Expression:
     
     def simplify(self, assign: dict):
         """TODO: Encontrar padrões de simplificação."""
-        return None
+        return self
 
 
 class Operand(Expression):
@@ -31,9 +34,6 @@ class Operand(Expression):
 
     def stringify(self, variables: dict):
         return ""
-    
-    def simplify(self, assign: dict):
-        return None
 
 
 class Operator(Expression):
@@ -45,38 +45,29 @@ class Operator(Expression):
 
     def stringify(self, variables: dict):
         return ""
-    
-    def simplify(self, assign: dict):
-        return None
 
 
 """Constantes"""
 class TrueOperand(Operand):
     """Representa uma constante Verdade."""
 
-    def evaluate(self, assign: dict):
+    def evaluate(self, assign: dict = None):
         """Retorna verdade."""
         return True
 
-    def stringify(self, variables: dict):
+    def stringify(self, variables: dict = None):
         return "V"
-    
-    def simplify(self, assign: dict):
-        return True
 
 
 class FalseOperand(Operand):
     """Representa uma constante Falso."""
 
-    def evaluate(self, assign: dict):
+    def evaluate(self, assign: dict = None):
         """Retorna falso."""
         return False
 
-    def stringify(self, variables: dict):
+    def stringify(self, variables: dict = None):
         return "F"
-    
-    def simplify(self, assign: dict):
-        return False
 
 
 class VarOperand(Operand):
@@ -103,9 +94,6 @@ class VarOperand(Operand):
         if self.var in variables:
             return variables[self.var]
         return self.var
-    
-    def simplify(self, assign: dict):
-        return assign[self.var]
 
 
 """Operadores unários"""
@@ -123,9 +111,6 @@ class UnaryOperator(Operator):
 
     def stringify(self, variables: dict):
         return self.operand.stringify(variables)
-    
-    def simplify(self, assign: dict):
-        return None
 
 
 class NotOperator(UnaryOperator):
@@ -138,10 +123,7 @@ class NotOperator(UnaryOperator):
         return not self.operand.evaluate(assign)
 
     def stringify(self, variables: dict):
-        return f"(¬{self.operand.stringify(variables)})"
-    
-    def simplify(self, assign: dict):
-        return self
+        return f"¬{self.operand.stringify(variables)}"
 
     def equivalences(self):
         equiv = [
@@ -181,8 +163,19 @@ class AndOperator(BinaryOperator):
     def evaluate(self, assign: dict):
         return self.left.evaluate(assign) and self.right.evaluate(assign)
 
-    def stringify(self, variables: dict):
+    def stringify(self, variables: dict = None):
+        if variables is None:
+            variables = dict()
         return f"({self.left.stringify(variables)} ∧ {self.right.stringify(variables)})"
+
+    def simplify(self, assign: dict = None):
+        if assign is None:
+            assign = dict()
+
+        if FalseOperand in (type(self.left), type(self.right)):
+
+            return FalseOperand()
+        return self
 
 
 class OrOperator(BinaryOperator):
@@ -191,11 +184,25 @@ class OrOperator(BinaryOperator):
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
-    def evaluate(self, assign: dict):
+    def evaluate(self, assign: dict = None):
+        if assign is None:
+            assign = dict()
+
         return self.left.evaluate(assign) or self.right.evaluate(assign)
 
-    def stringify(self, variables: dict):
+    def stringify(self, variables: dict = None):
+        if variables is None:
+            variables = dict()
+
         return f"({self.left.stringify(variables)} ∨ {self.right.stringify(variables)})"
+
+    def simplify(self, assign: dict = None):
+        if assign is None:
+            assign = dict()
+
+        if TrueOperand in (type(self.left), type(self.right)):
+            return TrueOperand()
+        return self
 
 
 class ImplicationOperator(BinaryOperator):
@@ -304,6 +311,9 @@ def main():
     op = ImplicationOperator(AndOperator(VarOperand('p'), VarOperand('q')), TrueOperand())
     print(op.stringify(dict(p='TESTE')))
     print(op.evaluate(dict()))
+
+    op2 = OrOperator(TrueOperand(), FalseOperand())
+    print(op2.stringify(), '=', op2.simplify())
 
 
 if __name__ == '__main__':

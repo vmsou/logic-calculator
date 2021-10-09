@@ -1,5 +1,5 @@
 # Resolução de Problemas com Lógica Matemática - Lógica Proposicional
-Trabalho Semestral
+Trabalho Prático
 
 # Grupo
 * Vinicius Marques da Silva Oliveira
@@ -40,6 +40,6 @@ python main.py
 </h4>
 
 ## Para fazer:
-- [ ] SIMPLIFICATION
 - [ ] EQUIVALENCES
+- [ ] SIMPLIFICATION
 

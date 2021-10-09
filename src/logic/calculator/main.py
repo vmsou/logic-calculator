@@ -1,7 +1,5 @@
 from logic.calculator.parser import LogicParser
 
-errors = []
-
 def header():
     size = 60
     print("[ Calculadora Lógica ]".center(size, '-'))
@@ -11,14 +9,16 @@ def header():
     print("NOT = '!'")
     print("Operadores Binários: ")
     print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'")
+    print("Variáveis: p, q, r, A, B e C")
     print("-" * size)
 
-def show_errors():
+def show_errors(errors):
     for error in errors:
         print(f"\033[91m[Error] {error}\033[0m")
     errors.clear()
 
 def main():
+    errors = []
     parser = LogicParser()
     header()
     while True:
@@ -33,7 +33,7 @@ def main():
             print(f"Fórmula Bem Formada (FBF): {parser.is_fbf()}")
             parser.show_table()
 
-        show_errors()
+        show_errors(errors)
         print(flush=True)
 
 

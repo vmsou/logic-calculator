@@ -3,11 +3,9 @@ from enum import Enum
 from logic.stream.exceptions import BadToken, FullBuffer
 from logic.wordtree import WordTree
 
-whitespace = (' ', '\n', '\t')
-
 
 def reverse_map(sample_dict: dict):
-    """Inverte um mapa, os valores apontam para a chave."""
+    """Inverte um mapa; os valores apontam para a chave."""
     reversed_map = {}
     for key, val in sample_dict.items():
         for i in val:
@@ -30,7 +28,7 @@ class Logic(Enum):
     XOR = 9
     NAND = 10
     NOR = 11
-    TRUE = 12,
+    TRUE = 12
     FALSE = 13
 
 
@@ -43,18 +41,19 @@ logicMap = {
     Logic.AND: ['AND', '&', '.', '∧', '^'],
     Logic.OR: ['OR', '||', '|', '+', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', '->', '→'],
-    Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷', '≡'],
+    Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷', '≡', '='],
     Logic.XOR: ['XOR', '⊻', '⊕'],
     Logic.NAND: ['NAND', '↑'],
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r'],
+    Logic.VAR: ['p', 'q', 'r', 'A', 'B', 'C'],
 }
 
 # Utilizado para facilitiar procura
+whitespace = (' ', '\n', '\t')
 equivalent = reverse_map(logicMap)
-operators = [key for key, val in equivalent.items() if val != Logic.CONSTANT]
+operators = (key for key, val in equivalent.items() if val != Logic.CONSTANT)
 word_tree = WordTree()
 
 for char in equivalent:
@@ -160,7 +159,7 @@ class TokenStream:
         return word
 
     def get(self):
-        """Retorna um Token permitido. Utilizando uma Arvore de Palavras para se aproximar."""
+        """Retorna somente um Token permitido. Utilizando uma Arvore de Palavras para se aproximar."""
         if self.full:
             self.full = False
             return self.buffer
@@ -168,7 +167,12 @@ class TokenStream:
         ch = self.source.get()
         self.index += 1
 
-        # Compare characters
+        if ch in logicMap[Logic.CONSTANT]:
+            if ch in logicMap[Logic.TRUE]:
+                return Token(equivalent[ch], True)
+            elif ch in logicMap[Logic.FALSE]:
+                return Token(equivalent[ch], False)
+
         if ch in word_tree.root.children:
             match = self.match(ch)
             if match in equivalent:
