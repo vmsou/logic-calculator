@@ -5,8 +5,11 @@ class CharNode:
         self.finished: bool = False
         self.counter: int = 1
 
+    def __repr__(self) -> str:
+        return f"CharNode(char='{self.char}', finished={self.finished}, counter={self.counter}, children={self.children})"
+
     def __eq__(self, other):
-        return self.char == other.char
+        return self.char == other
 
     def __hash__(self):
         return hash(self.char)
@@ -20,10 +23,9 @@ class WordTree:
         node: CharNode = self.root
         for char in word:
             found = False
-            node2 = CharNode(char)
-            if node2 in node.children:
-                node.children[node2].counter += 1
-                node = node.children[node2]
+            if char in node.children:
+                node.children[char].counter += 1
+                node = node.children[char]
                 found = True
                 break
             if not found:
@@ -38,22 +40,21 @@ class WordTree:
             return False
         for char in word:
             found = False
-            node2 = CharNode(char)
-            if node2 in node.children:
+            if char in node.children:
                 found = True
-                node = node.children[node2]
+                node = node.children[char]
             if not found:
                 return False
-        return node.finished
+
+        return True
 
 def main():
     root = WordTree()
-    root.add("word")
+    root.add("NOR")
     root.add('&')
 
-    print(root.find("word"))
+    print(root.find("NOR"))
     print(root.find("&"))
-
 
 
 if __name__ == '__main__':

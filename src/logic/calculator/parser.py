@@ -1,7 +1,7 @@
 import tabulate
 
 from core import *
-from logic.stream import Logic, Token
+from logic.stream.core import Logic, Token
 from logic.stream.exceptions import ParseError, BadToken
 from verify import setup
 
