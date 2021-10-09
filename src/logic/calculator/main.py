@@ -1,5 +1,3 @@
-import sys
-
 from logic.calculator.parser import LogicParser
 
 errors = []

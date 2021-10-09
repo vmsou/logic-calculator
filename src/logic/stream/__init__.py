@@ -1,6 +1,7 @@
 from enum import Enum
 
 from logic.stream.exceptions import BadToken, FullBuffer
+from logic import wordtree
 
 whitespace = (' ', '\n', '\t')
 
@@ -43,7 +44,7 @@ logicMap = {
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r', 's', 'a', 'b', 'c', 'x', 'y', 'z'],
+    Logic.VAR: ['p', 'q', 'r', 'A', 'B', 'C'],
 }
 
 equivalent = reverse_map(logicMap)
@@ -130,7 +131,7 @@ class TokenStream:
         word = str(ch)
         while expect.startswith(word):
             word += self.source.get()
-
+        print(word)
         if word == expect:
             return True
         else:
@@ -143,35 +144,20 @@ class TokenStream:
             self.full = False
             return self.buffer
 
-        ch = self.source.get()
+        # ch = self.source.get()
         self.index += 1
 
         # Compare characters
-        if ch in operators:
-            return Token(equivalent[ch], ch)
+        for var in logicMap[Logic.VAR]:
+            if self.match(var):
+                return Token(equivalent[var], var)
 
-        elif ch == 'V':
-            return Token(equivalent[ch], True)
+        for op in sorted(operators, reverse=True):
+            if self.match(op):
+                return Token(equivalent[op], op)
 
-        elif ch == 'F':
-            return Token(equivalent[ch], False)
 
-        elif ch == '':
-            return Token("", "")
-
-        else:
-            if ch:
-                s = ""
-                while ch and s not in operators and ch not in operators:
-                    s += ch
-                    ch = self.source.get()
-
-                self.source.putback(ch)
-                if s in equivalent:
-                    return Token(equivalent[s], s)
-                return Token(Logic.VAR, s)
-
-        raise BadToken("Bad Token: char="+ch)
+        raise BadToken("Bad Token: char="+ self.source.get())
 
     def putback(self, t: Token):
         if self.full:
