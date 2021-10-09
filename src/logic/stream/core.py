@@ -30,16 +30,21 @@ class Logic(Enum):
     XOR = 9
     NAND = 10
     NOR = 11
+    TRUE = 12,
+    FALSE = 13
 
 
+"""Mapea os Tokens com suas representações."""
 logicMap = {
-    Logic.CONSTANT: ['V', 'F', 'T'],
+    Logic.TRUE: ['V', 'T'],
+    Logic.FALSE: ['F'],
+    Logic.CONSTANT: ['V', 'T', 'F'],
     Logic.NOT: ['NOT', '!', '~', '¬'],
     Logic.AND: ['AND', '&', '.', '∧', '^'],
     Logic.OR: ['OR', '||', '|', '+', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', '->', '→'],
-    Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷'],
-    Logic.XOR: ['XOR', '⊻'],
+    Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷', '≡'],
+    Logic.XOR: ['XOR', '⊻', '⊕'],
     Logic.NAND: ['NAND', '↑'],
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
@@ -47,11 +52,9 @@ logicMap = {
     Logic.VAR: ['p', 'q', 'r'],
 }
 
+# Utilizado para facilitiar procura
 equivalent = reverse_map(logicMap)
-
 operators = [key for key, val in equivalent.items() if val != Logic.CONSTANT]
-ignore = logicMap[Logic.CONSTANT] + logicMap[Logic.OPEN] + logicMap[Logic.CLOSE]
-
 word_tree = WordTree()
 
 for char in equivalent:
@@ -59,6 +62,8 @@ for char in equivalent:
 
 
 class ReturnString:
+    """Simula um input() com texto predeterminado"""
+
     def __init__(self, text=""):
         self.text = text
 
@@ -68,6 +73,7 @@ class ReturnString:
 
 class Token:
     """Representa um elemento lógico dentro de uma expressão."""
+
     def __init__(self, kind=None, value=None):
         self.kind = kind
         self.value = value
@@ -80,6 +86,8 @@ class Token:
 
 
 class InputStream:
+    """Nesse Stream se obtem caracteres separados pelo espaço em branco."""
+
     def __init__(self, source=input):
         self.source = source
         self.buffer = ""
@@ -88,18 +96,23 @@ class InputStream:
         return bool(self.buffer)
 
     def get(self):
+        """Retorna um caracter."""
         return self.char_tokenize()
 
-    def putback(self, val):
+    def putback(self, val: str):
+        """Retorna o caracter para o buffer"""
         self.buffer = val + self.buffer
 
     def input(self):
+        """Utiliza o source para pegar um input."""
         self.buffer = self.source()
 
     def empty(self):
+        """Verfifica se acabou o buffer."""
         return len(self.buffer) <= 0
 
     def char_tokenize(self):
+        """Pega o primeiro caracter que não seja um espaço branco."""
         index = 0
         size = len(self.buffer)
         value = ""
@@ -115,6 +128,8 @@ class InputStream:
 
 
 class TokenStream:
+    """Utiliza um InputStream para separar os tokens de uma string."""
+
     def __init__(self, source: InputStream):
         self.index = 0
         self.source = source
@@ -122,6 +137,7 @@ class TokenStream:
         self.buffer = Token()
 
     def tokenize(self):
+        """Retorna uma lista com os Tokens permitidos. Finaliza com um EOF (End-of-File)."""
         tokens = []
         ch = self.get()
         while ch.kind != "":
@@ -144,7 +160,7 @@ class TokenStream:
         return word
 
     def get(self):
-        """Retorna um Token permitido."""
+        """Retorna um Token permitido. Utilizando uma Arvore de Palavras para se aproximar."""
         if self.full:
             self.full = False
             return self.buffer
@@ -166,6 +182,7 @@ class TokenStream:
         raise BadToken(f"Bad Token: char={ch}")
 
     def putback(self, t: Token):
+        """Retorna um Token para o buffer."""
         if self.full:
             raise FullBuffer("Full Buffer:", t)
         if t.kind:
@@ -173,6 +190,7 @@ class TokenStream:
             self.full = True
 
     def clean(self):
+        """Limpa o buffer."""
         self.buffer = Token()
         self.full = False
 

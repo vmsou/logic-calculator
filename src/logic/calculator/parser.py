@@ -38,7 +38,7 @@ def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
 
 
 def last(tokens: list):
-    """Retorna o último item sem remove-lo"""
+    """Retorna o último item sem removê-lo"""
     return tokens[-1]
 
 
@@ -75,13 +75,14 @@ class LogicParser:
     Utilizado para ser intermediario entre as entradas do úsuario e seus retornos.
     Essa classe transforma a entrada em Tokens e depois converte os Tokens em Operandos
     """
+
     def __init__(self):
-        # Used to parse
+        # Usado para o parse
         self.expr = None
         self.operators = []
         self.operands = []
 
-        # Used to calculate
+        # Usado para calcular
         self.tokens = []
         self.variables = dict()
         self.operand: Operand = Operand()
