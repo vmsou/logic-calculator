@@ -36,7 +36,7 @@ logicMap = {
     Logic.CONSTANT: ['V', 'F', 'T'],
     Logic.NOT: ['NOT', '!', '~', '¬'],
     Logic.AND: ['AND', '&', '.', '∧', '^'],
-    Logic.OR: ['OR', '|', '+', '∨', 'v'],
+    Logic.OR: ['OR', '||', '|', '+', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', '->', '→'],
     Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷'],
     Logic.XOR: ['XOR', '⊻'],
@@ -44,7 +44,7 @@ logicMap = {
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r', 'A', 'B', 'C'],
+    Logic.VAR: ['p', 'q', 'r'],
 }
 
 equivalent = reverse_map(logicMap)
@@ -131,37 +131,39 @@ class TokenStream:
         tokens.append(Token(Logic.EOF))
         return tokens
 
-    def match(self, expect: str):
-        ch = self.source.get()
-        word = str(ch)
-        while expect.startswith(word):
-            word += self.source.get()
-        print(word)
-        if word == expect:
-            return True
-        else:
-            for c in word:
-                self.source.putback(c)
-            return False
+    def match(self, ch: str):
+        """Procura uma aproximação a partir de 1 caractere."""
+        node = word_tree.root
+        word = ""
+        while ch in node.children:
+            node = node.children[ch]
+            word += ch
+            ch = self.source.get()
+        self.source.putback(ch)
+
+        return word
 
     def get(self):
+        """Retorna um Token permitido."""
         if self.full:
             self.full = False
             return self.buffer
 
-        # ch = self.source.get()
+        ch = self.source.get()
         self.index += 1
 
         # Compare characters
-        for var in logicMap[Logic.VAR]:
-            if self.match(var):
-                return Token(equivalent[var], var)
+        if ch in word_tree.root.children:
+            match = self.match(ch)
+            if match in equivalent:
+                return Token(equivalent[match], match)
+            for c in match:
+                self.source.putback(c)
 
-        for op in sorted(operators, reverse=True):
-            if self.match(op):
-                return Token(equivalent[op], op)
+        if ch == "":
+            return Token("", "")
 
-        raise BadToken("Bad Token: char="+ self.source.get())
+        raise BadToken(f"Bad Token: char={ch}")
 
     def putback(self, t: Token):
         if self.full:
@@ -174,3 +176,16 @@ class TokenStream:
         self.buffer = Token()
         self.full = False
 
+
+def main():
+    text_stream = ReturnString()
+    cin = InputStream(text_stream)
+    ts = TokenStream(cin)
+    while True:
+        text_stream.text = input("> ")
+        cin.input()
+        print(ts.match("pq"))
+
+
+if __name__ == '__main__':
+    main()
