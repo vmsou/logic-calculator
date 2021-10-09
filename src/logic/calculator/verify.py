@@ -7,7 +7,7 @@ ts = TokenStream(cin)
 
 def setup(expr):
     tokens = tokenize(expr)
-    return get_vars(tokens)
+    return tokens, get_vars(tokens)
 
 
 def tokenize(expr):
@@ -21,7 +21,7 @@ def get_vars(tokens):
     for t in tokens:
         if t.kind == Logic.VAR:
             var_dict[t.value] = True
-    return tokens, var_dict
+    return var_dict
 
 
 if __name__ == "__main__":

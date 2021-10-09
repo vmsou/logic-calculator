@@ -2,7 +2,7 @@ from enum import Enum
 
 from logic.stream.exceptions import BadToken, FullBuffer
 
-whitespace = (' ', '\n')
+whitespace = (' ', '\n', '\t')
 
 
 class Logic(Enum):
@@ -24,8 +24,8 @@ class Logic(Enum):
 logicMap = {
     Logic.CONSTANT: ['V', 'F', 'T'],
     Logic.NOT: ['NOT', '!', '~', '¬'],
-    Logic.AND: ['AND', '&', '.', '∧'],
-    Logic.OR: ['OR', '|', '+', '∨'],
+    Logic.AND: ['AND', '&', '.', '∧', '^'],
+    Logic.OR: ['OR', '|', '+', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', '->', '→'],
     Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷'],
     Logic.XOR: ['XOR', '⊻'],

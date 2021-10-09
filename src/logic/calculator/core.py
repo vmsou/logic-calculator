@@ -1,6 +1,6 @@
-"""Basic Templates"""
+"""Essa seção representa elementos de uma expressão lógica e seus resultados."""
 
-
+"""Modelos lógicos"""
 class Expression:
     """Expressão que represanta ambos Operadores e Operandos."""
     def __repr__(self):
@@ -40,7 +40,7 @@ class Operator(Expression):
         return None
 
 
-"""Constants"""
+"""Constantes"""
 class TrueOperand(Operand):
     """Representa uma constante Verdade."""
     def evaluate(self, assign: dict):
@@ -91,7 +91,7 @@ class VarOperand(Operand):
         return assign[self.var]
 
 
-"""Unary Operators"""
+"""Operadores unários"""
 class UnaryOperator(Operator):
     """Representa um Operador unário."""
     def __init__(self, operand: Expression):
@@ -132,7 +132,7 @@ class NotOperator(UnaryOperator):
         return equiv
 
 
-"""Binary Operators"""
+"""Operadores binários"""
 class BinaryOperator(Operator):
     """Representa um Operador binário."""
     def __init__(self, left: Expression, right: Expression):

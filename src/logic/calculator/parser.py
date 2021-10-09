@@ -116,7 +116,7 @@ class LogicParser:
                     elif last(self.operators).kind == Logic.OPEN:
                         raise ParseError(f"Parêntese aberto não possui fechamento {t}.")
 
-                    raise ParseError(f"Falta operandos para esse operadores {t}.")
+                    raise ParseError(f"Falta operandos. {t}")
                 else:
                     raise ParseError(f"Esperava variável ou constante. {t}")
             else:

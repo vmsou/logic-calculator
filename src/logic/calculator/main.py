@@ -2,30 +2,46 @@ import sys
 
 from logic.calculator.parser import LogicParser
 
+errors = []
 
 def header():
-    print(" [Calculadora Lógica] ".center(60, '-'))
+    size = 60
+    print(" [Calculadora Lógica] ".center(size, '-'))
     print("Constantes: ")
     print("True = 'V', False = 'F'")
     print("Operadores Unários: ")
     print("NOT = '!'")
     print("Operadores Binários: ")
     print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'\n")
+    print("-" * size)
 
+def show_errors():
+    for error in errors:
+        print(f"\033[91m[Error] {error}\033[0m")
+    errors.clear()
 
 def main():
     parser = LogicParser()
     header()
     while True:
-        parser.expr = input("> ")
+        expr = input("> ")
+        parser.expr = expr
         try:
             parser.parse()
-            print(f"Fórmula Bem Formada (FBF): {parser.is_fbf()}")
         except Exception as e:
-            print(f"\nError: {e}\n", file=sys.stderr)
+            errors.append(e)
+
         if parser.valid:
+            print(f"Fórmula Válida: {parser.valid}")
+            if parser.is_fbf():
+                print(f"Fórmula Bem Formada (FBF): Verdade")
+            else:
+                print(f"Fórmula Bem Formada (FBF): Falso")
+
             parser.show_table()
-        print()
+
+        show_errors()
+        print(flush=True)
 
 
 if __name__ == "__main__":
