@@ -190,12 +190,10 @@ class LogicParser:
 
     def is_fbf(self):
         """Verifica se os tokens constroem uma Fórmula Bem Formada"""
-        if self.tokens:
-            for i in self.tokens:
-                if i.kind not in fbf_permitted:
-                    return False
-            return True
-        return False
+        for i in self.tokens:
+            if i.kind not in fbf_permitted:
+                return False
+        return True
 
     def calculate(self):
         """Gera a tabela a partir dos resultados do parse"""

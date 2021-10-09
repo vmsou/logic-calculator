@@ -24,10 +24,9 @@ class WordTree:
             if char in node.children:
                 node = node.children[char]
                 found = True
-                break
             if not found:
                 new_node = CharNode(char)
-                node.children[new_node] = new_node
+                node.children[char] = new_node
                 node = new_node
 
     def find(self, word: str):
@@ -46,11 +45,11 @@ class WordTree:
 
 def main():
     root = WordTree()
-    root.add("NOR")
-    root.add('&')
+    root.add("OR")
+    root.add('OU')
 
-    print(root.find("NOR"))
-    print(root.find("&"))
+    print(root.find("OU"))
+    print(root.find("OR"))
     print(root.find("&&"))
 
 

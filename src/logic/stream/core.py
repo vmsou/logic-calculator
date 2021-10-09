@@ -37,9 +37,9 @@ logicMap = {
     Logic.TRUE: ['V', 'T'],
     Logic.FALSE: ['F'],
     Logic.CONSTANT: ['V', 'T', 'F'],
-    Logic.NOT: ['NOT', '!', '~', '¬'],
-    Logic.AND: ['AND', '&', '.', '∧', '^'],
-    Logic.OR: ['OR', '||', '|', '+', '∨', 'v'],
+    Logic.NOT: ['NOT', 'NÃO', '!', '~', '¬'],
+    Logic.AND: ['AND', 'E', '&', '.', '∧', '^'],
+    Logic.OR: ['OR', 'OU', '||', '|', '+', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', '->', '→'],
     Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷', '≡', '='],
     Logic.XOR: ['XOR', '⊻', '⊕'],
@@ -203,10 +203,11 @@ def main():
     text_stream = ReturnString()
     cin = InputStream(text_stream)
     ts = TokenStream(cin)
-    while True:
-        text_stream.text = input("> ")
-        cin.input()
-        print(ts.match("pq"))
+
+    text_stream.text = "OU"
+    print(word_tree.root.children["O"])
+    cin.input()
+    print(ts.match("OU"))
 
 
 if __name__ == '__main__':
