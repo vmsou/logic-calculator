@@ -54,21 +54,19 @@ def bool_to_str(boolean: bool):
     return "F"
 
 
-def generate_variables(expr_vars):
+def generate_variables(expr_vars: dict):
     """Gera árvore verdade a partir de varaiveis"""
-    length = len(expr_vars)
-    size = 2 ** length
-    vars_table = [{} for _ in range(size)]
-    half = size
+    variables = sorted(expr_vars.keys())
+    length = len(variables)
+    size = 2 ** length - 1
+    vars_table = []
 
-    for var in expr_vars:
-        half //= 2
-        actual = True
-        for j in range(1, size + 1):
-            vars_table[j-1][var] = actual
-            if j % half == 0:
-                actual = not actual
-
+    for i in range(size, -1, -1):
+        row = {}
+        b = format(i, f'#0{length + 2}b')
+        for c in range(-length, 0, 1):
+            row[variables[c]] = (bool(int(b[c])))
+        vars_table.append(row)
     return vars_table
 
 

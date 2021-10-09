@@ -12,7 +12,7 @@ def header():
     print("Operadores Unários: ")
     print("NOT = '!'")
     print("Operadores Binários: ")
-    print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'\n")
+    print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'")
     print("-" * size)
 
 def show_errors():
@@ -30,7 +30,7 @@ def main():
         except Exception as e:
             errors.append(e)
 
-        print(f"Fórmula Válida: {parser.valid}")
+        print(f"Fórmula Válida: {parser.is_valid()}")
         if parser.is_valid():
             print(f"Fórmula Bem Formada (FBF): {parser.is_fbf()}")
             parser.show_table()

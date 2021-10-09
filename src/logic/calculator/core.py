@@ -1,24 +1,32 @@
-"""Essa seção representa elementos de uma expressão lógica e seus resultados."""
+"""
+Essa seção representa elementos de uma expressão lógica e seus resultados.
+"""
 
 """Modelos lógicos"""
 class Expression:
     """Expressão que represanta ambos Operadores e Operandos."""
+
     def __repr__(self):
         return f"{type(self).__name__}()"
 
     def evaluate(self, assign: dict):
+        """Calcula o resultado de forma encadeada"""
         return None
 
     def stringify(self, variables: dict):
+        """Mostra a expressão em forma de string"""
         return ""
     
     def simplify(self, assign: dict):
+        """TODO: Encontrar padrões de simplificação."""
         return None
 
 
 class Operand(Expression):
     """Representa um operando."""
+
     def evaluate(self, assign: dict):
+        """Retorna Verdade ou Falso."""
         return None
 
     def stringify(self, variables: dict):
@@ -30,7 +38,9 @@ class Operand(Expression):
 
 class Operator(Expression):
     """Representa um operador."""
+
     def evaluate(self, assign: dict):
+        """Realiza uma operação com base em operadores/operandos atribuidos"""
         return None
 
     def stringify(self, variables: dict):
@@ -43,7 +53,9 @@ class Operator(Expression):
 """Constantes"""
 class TrueOperand(Operand):
     """Representa uma constante Verdade."""
+
     def evaluate(self, assign: dict):
+        """Retorna verdade."""
         return True
 
     def stringify(self, variables: dict):
@@ -55,7 +67,9 @@ class TrueOperand(Operand):
 
 class FalseOperand(Operand):
     """Representa uma constante Falso."""
+
     def evaluate(self, assign: dict):
+        """Retorna falso."""
         return False
 
     def stringify(self, variables: dict):
@@ -67,6 +81,7 @@ class FalseOperand(Operand):
 
 class VarOperand(Operand):
     """Representa uma Variável."""
+
     def __init__(self, var):
         self.var = var
 
@@ -74,6 +89,7 @@ class VarOperand(Operand):
         return f"{type(self).__name__}({self.var})"
 
     def evaluate(self, assign: dict = None):
+        """Durante o calculo é atribuido um valor a partir do dicionario. Caso não atribuido retorna Verdade."""
         if assign is None:
             assign = dict()
         if self.var in assign:
@@ -81,8 +97,9 @@ class VarOperand(Operand):
         return True
 
     def stringify(self, variables: dict = None):
+        """Retorna em forma de string o valor atribuido no dicionario ou sua chave interna."""
         if variables is None:
-            assign = dict()
+            variables = dict()
         if self.var in variables:
             return variables[self.var]
         return self.var
@@ -94,6 +111,7 @@ class VarOperand(Operand):
 """Operadores unários"""
 class UnaryOperator(Operator):
     """Representa um Operador unário."""
+
     def __init__(self, operand: Expression):
         self.operand = operand
 
@@ -112,6 +130,7 @@ class UnaryOperator(Operator):
 
 class NotOperator(UnaryOperator):
     """Representa um Operador unário de negação."""
+
     def __init__(self, operand: Expression):
         super().__init__(operand)
 
@@ -135,6 +154,7 @@ class NotOperator(UnaryOperator):
 """Operadores binários"""
 class BinaryOperator(Operator):
     """Representa um Operador binário."""
+
     def __init__(self, left: Expression, right: Expression):
         self.left = left
         self.right = right
@@ -154,6 +174,7 @@ class BinaryOperator(Operator):
 
 class AndOperator(BinaryOperator):
     """Representa um Operador binário de conjunção."""
+
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -166,6 +187,7 @@ class AndOperator(BinaryOperator):
 
 class OrOperator(BinaryOperator):
     """Representa um Operador binário de disjunção."""
+
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -178,6 +200,7 @@ class OrOperator(BinaryOperator):
 
 class ImplicationOperator(BinaryOperator):
     """Representa um Operador binário de implicação."""
+
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -200,6 +223,7 @@ class ImplicationOperator(BinaryOperator):
 
 class EquivalenceOperator(BinaryOperator):
     """Representa um Operador binário de equivalência."""
+
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -218,6 +242,7 @@ class EquivalenceOperator(BinaryOperator):
 
 class NandOperator(BinaryOperator):
     """Representa um Operador binário de negação de conjunção."""
+
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -237,6 +262,7 @@ class NandOperator(BinaryOperator):
 
 class NorOperator(BinaryOperator):
     """Representa um Operador binário de negação de disjunção."""
+
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
@@ -256,6 +282,7 @@ class NorOperator(BinaryOperator):
 
 class XorOperator(BinaryOperator):
     """Representa um Operador binário de disjunção exclusiva."""
+
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
