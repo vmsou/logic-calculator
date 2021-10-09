@@ -76,10 +76,15 @@ class LogicParser:
     Essa classe transforma a entrada em Tokens e depois converte os Tokens em Operandos
     """
     def __init__(self):
+        # Used to parse
         self.expr = None
-        self.res = None
         self.operators = []
         self.operands = []
+
+        # Used to calculate
+        self.tokens = []
+        self.variables = dict()
+        self.operand: Operand = Operand()
         self.valid = False
 
     @property
@@ -106,7 +111,7 @@ class LogicParser:
                 if t.kind in (Logic.CONSTANT, Logic.VAR):
                     self.append(to_operand(t))
                     expect_operand = False
-                elif t.kind == Logic.OPEN or t.kind == Logic.NOT:
+                elif t.kind in (Logic.OPEN, Logic.NOT):
                     self.operators.append(t)
                 elif t.kind == Logic.EOF:
                     if len(self.operators) == 0:
@@ -126,9 +131,11 @@ class LogicParser:
                             break
 
                         if t.kind == Logic.IMPLICATION:
-                            if priority(last(self.operators)) <= priority(t):
+                            # Consequência/Conclusão aparecer primeiro à direita até a esquerda
+                            if priority(last(self.operators)) >= priority(t):
                                 break
                         else:
+                            # Primeiro na leitura da esquerda para a direita
                             if priority(last(self.operators)) < priority(t):
                                 break
 
@@ -173,15 +180,17 @@ class LogicParser:
             raise ParseError(f"Nenhum parêntese de fechamento. {lone_open}.")
 
         self.valid = True
-        self.res = tokens, self.operands.pop(), setup_result[1]
+        self.tokens = tokens
+        self.operand = self.operands.pop()
+        self.variables = setup_result[1]
 
     def is_valid(self):
         return self.valid
 
     def is_fbf(self):
         """Verifica se os tokens constroem uma Fórmula Bem Formada"""
-        if self.res:
-            for i in self.res[0]:
+        if self.tokens:
+            for i in self.tokens:
                 if i.kind not in fbf_permitted:
                     return False
             return True
@@ -189,8 +198,8 @@ class LogicParser:
 
     def calculate(self):
         """Gera a tabela a partir dos resultados do parse"""
-        op = self.res[1]
-        v = self.res[2]
+        op = self.operand
+        v = self.variables
         truth = generate_variables(v)
 
         header = [k for k in sorted(v)]
