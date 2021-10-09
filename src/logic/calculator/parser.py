@@ -106,7 +106,7 @@ class LogicParser:
         for t in tokens:
             if expect_operand:
                 if t.kind in (Logic.CONSTANT, Logic.VAR):
-                    self.append_operand(to_operand(t))
+                    self.append(to_operand(t))
                     expect_operand = False
                 elif t.kind == Logic.OPEN or t.kind == Logic.NOT:
                     self.operators.append(t)
@@ -116,7 +116,7 @@ class LogicParser:
                     elif last(self.operators).kind == Logic.OPEN:
                         raise ParseError(f"Parêntese aberto não possui fechamento {t}.")
 
-                    raise ParseError(f"Falta operandos. {t}")
+                    raise ParseError(f"Falta operandos. {self.operators}")
                 else:
                     raise ParseError(f"Esperava variável ou constante. {t}")
             else:
@@ -127,14 +127,18 @@ class LogicParser:
                         if last(self.operators).kind == Logic.OPEN:
                             break
 
-                        if priority(last(self.operators)) < priority(t):
-                            break
+                        if t.kind == Logic.IMPLICATION:
+                            if priority(last(self.operators)) <= priority(t):
+                                break
+                        else:
+                            if priority(last(self.operators)) < priority(t):
+                                break
 
                         operator: Token = self.operators.pop()
                         rhs: Operand = self.operands.pop()
                         lhs: Operand = self.operands.pop()
 
-                        self.append_operand(to_operator(lhs, operator, rhs))
+                        self.append(to_operator(lhs, operator, rhs))
 
                     self.operators.append(t)
                     expect_operand = True
@@ -155,12 +159,12 @@ class LogicParser:
                         rhs: Operand = self.operands.pop()
                         lhs: Operand = self.operands.pop()
 
-                        self.append_operand(to_operator(lhs, curr_op, rhs))
+                        self.append(to_operator(lhs, curr_op, rhs))
 
                     ex: Operand = self.operands.pop()
-                    self.append_operand(ex)
+                    self.append(ex)
                 else:
-                    raise ParseError(f"Esperando parêntese de fechada ou operador. {t}")
+                    raise ParseError(f"Esperava operador ou parêntese de fechada. {t}")
 
         assert len(self.operators) != 0
         assert self.operators.pop().kind == Logic.EOF
@@ -172,6 +176,9 @@ class LogicParser:
 
         self.valid = True
         self.res = tokens, self.operands.pop(), setup_result[1]
+
+    def is_valid(self):
+        return self.valid
 
     def is_fbf(self):
         """Verifica se os tokens constroem uma Fórmula Bem Formada"""
@@ -186,11 +193,10 @@ class LogicParser:
         """Gera a tabela a partir dos resultados do parse"""
         op = self.res[1]
         v = self.res[2]
-        repeat_dict = {k: k for k in v}
         truth = generate_variables(v)
 
         header = [k for k in sorted(v)]
-        header.append(op.stringify(repeat_dict))
+        header.append(op.stringify(dict()))
         table = [header]
 
         for var in truth:
@@ -205,7 +211,7 @@ class LogicParser:
         data = self.calculate()
         print(tabulate.tabulate(data, tablefmt='fancy_grid', stralign='center'))
 
-    def append_operand(self, expr: Expression):
+    def append(self, expr: Expression):
         """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
         while len(self.operators) > 0 and last(self.operators).kind == Logic.NOT:
             self.operators.pop()

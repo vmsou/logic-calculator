@@ -6,7 +6,7 @@ errors = []
 
 def header():
     size = 60
-    print(" [Calculadora Lógica] ".center(size, '-'))
+    print("[ Calculadora Lógica ]".center(size, '-'))
     print("Constantes: ")
     print("True = 'V', False = 'F'")
     print("Operadores Unários: ")
@@ -24,20 +24,15 @@ def main():
     parser = LogicParser()
     header()
     while True:
-        expr = input("> ")
-        parser.expr = expr
+        parser.expr = input("> ")
         try:
             parser.parse()
         except Exception as e:
             errors.append(e)
 
-        if parser.valid:
-            print(f"Fórmula Válida: {parser.valid}")
-            if parser.is_fbf():
-                print(f"Fórmula Bem Formada (FBF): Verdade")
-            else:
-                print(f"Fórmula Bem Formada (FBF): Falso")
-
+        print(f"Fórmula Válida: {parser.valid}")
+        if parser.is_valid():
+            print(f"Fórmula Bem Formada (FBF): {parser.is_fbf()}")
             parser.show_table()
 
         show_errors()

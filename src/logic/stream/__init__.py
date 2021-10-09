@@ -5,7 +5,17 @@ from logic.stream.exceptions import BadToken, FullBuffer
 whitespace = (' ', '\n', '\t')
 
 
+def reverse_map(sample_dict: dict):
+    """Inverte um mapa, os valores apontam para a chave."""
+    reversed_map = {}
+    for key, val in sample_dict.items():
+        for i in val:
+            reversed_map[i] = key
+    return reversed_map
+
+
 class Logic(Enum):
+    """Elementos lógicos e parte de suas precedências"""
     EOF = -1
     EQUIVALENCE = 0
     IMPLICATION = 1
@@ -36,11 +46,7 @@ logicMap = {
     Logic.VAR: ['p', 'q', 'r', 's', 'a', 'b', 'c', 'x', 'y', 'z'],
 }
 
-equivalent = {}
-
-for key, val in logicMap.items():
-    for i in val:
-        equivalent[i] = key
+equivalent = reverse_map(logicMap)
 
 operators = [key for key, val in equivalent.items() if val != Logic.CONSTANT]
 ignore = logicMap[Logic.CONSTANT] + logicMap[Logic.OPEN] + logicMap[Logic.CLOSE]
@@ -55,12 +61,13 @@ class ReturnString:
 
 
 class Token:
+    """Representa um elemento lógico dentro de uma expressão."""
     def __init__(self, kind=None, value=None):
         self.kind = kind
         self.value = value
 
     def __str__(self):
-        return f"{type(self).__name__}(kind={self.kind}, value={self.value})"
+        return f"{type(self).__name__}(kind={self.kind}, value='{self.value}')"
 
     def __repr__(self):
         return str(self)
