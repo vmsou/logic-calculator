@@ -83,6 +83,12 @@ class Token:
     def __repr__(self):
         return str(self)
 
+    @property
+    def priority(self):
+        if type(self.kind) == Logic:
+            return self.kind.value
+        return 0
+
 
 class InputStream:
     """Nesse Stream se obtem caracteres separados pelo espaço em branco."""

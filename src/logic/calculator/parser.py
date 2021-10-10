@@ -37,11 +37,6 @@ def to_operator(left: Operand, token: Token, right: Operand) -> Operator:
     raise BadToken(f"{token} não é um operador.")
 
 
-def priority(token: Token):
-    """Retorna a prioridade de um Token"""
-    return token.kind.value
-
-
 def bool_to_str(boolean: bool):
     """Converte um elemento booleano em uma string 'V' ou 'F'"""
     if boolean:
@@ -137,11 +132,11 @@ class LogicParser:
 
                         if t.kind == Logic.IMPLICATION:
                             # Consequência/Conclusão aparecer primeiro à direita até a esquerda
-                            if priority(self.last()) <= priority(t):
+                            if self.last().priority <= t.priority:
                                 break
                         else:
                             # Primeiro na leitura da esquerda para a direita
-                            if priority(self.last()) < priority(t):
+                            if self.last().priority < t.priority:
                                 break
 
                         operator: Token = self.operators.pop()
@@ -212,19 +207,19 @@ class LogicParser:
 
         header: list = [k for k in sorted(v)]
         header.append(op.stringify(dict()))
-        table: list = [header]
+        table: list = []
 
         for var in truth:
             row: list = [bool_to_str(var[key]) for key in sorted(var)]
             row.append(bool_to_str(op.evaluate(var)))
             table.append(row)
 
-        return table
+        return header, table
 
     def show_table(self):
         """Usa o módulo tabulate para monstrar a tabela"""
-        data = self.calculate()
-        print(tabulate.tabulate(data, tablefmt='fancy_grid', stralign='center'))
+        header, data = self.calculate()
+        print(tabulate.tabulate(data, headers=header, tablefmt='fancy_grid', stralign='center'))
 
     def append(self, expr: Expression):
         """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
