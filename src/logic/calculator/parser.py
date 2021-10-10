@@ -43,7 +43,7 @@ def priority(token: Token):
 
 
 def bool_to_str(boolean: bool):
-    """Converte um elemento booleano em uma string V ou F"""
+    """Converte um elemento booleano em uma string 'V' ou 'F'"""
     if boolean:
         return "V"
     return "F"
@@ -73,15 +73,15 @@ class LogicParser:
 
     def __init__(self):
         # Usado para o parse
-        self.expr = None
-        self.operators = []
-        self.operands = []
+        self.expr: str = ""
+        self.operators: list[Token] = []
+        self.operands: list = []
 
         # Usado para calcular
-        self.tokens = []
-        self.variables = dict()
+        self.tokens: list = []
+        self.variables: dict = dict()
         self.operand: Operand = Operand()
-        self.valid = False
+        self.valid: bool = False
 
     @property
     def expr(self):
@@ -90,19 +90,26 @@ class LogicParser:
     @expr.setter
     def expr(self, value):
         """Limpa os recursos quando expressão for escolhida."""
-        self.valid = False
+        # parse
         self._expr = value
         self.operators = []
         self.operands = []
+
+        # calcular
+        self.tokens = []
+        self.variables = dict()
+        self.operand = Operand()
+        self.valid = False
 
     def parse(self):
         """Função principal para conversão da entrada em Tokens e depois para Operandos"""
         setup_result: list = setup(self.expr)
         tokens: list[Token] = setup_result[0]
+        variables: dict[str, bool] = setup_result[1]
 
         expect_operand = True
-
         for t in tokens:
+            # Espera um operando para juntar com um operador.
             if expect_operand:
                 if t.kind in (Logic.CONSTANT, Logic.VAR):
                     self.append(to_operand(t))
@@ -119,6 +126,7 @@ class LogicParser:
                 else:
                     raise ParseError(f"Esperava variável ou constante. {t}")
             else:
+                # Caso ja tenha um operando, buscar um operador
                 if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     while True:
                         if len(self.operators) == 0:
@@ -136,8 +144,8 @@ class LogicParser:
                                 break
 
                         operator: Token = self.operators.pop()
-                        left: Operand = self.operands.pop()
                         right: Operand = self.operands.pop()
+                        left: Operand = self.operands.pop()
 
                         self.append(to_operator(left, operator, right))
 
@@ -157,8 +165,8 @@ class LogicParser:
                         if curr.kind == Logic.NOT:
                             raise ParseError(f"Nenhum operando para negar. {curr}")
 
-                        left: Operand = self.operands.pop()
                         right: Operand = self.operands.pop()
+                        left: Operand = self.operands.pop()
 
                         self.append(to_operator(left, curr, right))
 
@@ -178,7 +186,7 @@ class LogicParser:
         self.valid = True
         self.tokens = tokens
         self.operand = self.operands.pop()
-        self.variables = setup_result[1]
+        self.variables = variables
 
     def last(self):
         """Retorna o último operador sem removê-lo"""
