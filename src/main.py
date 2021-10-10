@@ -6,7 +6,7 @@ def header():
     print("Constantes: ")
     print("True = 'V', False = 'F'")
     print("Operadores Unários: ")
-    print("NOT = '!'")
+    print("NOT = '!', '~'")
     print("Operadores Binários: ")
     print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'")
     print("Variáveis: p, q, r, A, B e C")

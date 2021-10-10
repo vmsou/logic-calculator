@@ -1,7 +1,7 @@
 from enum import Enum
 
 from logic.stream.exceptions import BadToken, FullBuffer
-from logic.wordtree import WordTree
+from wordtree import WordTree
 
 
 def reverse_map(sample_dict: dict):
@@ -150,7 +150,7 @@ class TokenStream:
         """Procura uma aproximação a partir de 1 caractere."""
         node = word_tree.root
         word = ""
-        while ch in node.children:
+        while node.has(ch):
             node = node.children[ch]
             word += ch
             ch = self.source.get()

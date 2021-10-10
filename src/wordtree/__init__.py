@@ -12,6 +12,9 @@ class CharNode:
     def __hash__(self):
         return hash(self.char)
 
+    def has(self, char: str):
+        return char in self.children
+
 
 class WordTree:
     def __init__(self):
