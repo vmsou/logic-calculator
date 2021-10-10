@@ -107,7 +107,7 @@ class LogicParser:
         tokens: list[Token] = setup_result[0]
         variables: dict[str, bool] = setup_result[1]
 
-        expect_operand = True
+        expect_operand: bool = True
         for t in tokens:
             # Espera um operando para juntar com um operador.
             if expect_operand:
@@ -129,6 +129,7 @@ class LogicParser:
                 # Caso ja tenha um operando, buscar um operador
                 if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     while True:
+                        # Se a liste de operandos estiver vazias quebrar loop, e adicionar token atual para operandos.
                         if len(self.operators) == 0:
                             break
                         if self.last().kind == Logic.OPEN:
@@ -136,7 +137,7 @@ class LogicParser:
 
                         if t.kind == Logic.IMPLICATION:
                             # Consequência/Conclusão aparecer primeiro à direita até a esquerda
-                            if priority(self.last()) > priority(t):
+                            if priority(self.last()) <= priority(t):
                                 break
                         else:
                             # Primeiro na leitura da esquerda para a direita
@@ -176,7 +177,8 @@ class LogicParser:
                     raise ParseError(f"Esperava operador ou parêntese de fechada. {t}")
 
         assert len(self.operators) != 0
-        assert self.operators.pop().kind == Logic.EOF
+        should_eof = self.operators.pop()
+        assert should_eof.kind == Logic.EOF
 
         if len(self.operators) != 0:
             lone_open: Token = self.operators.pop()
@@ -204,16 +206,16 @@ class LogicParser:
 
     def calculate(self):
         """Gera a tabela a partir dos resultados do parse"""
-        op = self.operand
-        v = self.variables
-        truth = generate_variables(v)
+        op: Operand = self.operand
+        v: dict[str, bool] = self.variables
+        truth: list = generate_variables(v)
 
-        header = [k for k in sorted(v)]
+        header: list = [k for k in sorted(v)]
         header.append(op.stringify(dict()))
-        table = [header]
+        table: list = [header]
 
         for var in truth:
-            row = [bool_to_str(var[key]) for key in sorted(var)]
+            row: list = [bool_to_str(var[key]) for key in sorted(var)]
             row.append(bool_to_str(op.evaluate(var)))
             table.append(row)
 
