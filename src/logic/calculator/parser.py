@@ -1,9 +1,9 @@
 import tabulate
 
-from core import *
+from logic.calculator.core import *
 from logic.stream.core import Logic, Token
 from logic.stream.exceptions import ParseError, BadToken
-from verify import setup
+from logic.calculator.verify import setup
 
 operator_map = {
     Logic.AND: AndOperator,
@@ -129,7 +129,7 @@ class LogicParser:
                         if t.kind == Logic.IMPLICATION:
                             # Consequência/Conclusão aparecer primeiro à direita até a esquerda
                             if priority(self.last()) > priority(t):
-                                pass
+                                break
                         else:
                             # Primeiro na leitura da esquerda para a direita
                             if priority(self.last()) < priority(t):
@@ -150,17 +150,17 @@ class LogicParser:
                     while True:
                         if len(self.operators) == 0:
                             raise ParseError(f"Não possui parêntese de abertura. {t}")
-                        curr_op: Token = self.operators.pop()
+                        curr: Token = self.operators.pop()
 
-                        if curr_op.kind == Logic.OPEN:
+                        if curr.kind == Logic.OPEN:
                             break
-                        if curr_op.kind == Logic.NOT:
-                            raise ParseError(f"Nenhum operando para negar. {curr_op}")
+                        if curr.kind == Logic.NOT:
+                            raise ParseError(f"Nenhum operando para negar. {curr}")
 
                         left: Operand = self.operands.pop()
                         right: Operand = self.operands.pop()
 
-                        self.append(to_operator(left, curr_op, right))
+                        self.append(to_operator(left, curr, right))
 
                     ex: Operand = self.operands.pop()
                     self.append(ex)

@@ -52,7 +52,7 @@ class TrueOperand(Operand):
     """Representa uma constante Verdade."""
 
     def evaluate(self, assign: dict = None):
-        """Retorna verdade."""
+        """Retorna valor booleano verdade."""
         return True
 
     def stringify(self, variables: dict = None):
@@ -63,7 +63,7 @@ class FalseOperand(Operand):
     """Representa uma constante Falso."""
 
     def evaluate(self, assign: dict = None):
-        """Retorna falso."""
+        """Retorna valor booleano falso."""
         return False
 
     def stringify(self, variables: dict = None):
