@@ -32,7 +32,7 @@ class Logic(Enum):
     FALSE = 13
 
 
-"""Mapea os Tokens com suas representações."""
+"""Mapeia os Tokens com suas representações."""
 logicMap = {
     Logic.TRUE: ['V', 'T'],
     Logic.FALSE: ['F'],
@@ -40,8 +40,8 @@ logicMap = {
     Logic.NOT: ['NOT', 'NÃO', '!', '~', '¬'],
     Logic.AND: ['AND', 'E', '&', '.', '∧', '^'],
     Logic.OR: ['OR', 'OU', '||', '|', '+', '∨', 'v'],
-    Logic.IMPLICATION: ['IMPLIES', '->', '→'],
-    Logic.EQUIVALENCE: ['EQUAL', '<->', '⟷', '≡', '='],
+    Logic.IMPLICATION: ['IMPLIES', 'IMPLICA', '->', '→'],
+    Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '='],
     Logic.XOR: ['XOR', '⊻', '⊕'],
     Logic.NAND: ['NAND', '↑'],
     Logic.NOR: ['NOR', '↓'],
@@ -173,14 +173,14 @@ class TokenStream:
             elif ch in logicMap[Logic.FALSE]:
                 return Token(equivalent[ch], False)
 
-        if ch in word_tree.root.children:
+        elif ch in word_tree.root.children:
             match = self.match(ch)
             if match in equivalent:
                 return Token(equivalent[match], match)
             for c in match:
                 self.source.putback(c)
 
-        if ch == "":
+        elif ch == "":
             return Token("", "")
 
         raise BadToken(f"Bad Token: char={ch}")

@@ -30,16 +30,11 @@ def to_operand(token: Token) -> Operand:
     raise BadToken(f"{token} não é um operando.")
 
 
-def to_operator(lhs: Operand, token: Token, rhs: Operand) -> Operator:
+def to_operator(left: Operand, token: Token, right: Operand) -> Operator:
     """Construi um Operator a partir de um Token e seus Operands"""
     if token.kind in operator_map:
-        return operator_map[token.kind](lhs, rhs)
+        return operator_map[token.kind](left, right)
     raise BadToken(f"{token} não é um operador.")
-
-
-def last(tokens: list):
-    """Retorna o último item sem removê-lo"""
-    return tokens[-1]
 
 
 def priority(token: Token):
@@ -55,7 +50,7 @@ def bool_to_str(boolean: bool):
 
 
 def generate_variables(expr_vars: dict):
-    """Gera árvore verdade a partir de varaiveis"""
+    """Gera árvore verdade a partir de variaveis"""
     variables = sorted(expr_vars.keys())
     length = len(variables)
     size = 2 ** length - 1
@@ -117,7 +112,7 @@ class LogicParser:
                 elif t.kind == Logic.EOF:
                     if len(self.operators) == 0:
                         raise ParseError("Erro de Parse")
-                    elif last(self.operators).kind == Logic.OPEN:
+                    elif self.last().kind == Logic.OPEN:
                         raise ParseError(f"Parêntese aberto não possui fechamento {t}.")
 
                     raise ParseError(f"Falta operandos. {self.operators}")
@@ -128,23 +123,23 @@ class LogicParser:
                     while True:
                         if len(self.operators) == 0:
                             break
-                        if last(self.operators).kind == Logic.OPEN:
+                        if self.last().kind == Logic.OPEN:
                             break
 
                         if t.kind == Logic.IMPLICATION:
                             # Consequência/Conclusão aparecer primeiro à direita até a esquerda
-                            if priority(last(self.operators)) >= priority(t):
-                                break
+                            if priority(self.last()) > priority(t):
+                                pass
                         else:
                             # Primeiro na leitura da esquerda para a direita
-                            if priority(last(self.operators)) < priority(t):
+                            if priority(self.last()) < priority(t):
                                 break
 
                         operator: Token = self.operators.pop()
-                        rhs: Operand = self.operands.pop()
-                        lhs: Operand = self.operands.pop()
+                        left: Operand = self.operands.pop()
+                        right: Operand = self.operands.pop()
 
-                        self.append(to_operator(lhs, operator, rhs))
+                        self.append(to_operator(left, operator, right))
 
                     self.operators.append(t)
                     expect_operand = True
@@ -162,10 +157,10 @@ class LogicParser:
                         if curr_op.kind == Logic.NOT:
                             raise ParseError(f"Nenhum operando para negar. {curr_op}")
 
-                        rhs: Operand = self.operands.pop()
-                        lhs: Operand = self.operands.pop()
+                        left: Operand = self.operands.pop()
+                        right: Operand = self.operands.pop()
 
-                        self.append(to_operator(lhs, curr_op, rhs))
+                        self.append(to_operator(left, curr_op, right))
 
                     ex: Operand = self.operands.pop()
                     self.append(ex)
@@ -184,6 +179,10 @@ class LogicParser:
         self.tokens = tokens
         self.operand = self.operands.pop()
         self.variables = setup_result[1]
+
+    def last(self):
+        """Retorna o último operador sem removê-lo"""
+        return self.operators[-1]
 
     def is_valid(self):
         return self.valid
@@ -219,7 +218,7 @@ class LogicParser:
 
     def append(self, expr: Expression):
         """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
-        while len(self.operators) > 0 and last(self.operators).kind == Logic.NOT:
+        while len(self.operators) > 0 and self.last().kind == Logic.NOT:
             self.operators.pop()
             expr = NotOperator(expr)
 
