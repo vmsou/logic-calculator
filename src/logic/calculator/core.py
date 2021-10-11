@@ -123,7 +123,7 @@ class NotOperator(UnaryOperator):
         return not self.operand.evaluate(assign)
 
     def stringify(self, variables: dict):
-        return f"¬{self.operand.stringify(variables)}"
+        return f"(¬{self.operand.stringify(variables)})"
 
     def equivalences(self):
         equiv = [

@@ -16,18 +16,20 @@ def reverse_map(sample_dict: dict):
 class Logic(Enum):
     """Elementos lógicos e parte de suas precedências"""
     EOF = -1
+    # Operators --------
     EQUIVALENCE = 0
     IMPLICATION = 1
     OR = 2
-    AND = 3
-    NOT = 4
-    CLOSE = 5
-    OPEN = 6
-    VAR = 7
-    CONSTANT = 8
-    XOR = 9
-    NAND = 10
-    NOR = 11
+    NOR = 3
+    XOR = 4
+    AND = 5
+    NAND = 6
+    NOT = 7
+    # ------------------
+    CLOSE = 8
+    OPEN = 9
+    VAR = 10
+    CONSTANT = 11
     TRUE = 12
     FALSE = 13
 
@@ -36,12 +38,11 @@ class Logic(Enum):
 logicMap = {
     Logic.TRUE: ['V', 'T'],
     Logic.FALSE: ['F'],
-    Logic.CONSTANT: ['V', 'T', 'F'],
     Logic.NOT: ['NOT', 'NÃO', '!', '~', '¬'],
     Logic.AND: ['AND', 'E', '&', '.', '∧', '^'],
     Logic.OR: ['OR', 'OU', '||', '|', '+', '∨', 'v'],
-    Logic.IMPLICATION: ['IMPLIES', 'IMPLICA', '->', '→'],
-    Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '=='],
+    Logic.IMPLICATION: ['IMPLIES', 'IMPLICA', '->', '→', '⇒'],
+    Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '==', '⇔'],
     Logic.XOR: ['XOR', '⊻', '⊕'],
     Logic.NAND: ['NAND', '↑'],
     Logic.NOR: ['NOR', '↓'],
@@ -50,7 +51,9 @@ logicMap = {
     Logic.VAR: ['p', 'q', 'r', 's', 'A', 'B', 'C'],
 }
 
-# Utilizado para facilitiar procura
+logicMap[Logic.CONSTANT] = logicMap[Logic.TRUE] + logicMap[Logic.FALSE]
+
+# Utilizado para facilitar procuras
 whitespace = (' ', '\n', '\t')
 equivalent = reverse_map(logicMap)
 operators = (key for key, val in equivalent.items() if val != Logic.CONSTANT)
@@ -63,8 +66,8 @@ for char in equivalent:
 class ReturnString:
     """Simula um input() com texto predeterminado"""
 
-    def __init__(self, text=""):
-        self.text = text
+    def __init__(self, text: str = ""):
+        self.text: str = text
 
     def __call__(self, *args, **kwargs):
         return self.text
@@ -73,8 +76,8 @@ class ReturnString:
 class Token:
     """Representa um elemento lógico dentro de uma expressão."""
 
-    def __init__(self, kind=None, value=None):
-        self.kind = kind
+    def __init__(self, kind: Logic = Logic.EOF, value: str = ""):
+        self.kind: Logic = kind
         self.value = value
 
     def __str__(self):
@@ -95,7 +98,7 @@ class InputStream:
 
     def __init__(self, source=input):
         self.source = source
-        self.buffer = ""
+        self.buffer: str = ""
 
     def __bool__(self):
         return bool(self.buffer)
@@ -175,9 +178,9 @@ class TokenStream:
 
         if ch in logicMap[Logic.CONSTANT]:
             if ch in logicMap[Logic.TRUE]:
-                return Token(equivalent[ch], True)
+                return Token(equivalent[ch], "V")
             elif ch in logicMap[Logic.FALSE]:
-                return Token(equivalent[ch], False)
+                return Token(equivalent[ch], "F")
 
         elif ch in word_tree.root.children:
             match = self.match(ch)
