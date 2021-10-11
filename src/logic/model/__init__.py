@@ -3,6 +3,8 @@ Essa seção representa elementos de uma expressão lógica e seus resultados.
 """
 
 """Modelos lógicos"""
+
+
 class Expression:
     """Expressão que represanta ambos Operadores e Operandos."""
 
@@ -19,7 +21,7 @@ class Expression:
     def stringify(self, variables: dict):
         """Mostra a expressão em forma de string"""
         return ""
-    
+
     def simplify(self, assign: dict):
         """TODO: Encontrar padrões de simplificação."""
         return self

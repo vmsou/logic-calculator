@@ -2,7 +2,7 @@
 Essa seção modelas os operandos, indicando seus resultados como Verdade, Falso ou uma Variável.
 """
 
-from logic.calculator.model import Operand
+from logic.model import Operand
 
 """Constantes"""
 class TRUE(Operand):

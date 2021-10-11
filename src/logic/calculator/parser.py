@@ -1,9 +1,8 @@
 import tabulate
 
-from logic.calculator import operator
-from logic.calculator import operand
+from logic.model import operator, operand
 
-from logic.calculator.model import Expression, Operator, Operand
+from logic.model import Expression, Operator, Operand
 from logic.stream.core import Logic, Token
 from logic.stream.exceptions import ParseError, BadToken
 from logic.calculator.verify import setup

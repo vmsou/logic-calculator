@@ -2,8 +2,8 @@
 Nesta seção é modelado os operados unários e binários.
 """
 
-from logic.calculator.model import Operator, Expression
-from logic.calculator.operand import TRUE, FALSE
+from logic.model import Operator, Expression
+from logic.model.operand import TRUE, FALSE
 
 """Operadores unários"""
 class Unary(Operator):
