@@ -1,11 +1,13 @@
 import tabulate
 
-from logic.model import operator, operand
-
-from logic.model import Expression, Operator, Operand
-from logic.stream.core import Logic, Token
-from logic.stream.exceptions import ParseError, BadToken
 from logic.calculator.setup import setup
+
+from logic.model import operator, operand
+from logic.model import Expression, Operator, Operand
+from logic.model.exceptions import ParseError
+
+from logic.stream.core import Logic, Token
+from logic.stream.exceptions import BadToken
 
 operator_map = {
     Logic.AND: operator.AND,
@@ -188,21 +190,22 @@ class LogicParser:
         self.variables = variables
 
     def last(self) -> Token:
-        """Retorna o último operador sem removê-lo"""
+        """Retorna o último operador Token sem removê-lo"""
         return self.operators[-1]
 
     def is_valid(self) -> bool:
+        """Indica se não houve problemas durante o parse."""
         return self.valid
 
     def is_fbf(self) -> bool:
-        """Verifica se os tokens constroem uma Fórmula Bem Formada"""
+        """Verifica se os tokens constroem uma Fórmula Bem Formada."""
         for i in self.tokens:
             if i.kind not in fbf_permitted:
                 return False
         return True
 
     def calculate(self) -> tuple:
-        """Gera a tabela a partir dos resultados do parse"""
+        """Gera a tabela a partir dos resultados do parse."""
         op: Operand = self.operand
         v: dict[str, bool] = self.variables
         truth: list = generate_variables(v)
@@ -219,7 +222,7 @@ class LogicParser:
         return header, table
 
     def show_table(self) -> None:
-        """Usa o módulo tabulate para monstrar a tabela"""
+        """Usa o módulo tabulate para mostrar a tabela."""
         header, data = self.calculate()
         print(tabulate.tabulate(data, headers=header, tablefmt='fancy_grid', stralign='center'))
 

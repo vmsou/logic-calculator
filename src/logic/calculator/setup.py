@@ -19,6 +19,7 @@ def tokenize(expr: str) -> list[Token]:
 
 
 def get_vars(tokens: list[Token]) -> dict[str, bool]:
+    """Recebe uma lista de Tokens e retorna um mapa com suas variáveis."""
     var_dict: dict[str, bool] = {}
     for v in filter(lambda x: x.kind == Logic.VAR, tokens):
         var_dict[v.value] = True

@@ -1,18 +1,8 @@
 class BadToken(Exception):
+    """Representa um Token não permitido."""
     pass
 
 
 class FullBuffer(Exception):
-    pass
-
-
-class PrimaryExpected(Exception):
-    pass
-
-
-class ExpectedToken(Exception):
-    pass
-
-
-class ParseError(Exception):
+    """Problema de lógica no programa. Foi colocado um Token no Buffer antes de ser resgatado."""
     pass

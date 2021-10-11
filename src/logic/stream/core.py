@@ -55,13 +55,13 @@ logicMap: dict[Logic, list[str]] = {
 logicMap[Logic.CONSTANT] = logicMap[Logic.TRUE] + logicMap[Logic.FALSE]
 
 # Utilizado para facilitar procuras
-whitespace = (' ', '\n', '\t')
-equivalent: dict = reverse_map(logicMap)
+whitespace: tuple = (' ', '\n', '\t')
+equivalent: dict[str, Logic] = reverse_map(logicMap)
 operators = (key for key, val in equivalent.items() if val != Logic.CONSTANT)
-word_tree = WordTree()
+word_tree: WordTree = WordTree()
 
-for char in equivalent:
-    word_tree.add(char)
+for word in equivalent:
+    word_tree.add(word)
 
 
 class ReturnString:
@@ -94,6 +94,7 @@ class Token:
 
     @property
     def priority(self) -> int:
+        """Retorna um valor de prioridade a partir de seu valor no Enum."""
         return self.kind.value
 
 

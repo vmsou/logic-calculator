@@ -21,7 +21,7 @@ def show_errors(errors: list[Exception]) -> None:
 
 def main():
     errors: list[Exception] = []
-    parser = LogicParser()
+    parser: LogicParser = LogicParser()
     header()
     while True:
         parser.expr = input("> ")
