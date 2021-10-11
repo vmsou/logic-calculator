@@ -6,7 +6,7 @@ from logic.model import operator, operand
 from logic.model import Expression, Operator, Operand
 from logic.model.exceptions import ParseError
 
-from logic.stream.core import Logic, Token
+from logic.stream.core import Logic, Token, logicMap
 from logic.stream.exceptions import BadToken
 
 operator_map = {
@@ -25,9 +25,9 @@ fbf_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR
 def to_operand(token: Token) -> Operand:
     """Converte Token para Operand"""
     if token.kind == Logic.CONSTANT:
-        if token.value in ("V", "T"):
+        if token.value in logicMap[Logic.TRUE]:
             return operand.TRUE()
-        elif token.value == "F":
+        elif token.value in logicMap[Logic.FALSE]:
             return operand.FALSE()
     elif token.kind == Logic.VAR:
         return operand.VAR(token.value)
@@ -48,7 +48,7 @@ def bool_to_str(boolean: bool) -> str:
     return "F"
 
 
-def generate_variables(expr_vars: dict[str, bool]) -> list[dict]:
+def gen_variables(expr_vars: dict[str, bool]) -> list[dict]:
     """Gera árvore verdade a partir de variaveis"""
     variables: list = sorted(expr_vars.keys())
     length: int = len(variables)
@@ -57,8 +57,8 @@ def generate_variables(expr_vars: dict[str, bool]) -> list[dict]:
 
     for i in range(size, -1, -1):
         row: dict = {}
-        b: str = format(i, f'#0{length + 2}b')
-        for c in range(-length, 0, 1):
+        b: str = format(i, f'#0{length + 2}b')[2:]  # Remove '0b'
+        for c in range(0, len(b)):
             row[variables[c]] = (bool(int(b[c])))
         vars_table.append(row)
     return vars_table
@@ -208,7 +208,7 @@ class LogicParser:
         """Gera a tabela a partir dos resultados do parse."""
         op: Operand = self.operand
         v: dict[str, bool] = self.variables
-        truth: list = generate_variables(v)
+        truth: list = gen_variables(v)
 
         header: list = [k for k in sorted(v)]
         header.append(op.stringify(dict()))
