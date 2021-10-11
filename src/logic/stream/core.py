@@ -36,11 +36,11 @@ class Logic(Enum):
 
 
 """Mapeia os Tokens com suas representações."""
-logicMap = {
+logicMap: dict[Logic, list[str]] = {
     Logic.TRUE: ['V', 'T'],
     Logic.FALSE: ['F'],
     Logic.NOT: ['NOT', 'NÃO', '!', '~', '¬'],
-    Logic.AND: ['AND', 'E', '&', '.', '∧', '^'],
+    Logic.AND: ['AND', 'E', '&&', '&', '.', '∧', '^'],
     Logic.OR: ['OR', 'OU', '||', '|', '+', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', 'IMPLICA', '->', '→', '⇒'],
     Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '==', '⇔'],
@@ -49,7 +49,7 @@ logicMap = {
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r', 's', 'A', 'B', 'C'],
+    Logic.VAR: ['p', 'q', 'r', 'A', 'B', 'C'],
 }
 
 logicMap[Logic.CONSTANT] = logicMap[Logic.TRUE] + logicMap[Logic.FALSE]

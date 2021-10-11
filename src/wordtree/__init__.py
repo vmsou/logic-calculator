@@ -1,7 +1,9 @@
 class CharNode:
+    """Representa um prefixo em uma arvore de prefixos."""
+
     def __init__(self, char: str):
         self.char: str = char
-        self.children: dict[CharNode] = {}
+        self.children: dict[str, CharNode] = {}
 
     def __repr__(self) -> str:
         return f"CharNode(char='{self.char}', children={self.children})"
@@ -17,8 +19,10 @@ class CharNode:
 
 
 class WordTree:
+    """Representa uma arvore de prefixos e guarda sua raiz."""
+
     def __init__(self):
-        self.root = CharNode("")
+        self.root: CharNode = CharNode("")
 
     def add(self, word: str):
         node: CharNode = self.root

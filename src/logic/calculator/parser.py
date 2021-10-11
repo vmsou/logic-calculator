@@ -5,7 +5,7 @@ from logic.model import operator, operand
 from logic.model import Expression, Operator, Operand
 from logic.stream.core import Logic, Token
 from logic.stream.exceptions import ParseError, BadToken
-from logic.calculator.verify import setup
+from logic.calculator.setup import setup
 
 operator_map = {
     Logic.AND: operator.AND,
@@ -23,9 +23,9 @@ fbf_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR
 def to_operand(token: Token) -> Operand:
     """Converte Token para Operand"""
     if token.kind == Logic.CONSTANT:
-        if token.value:
+        if token.value in ("V", "T"):
             return operand.TRUE()
-        elif not token.value:
+        elif token.value == "F":
             return operand.FALSE()
     elif token.kind == Logic.VAR:
         return operand.VAR(token.value)
@@ -100,7 +100,7 @@ class LogicParser:
 
     def parse(self) -> None:
         """Função principal para conversão da entrada em Tokens e depois para Operandos"""
-        setup_result: list = setup(self.expr)
+        setup_result: tuple[list[Token], dict[str, bool]] = setup(self.expr)
         tokens: list[Token] = setup_result[0]
         variables: dict[str, bool] = setup_result[1]
 
@@ -141,11 +141,11 @@ class LogicParser:
                             if self.last().priority < t.priority:
                                 break
 
-                        operator: Token = self.operators.pop()
+                        op: Token = self.operators.pop()
                         right: Operand = self.operands.pop()
                         left: Operand = self.operands.pop()
 
-                        self.append(to_operator(left, operator, right))
+                        self.append(to_operator(left, op, right))
 
                     self.operators.append(t)
                     expect_operand = True
@@ -156,17 +156,17 @@ class LogicParser:
                     while True:
                         if len(self.operators) == 0:
                             raise ParseError(f"Não possui parêntese de abertura. {t}")
-                        curr: Token = self.operators.pop()
+                        op: Token = self.operators.pop()
 
-                        if curr.kind == Logic.OPEN:
+                        if op.kind == Logic.OPEN:
                             break
-                        if curr.kind == Logic.NOT:
-                            raise ParseError(f"Nenhum operando para negar. {curr}")
+                        if op.kind == Logic.NOT:
+                            raise ParseError(f"Nenhum operando para negar. {op}")
 
                         right: Operand = self.operands.pop()
                         left: Operand = self.operands.pop()
 
-                        self.append(to_operator(left, curr, right))
+                        self.append(to_operator(left, op, right))
 
                     ex: Operand = self.operands.pop()
                     self.append(ex)

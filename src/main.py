@@ -1,7 +1,8 @@
 from logic.calculator.parser import LogicParser
 
-def header():
-    size = 60
+def header() -> None:
+    """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
+    size: int = 60
     print("[ Calculadora Lógica ]".center(size, '-'))
     print("Constantes: ")
     print("True = 'V', False = 'F'")
@@ -12,7 +13,8 @@ def header():
     print("Variáveis: p, q, r, A, B e C")
     print("-" * size)
 
-def show_errors(errors):
+def show_errors(errors: list[Exception]) -> None:
+    """Imprime uma lista de erros e depois limpa a lista."""
     for error in errors:
         print(f"\033[91m[Error] {error}\033[0m")
     errors.clear()
