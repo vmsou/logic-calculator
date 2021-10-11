@@ -41,13 +41,13 @@ logicMap = {
     Logic.AND: ['AND', 'E', '&', '.', '∧', '^'],
     Logic.OR: ['OR', 'OU', '||', '|', '+', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', 'IMPLICA', '->', '→'],
-    Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '='],
+    Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '=='],
     Logic.XOR: ['XOR', '⊻', '⊕'],
     Logic.NAND: ['NAND', '↑'],
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r', 'A', 'B', 'C'],
+    Logic.VAR: ['p', 'q', 'r', 's', 'A', 'B', 'C'],
 }
 
 # Utilizado para facilitiar procura

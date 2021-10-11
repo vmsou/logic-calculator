@@ -22,6 +22,12 @@ Essa é uma lista dos recursos utilizados para fazer esse projeto
 - [X] NOR
 - [X] NAND
 
+## Pastas
+### logic - Compõe os recursos para fazer o parse dos simbolos proposicionais
+#### - calculator: Utilizado para fazer cálculo proposicionais
+#### - stream: Utilizado para criar tokens a partir de simbolos predeterminados
+### wordtree - Utilizado pelo stream para fazer busca de palavras em arvore de prefixos
+
 ## 🛠 Pacotes
 - [tabulate](https://pypi.org/project/tabulate/) 
 ```bash
@@ -42,6 +48,8 @@ python main.py
 </h4>
 
 ## Para fazer:
+- [ ] IMPLICATION CHAIN PRECEDENCE
+- [ ] EQUIVALENCE CHAIN PRECEDENCE
 - [ ] EQUIVALENCES
 - [ ] SIMPLIFICATION
 
