@@ -1,10 +1,11 @@
 from enum import Enum
+from typing import Callable
 
 from logic.stream.exceptions import BadToken, FullBuffer
 from wordtree import WordTree
 
 
-def reverse_map(sample_dict: dict):
+def reverse_map(sample_dict: dict) -> dict:
     """Inverte um mapa; os valores apontam para a chave."""
     reversed_map = {}
     for key, val in sample_dict.items():
@@ -55,7 +56,7 @@ logicMap[Logic.CONSTANT] = logicMap[Logic.TRUE] + logicMap[Logic.FALSE]
 
 # Utilizado para facilitar procuras
 whitespace = (' ', '\n', '\t')
-equivalent = reverse_map(logicMap)
+equivalent: dict = reverse_map(logicMap)
 operators = (key for key, val in equivalent.items() if val != Logic.CONSTANT)
 word_tree = WordTree()
 
@@ -86,44 +87,47 @@ class Token:
     def __repr__(self):
         return str(self)
 
+    def __bool__(self):
+        if self.kind == Logic.EOF:
+            return False
+        return True
+
     @property
-    def priority(self):
-        if type(self.kind) == Logic:
-            return self.kind.value
-        return 0
+    def priority(self) -> int:
+        return self.kind.value
 
 
 class InputStream:
     """Nesse Stream se obtem caracteres separados pelo espaço em branco."""
 
-    def __init__(self, source=input):
-        self.source = source
+    def __init__(self, source: Callable = input):
+        self.source: Callable = source
         self.buffer: str = ""
 
     def __bool__(self):
         return bool(self.buffer)
 
-    def get(self):
+    def get(self) -> str:
         """Retorna um caracter."""
         return self.char_tokenize()
 
-    def putback(self, val: str):
+    def putback(self, val: str) -> None:
         """Retorna o caracter para o buffer"""
         self.buffer = val + self.buffer
 
-    def input(self):
+    def input(self) -> None:
         """Utiliza o source para pegar um input."""
         self.buffer = self.source()
 
-    def empty(self):
+    def empty(self) -> bool:
         """Verfifica se acabou o buffer."""
         return len(self.buffer) <= 0
 
-    def char_tokenize(self):
+    def char_tokenize(self) -> str:
         """Pega o primeiro caracter que não seja um espaço branco."""
-        index = 0
-        size = len(self.buffer)
-        value = ""
+        index: int = 0
+        size: int = len(self.buffer)
+        value: str = ""
         if self.buffer:
             while index < size and self.buffer[index] in whitespace:
                 index += 1
@@ -139,26 +143,25 @@ class TokenStream:
     """Utiliza um InputStream para separar os tokens de uma string."""
 
     def __init__(self, source: InputStream):
-        self.index = 0
         self.source = source
         self.full = False
         self.buffer = Token()
 
-    def tokenize(self):
+    def tokenize(self) -> list[Token]:
         """Retorna uma lista com os Tokens permitidos. Finaliza com um EOF (End-of-File)."""
-        tokens = []
-        ch = self.get()
-        while ch.kind != "":
-            tokens.append(ch)
-            ch = self.get()
+        tokens: list[Token] = []
+        t: Token = self.get()
+        while t:
+            tokens.append(t)
+            t = self.get()
 
         tokens.append(Token(Logic.EOF))
         return tokens
 
-    def match(self, ch: str):
+    def match(self, ch: str) -> str:
         """Procura uma aproximação a partir de 1 caractere."""
         node = word_tree.root
-        word = ""
+        word: str = ""
         while node.has(ch):
             node = node.children[ch]
             word += ch
@@ -167,14 +170,13 @@ class TokenStream:
 
         return word
 
-    def get(self):
+    def get(self) -> Token:
         """Retorna somente um Token permitido. Utilizando uma Arvore de Palavras para se aproximar."""
         if self.full:
             self.full = False
             return self.buffer
 
-        ch = self.source.get()
-        self.index += 1
+        ch: str = self.source.get()
 
         if ch in logicMap[Logic.CONSTANT]:
             if ch in logicMap[Logic.TRUE]:
@@ -183,26 +185,25 @@ class TokenStream:
                 return Token(equivalent[ch], "F")
 
         elif ch in word_tree.root.children:
-            match = self.match(ch)
+            match: str = self.match(ch)
             if match in equivalent:
                 return Token(equivalent[match], match)
             for c in match:
                 self.source.putback(c)
 
         elif ch == "":
-            return Token("", "")
+            return Token()
 
         raise BadToken(f"Bad Token: char={ch}")
 
-    def putback(self, t: Token):
+    def putback(self, t: Token) -> None:
         """Retorna um Token para o buffer."""
         if self.full:
-            raise FullBuffer("Full Buffer:", t)
-        if t.kind:
-            self.buffer = t
-            self.full = True
+            raise FullBuffer(f"Full Buffer: {t}")
+        self.buffer = t
+        self.full = True
 
-    def clean(self):
+    def clean(self) -> None:
         """Limpa o buffer."""
         self.buffer = Token()
         self.full = False

@@ -15,7 +15,7 @@ operator_map = {
     Logic.NAND: NandOperator,
 }
 
-fbf_permitted = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
+fbf_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
 
 
 def to_operand(token: Token) -> Operand:
