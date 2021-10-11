@@ -65,7 +65,7 @@ for word in equivalent:
 
 
 class ReturnString:
-    """Simula um input() com texto predeterminado"""
+    """Simula um input() com texto predeterminado."""
 
     def __init__(self, text: str = ""):
         self.text: str = text
@@ -162,14 +162,14 @@ class TokenStream:
     def match(self, ch: str) -> str:
         """Procura uma aproximação a partir de 1 caractere."""
         node = word_tree.root
-        word: str = ""
+        matched: str = ""
         while node.has(ch):
             node = node.children[ch]
-            word += ch
+            matched += ch
             ch = self.source.get()
         self.source.putback(ch)
 
-        return word
+        return matched
 
     def get(self) -> Token:
         """Retorna somente um Token permitido. Utilizando uma Arvore de Palavras para se aproximar."""

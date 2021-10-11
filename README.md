@@ -6,9 +6,9 @@ Trabalho Prático com o objetivo de desenvolver um gerador de Tabela Verdade de 
 
 ## Sobre o Projeto
 Desenvolvimento de uma ferramenta para resolver problemas de Lógica Proposicional.
-Realiza operações de uma fórmula lógica, no formate de tabela-verdade.
+Realiza operações de uma fórmula lógica, no formato de tabela-verdade.
 
-Essa é uma lista dos recursos utilizados para fazer esse projeto
+Essa é uma lista dos recursos utilizados para realizar esse projeto
 
 ## Principais Funcionalidades
 ### Cálculo
@@ -23,10 +23,12 @@ Essa é uma lista dos recursos utilizados para fazer esse projeto
 - [X] NAND
 
 ## Pastas
-### logic - Compõe os recursos para fazer o parse dos simbolos proposicionais
-#### - calculator: Utilizado para fazer cálculo proposicionais
-#### - stream: Utilizado para criar tokens a partir de simbolos predeterminados
-### wordtree - Utilizado pelo stream para fazer busca de palavras em arvore de prefixos
+
+* ### logic - Compõe os recursos para fazer o parse dos simbolos proposicionais
+    * #### calculator: Utilizado para fazer o parse e cálculo proposicionais
+    * #### model: Representa modelos lógicos como Expressões, Operandos e Operadores.
+    * #### stream: Utilizado para criar e separar tokens de um texto a partir de simbolos predeterminados
+* ### wordtree - Usado pelo stream para fazer busca de palavras em arvore de prefixos
 
 ## 🛠 Pacotes
 - [tabulate](https://pypi.org/project/tabulate/) 
@@ -49,7 +51,7 @@ python main.py
 
 ## Para fazer:
 - [ ] IMPLICATION CHAIN PRECEDENCE
-- [ ] EQUIVALENCE CHAIN PRECEDENCE
+- [x] EQUIVALENCE CHAIN PRECEDENCE
 - [ ] EQUIVALENCES
 - [ ] SIMPLIFICATION
 
