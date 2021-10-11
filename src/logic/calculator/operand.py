@@ -1,4 +1,8 @@
-from logic.calculator.core import Operand
+"""
+Essa seção modelas os operandos, indicando seus resultados como Verdade, Falso ou uma Variável.
+"""
+
+from logic.calculator.model import Operand
 
 """Constantes"""
 class TRUE(Operand):

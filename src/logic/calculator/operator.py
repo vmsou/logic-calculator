@@ -1,8 +1,12 @@
-from logic.calculator.core import Operator, Expression
-from logic.calculator.operands import TRUE, FALSE
+"""
+Nesta seção é modelado os operados unários e binários.
+"""
+
+from logic.calculator.model import Operator, Expression
+from logic.calculator.operand import TRUE, FALSE
 
 """Operadores unários"""
-class UnaryOperator(Operator):
+class Unary(Operator):
     """Representa um Operador unário."""
 
     def __init__(self, operand: Expression):
@@ -18,7 +22,7 @@ class UnaryOperator(Operator):
         return self.operand.stringify(variables)
 
 
-class NOT(UnaryOperator):
+class NOT(Unary):
     """Representa um Operador unário de negação."""
 
     def __init__(self, operand: Expression):
@@ -39,7 +43,7 @@ class NOT(UnaryOperator):
 
 
 """Operadores binários"""
-class BinaryOperator(Operator):
+class Binary(Operator):
     """Representa um Operador binário."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -59,7 +63,7 @@ class BinaryOperator(Operator):
         return []
 
 
-class AND(BinaryOperator):
+class AND(Binary):
     """Representa um Operador binário de conjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -83,7 +87,7 @@ class AND(BinaryOperator):
         return self
 
 
-class OR(BinaryOperator):
+class OR(Binary):
     """Representa um Operador binário de disjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -110,7 +114,7 @@ class OR(BinaryOperator):
         return self
 
 
-class IMPLIES(BinaryOperator):
+class IMPLIES(Binary):
     """Representa um Operador binário de implicação."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -133,7 +137,7 @@ class IMPLIES(BinaryOperator):
         return equiv
 
 
-class EQUIVALENCE(BinaryOperator):
+class EQUIVALENCE(Binary):
     """Representa um Operador binário de equivalência."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -152,7 +156,7 @@ class EQUIVALENCE(BinaryOperator):
         return equiv
 
 
-class NAND(BinaryOperator):
+class NAND(Binary):
     """Representa um Operador binário de negação de conjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -172,7 +176,7 @@ class NAND(BinaryOperator):
         return equiv
 
 
-class NOR(BinaryOperator):
+class NOR(Binary):
     """Representa um Operador binário de negação de disjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -192,7 +196,7 @@ class NOR(BinaryOperator):
         return equiv
 
 
-class XOR(BinaryOperator):
+class XOR(Binary):
     """Representa um Operador binário de disjunção exclusiva."""
 
     def __init__(self, left: Expression, right: Expression):

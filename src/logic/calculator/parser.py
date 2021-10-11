@@ -1,21 +1,21 @@
 import tabulate
 
-from logic.calculator import operators
-from logic.calculator import operands
+from logic.calculator import operator
+from logic.calculator import operand
 
-from logic.calculator.core import Expression, Operator, Operand
+from logic.calculator.model import Expression, Operator, Operand
 from logic.stream.core import Logic, Token
 from logic.stream.exceptions import ParseError, BadToken
 from logic.calculator.verify import setup
 
 operator_map = {
-    Logic.AND: operators.AND,
-    Logic.OR: operators.OR,
-    Logic.EQUIVALENCE: operators.EQUIVALENCE,
-    Logic.IMPLICATION: operators.IMPLIES,
-    Logic.XOR: operators.XOR,
-    Logic.NOR: operators.NOR,
-    Logic.NAND: operators.NAND,
+    Logic.AND: operator.AND,
+    Logic.OR: operator.OR,
+    Logic.EQUIVALENCE: operator.EQUIVALENCE,
+    Logic.IMPLICATION: operator.IMPLIES,
+    Logic.XOR: operator.XOR,
+    Logic.NOR: operator.NOR,
+    Logic.NAND: operator.NAND,
 }
 
 fbf_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
@@ -25,11 +25,11 @@ def to_operand(token: Token) -> Operand:
     """Converte Token para Operand"""
     if token.kind == Logic.CONSTANT:
         if token.value:
-            return operands.TRUE()
+            return operand.TRUE()
         elif not token.value:
-            return operands.FALSE()
+            return operand.FALSE()
     elif token.kind == Logic.VAR:
-        return operands.VAR(token.value)
+        return operand.VAR(token.value)
     raise BadToken(f"{token} não é um operando.")
 
 
@@ -49,14 +49,14 @@ def bool_to_str(boolean: bool) -> str:
 
 def generate_variables(expr_vars: dict[str, bool]) -> list[dict]:
     """Gera árvore verdade a partir de variaveis"""
-    variables = sorted(expr_vars.keys())
-    length = len(variables)
-    size = 2 ** length - 1
-    vars_table = []
+    variables: list = sorted(expr_vars.keys())
+    length: int = len(variables)
+    size: int = 2 ** length - 1
+    vars_table: list[dict] = []
 
     for i in range(size, -1, -1):
-        row = {}
-        b = format(i, f'#0{length + 2}b')
+        row: dict = {}
+        b: str = format(i, f'#0{length + 2}b')
         for c in range(-length, 0, 1):
             row[variables[c]] = (bool(int(b[c])))
         vars_table.append(row)
@@ -228,6 +228,6 @@ class LogicParser:
         """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
         while len(self.operators) > 0 and self.last().kind == Logic.NOT:
             self.operators.pop()
-            expr = operators.NOT(expr)
+            expr = operator.NOT(expr)
 
         self.operands.append(expr)
