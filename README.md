@@ -24,11 +24,11 @@ Essa é uma lista dos recursos utilizados para realizar esse projeto
 
 ## Pastas
 
-* ### logic - Compõe os recursos para fazer o parse dos simbolos proposicionais
-    * #### calculator: Utilizado para fazer o parse e cálculo proposicionais
-    * #### model: Representa modelos lógicos como Expressões, Operandos e Operadores.
-    * #### stream: Utilizado para criar e separar tokens de um texto a partir de simbolos predeterminados
-* ### wordtree - Usado pelo stream para fazer busca de palavras em arvore de prefixos
+* ### [logic](./src/logic) - Compõe os recursos para fazer o parse dos simbolos proposicionais
+    * #### [calculator](./src/logic/calculator): Utilizado para fazer o parse e cálculo proposicionais
+    * #### [model](./src/logic/model): Representa modelos lógicos como Expressões, Operandos e Operadores.
+    * #### [stream](./src/logic/stream): Utilizado para criar e separar tokens de um texto a partir de simbolos predeterminados
+* ### [wordtree](./src/wordtree) - Usado pelo stream para fazer busca de palavras em arvore de prefixos
 
 ## 🛠 Pacotes
 - [tabulate](https://pypi.org/project/tabulate/) 
