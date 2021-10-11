@@ -1,18 +1,21 @@
 import tabulate
 
-from logic.calculator.core import *
+from logic.calculator import operators
+from logic.calculator import operands
+
+from logic.calculator.core import Expression, Operator, Operand
 from logic.stream.core import Logic, Token
 from logic.stream.exceptions import ParseError, BadToken
 from logic.calculator.verify import setup
 
 operator_map = {
-    Logic.AND: AndOperator,
-    Logic.OR: OrOperator,
-    Logic.EQUIVALENCE: EquivalenceOperator,
-    Logic.IMPLICATION: ImplicationOperator,
-    Logic.XOR: XorOperator,
-    Logic.NOR: NorOperator,
-    Logic.NAND: NandOperator,
+    Logic.AND: operators.AND,
+    Logic.OR: operators.OR,
+    Logic.EQUIVALENCE: operators.EQUIVALENCE,
+    Logic.IMPLICATION: operators.IMPLIES,
+    Logic.XOR: operators.XOR,
+    Logic.NOR: operators.NOR,
+    Logic.NAND: operators.NAND,
 }
 
 fbf_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
@@ -22,11 +25,11 @@ def to_operand(token: Token) -> Operand:
     """Converte Token para Operand"""
     if token.kind == Logic.CONSTANT:
         if token.value:
-            return TrueOperand()
+            return operands.TRUE()
         elif not token.value:
-            return FalseOperand()
+            return operands.FALSE()
     elif token.kind == Logic.VAR:
-        return VarOperand(token.value)
+        return operands.VAR(token.value)
     raise BadToken(f"{token} não é um operando.")
 
 
@@ -37,14 +40,14 @@ def to_operator(left: Operand, token: Token, right: Operand) -> Operator:
     raise BadToken(f"{token} não é um operador.")
 
 
-def bool_to_str(boolean: bool):
+def bool_to_str(boolean: bool) -> str:
     """Converte um elemento booleano em uma string 'V' ou 'F'"""
     if boolean:
         return "V"
     return "F"
 
 
-def generate_variables(expr_vars: dict):
+def generate_variables(expr_vars: dict[str, bool]) -> list[dict]:
     """Gera árvore verdade a partir de variaveis"""
     variables = sorted(expr_vars.keys())
     length = len(variables)
@@ -79,11 +82,11 @@ class LogicParser:
         self.valid: bool = False
 
     @property
-    def expr(self):
+    def expr(self) -> str:
         return self._expr
 
     @expr.setter
-    def expr(self, value):
+    def expr(self, value) -> None:
         """Limpa os recursos quando expressão for escolhida."""
         # parse
         self._expr = value
@@ -96,7 +99,7 @@ class LogicParser:
         self.operand = Operand()
         self.valid = False
 
-    def parse(self):
+    def parse(self) -> None:
         """Função principal para conversão da entrada em Tokens e depois para Operandos"""
         setup_result: list = setup(self.expr)
         tokens: list[Token] = setup_result[0]
@@ -185,21 +188,21 @@ class LogicParser:
         self.operand = self.operands.pop()
         self.variables = variables
 
-    def last(self):
+    def last(self) -> Token:
         """Retorna o último operador sem removê-lo"""
         return self.operators[-1]
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return self.valid
 
-    def is_fbf(self):
+    def is_fbf(self) -> bool:
         """Verifica se os tokens constroem uma Fórmula Bem Formada"""
         for i in self.tokens:
             if i.kind not in fbf_permitted:
                 return False
         return True
 
-    def calculate(self):
+    def calculate(self) -> tuple:
         """Gera a tabela a partir dos resultados do parse"""
         op: Operand = self.operand
         v: dict[str, bool] = self.variables
@@ -216,15 +219,15 @@ class LogicParser:
 
         return header, table
 
-    def show_table(self):
+    def show_table(self) -> None:
         """Usa o módulo tabulate para monstrar a tabela"""
         header, data = self.calculate()
         print(tabulate.tabulate(data, headers=header, tablefmt='fancy_grid', stralign='center'))
 
-    def append(self, expr: Expression):
+    def append(self, expr: Expression) -> None:
         """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
         while len(self.operators) > 0 and self.last().kind == Logic.NOT:
             self.operators.pop()
-            expr = NotOperator(expr)
+            expr = operators.NOT(expr)
 
         self.operands.append(expr)
