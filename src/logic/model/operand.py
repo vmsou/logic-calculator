@@ -8,22 +8,22 @@ from logic.model import Operand
 class TRUE(Operand):
     """Representa uma constante Verdade."""
 
-    def evaluate(self, assign: dict = None):
+    def evaluate(self, assign: dict = None) -> bool:
         """Retorna valor booleano verdade."""
         return True
 
-    def stringify(self, variables: dict = None):
+    def stringify(self, variables: dict = None) -> str:
         return "V"
 
 
 class FALSE(Operand):
     """Representa uma constante Falso."""
 
-    def evaluate(self, assign: dict = None):
+    def evaluate(self, assign: dict = None) -> bool:
         """Retorna valor booleano falso."""
         return False
 
-    def stringify(self, variables: dict = None):
+    def stringify(self, variables: dict = None) -> str:
         return "F"
 
 
@@ -36,7 +36,7 @@ class VAR(Operand):
     def __repr__(self):
         return f"{type(self).__name__}({self.var})"
 
-    def evaluate(self, assign: dict = None):
+    def evaluate(self, assign: dict = None) -> bool:
         """Durante o calculo é atribuido um valor a partir do dicionario. Caso não atribuido retorna Verdade."""
         if assign is None:
             assign = dict()
@@ -44,7 +44,7 @@ class VAR(Operand):
             return assign[self.var]
         return True
 
-    def stringify(self, variables: dict = None):
+    def stringify(self, variables: dict = None) -> str:
         """Retorna em forma de string o valor atribuido no dicionario ou sua chave interna."""
         if variables is None:
             variables = dict()

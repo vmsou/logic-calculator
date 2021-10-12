@@ -70,7 +70,7 @@ class ReturnString:
     def __init__(self, text: str = ""):
         self.text: str = text
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> str:
         return self.text
 
 
@@ -81,13 +81,13 @@ class Token:
         self.kind: Logic = kind
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{type(self).__name__}(kind={self.kind}, value='{self.value}')"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         if self.kind == Logic.EOF:
             return False
         return True
@@ -105,7 +105,7 @@ class InputStream:
         self.source: Callable = source
         self.buffer: str = ""
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self.buffer)
 
     def get(self) -> str:
@@ -130,12 +130,12 @@ class InputStream:
         size: int = len(self.buffer)
         value: str = ""
         if self.buffer:
+            # Andar o cursor até primeiro caractere não espaço em branco
             while index < size and self.buffer[index] in whitespace:
                 index += 1
-            while index < size and self.buffer[index] not in whitespace:
-                value = self.buffer[index]
-                self.buffer = self.buffer[index + 1:]
-                return value
+
+            value = self.buffer[index]
+            self.buffer = self.buffer[index + 1:]
 
         return value
 
@@ -189,6 +189,8 @@ class TokenStream:
             match: str = self.match(ch)
             if match in equivalent:
                 return Token(equivalent[match], match)
+
+            # Caso não tenha match; retornar string para o buffer
             for c in match:
                 self.source.putback(c)
 
@@ -210,7 +212,7 @@ class TokenStream:
         self.full = False
 
 
-def main():
+def main() -> None:
     text_stream = ReturnString()
     cin = InputStream(text_stream)
     ts = TokenStream(cin)
