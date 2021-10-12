@@ -4,11 +4,16 @@ text_stream = ReturnString()
 cin = InputStream(text_stream)
 ts = TokenStream(cin)
 
+class SetupResult:
+    def __init__(self, tokens: list[Token], variables: dict[str, bool]):
+        self.tokens: list[Token] = tokens
+        self.variables: dict[str, bool] = variables
 
-def setup(expr: str) -> tuple[list[Token], dict[str, bool]]:
+
+def setup(expr: str) -> SetupResult:
     """Prepara uma expressão para o parse. Retorna uma lista de Tokens e um mapa com suas variáveis."""
     tokens: list[Token] = tokenize(expr)
-    return tokens, get_vars(tokens)
+    return SetupResult(tokens, get_vars(tokens))
 
 
 def tokenize(expr: str) -> list[Token]:

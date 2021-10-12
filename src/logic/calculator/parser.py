@@ -1,6 +1,6 @@
 import tabulate
 
-from logic.calculator.setup import setup
+from logic.calculator.setup import setup, SetupResult
 
 from logic.model import operator, operand
 from logic.model import Expression, Operator, Operand
@@ -102,9 +102,9 @@ class LogicParser:
 
     def parse(self) -> None:
         """Função principal para conversão da entrada em Tokens e depois para Operandos"""
-        setup_result: tuple[list[Token], dict[str, bool]] = setup(self.expr)
-        tokens: list[Token] = setup_result[0]
-        variables: dict[str, bool] = setup_result[1]
+        setup_result: SetupResult = setup(self.expr)
+        tokens: list[Token] = setup_result.tokens
+        variables: dict[str, bool] = setup_result.variables
 
         expect_operand: bool = True
         for t in tokens:
@@ -128,7 +128,7 @@ class LogicParser:
                 # Caso ja tenha um operando, buscar um operador
                 if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     while True:
-                        # Se a liste de operandos estiver vazias quebrar loop, e adicionar token atual para operandos.
+                        # Se a lista de operandos estiver vazias quebrar loop, e adicionar token atual para operadores.
                         if len(self.operators) == 0:
                             break
                         if self.last().kind == Logic.OPEN:
@@ -208,14 +208,14 @@ class LogicParser:
         """Gera a tabela a partir dos resultados do parse."""
         op: Operand = self.operand
         v: dict[str, bool] = self.variables
-        truth: list = gen_variables(v)
+        truth: list[dict] = gen_variables(v)
 
-        header: list = [k for k in sorted(v)]
+        header: list[str] = [k for k in sorted(v)]
         header.append(op.stringify(dict()))
-        table: list = []
+        table: list[list] = []
 
         for var in truth:
-            row: list = [bool_to_str(var[key]) for key in sorted(var)]
+            row: list[str] = [bool_to_str(var[key]) for key in sorted(var)]
             row.append(bool_to_str(op.evaluate(var)))
             table.append(row)
 
