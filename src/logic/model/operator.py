@@ -3,7 +3,7 @@ Nesta seção é modelado os operados unários e binários.
 """
 
 from logic.model import Operator, Expression
-from logic.model.operand import TRUE, FALSE
+from logic.model.operand import TRUE, FALSE, VAR
 
 """Operadores unários"""
 class Unary(Operator):
@@ -214,3 +214,13 @@ class XOR(Binary):
             AND(OR(self.left, self.right), NOT(AND(self.left, self.right)))
         ]
         return equiv
+
+
+def main():
+    op = IMPLIES(AND(VAR('p'), VAR('q')), FALSE())
+    print(op.stringify(dict()))
+    print(op.evaluate(dict(p=False, q=False)))
+
+
+if __name__ == '__main__':
+    main()

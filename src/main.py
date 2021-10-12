@@ -19,7 +19,7 @@ def show_errors(errors: list[Exception]) -> None:
         print(f"\033[91m[Error] {error}\033[0m")
     errors.clear()
 
-def main():
+def main() -> None:
     errors: list[Exception] = []
     parser: LogicParser = LogicParser()
     header()

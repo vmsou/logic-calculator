@@ -1,3 +1,7 @@
+"""
+Essa seção prepara os tokens e as variáveis de uma expressão.
+"""
+
 from logic.stream.core import ReturnString, InputStream, TokenStream, Logic, Token
 
 text_stream = ReturnString()
@@ -31,5 +35,11 @@ def get_vars(tokens: list[Token]) -> dict[str, bool]:
     return var_dict
 
 
+def main():
+    setup_result: SetupResult = setup("p | q")
+    print(setup_result.tokens)
+    print(setup_result.variables)
+
+
 if __name__ == "__main__":
-    print(setup("p | q"))
+    main()

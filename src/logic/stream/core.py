@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Callable
 
 from logic.stream.exceptions import BadToken, FullBuffer
-from wordtree import WordTree
+from wordtree import WordTree, PrefixNode
 
 
 def reverse_map(sample_dict: dict) -> dict:
@@ -161,10 +161,10 @@ class TokenStream:
 
     def match(self, ch: str) -> str:
         """Procura uma aproximação a partir de 1 caractere."""
-        node = word_tree.root
+        node: PrefixNode = word_tree.root
         matched: str = ""
         while node.has(ch):
-            node = node.children[ch]
+            node = node.get(ch)
             matched += ch
             ch = self.source.get()
         self.source.putback(ch)
@@ -195,7 +195,7 @@ class TokenStream:
         elif ch == "":
             return Token()
 
-        raise BadToken(f"Bad Token: char={ch}")
+        raise BadToken(f"Bad Token: char='{ch}'")
 
     def putback(self, t: Token) -> None:
         """Retorna um Token para o buffer."""

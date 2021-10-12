@@ -1,57 +1,65 @@
-class CharNode:
+from __future__ import annotations
+
+
+class PrefixNode:
     """Representa um prefixo em uma arvore de prefixos."""
 
     def __init__(self, char: str):
         self.char: str = char
-        self.children: dict[str, CharNode] = {}
+        self.children: dict[str, PrefixNode] = {}
 
     def __repr__(self) -> str:
         return f"CharNode(char='{self.char}', children={self.children})"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.char == other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.char)
 
-    def has(self, char: str):
+    def has(self, char: str) -> bool:
         return char in self.children
+
+    def get(self, char: str) -> PrefixNode:
+        return self.children[char]
+
+    def set(self, char: str, node) -> None:
+        self.children[char] = node
 
 
 class WordTree:
     """Representa uma arvore de prefixos e guarda sua raiz."""
 
     def __init__(self):
-        self.root: CharNode = CharNode("")
+        self.root: PrefixNode = PrefixNode("")
 
-    def add(self, word: str):
-        node: CharNode = self.root
+    def add(self, word: str) -> None:
+        node: PrefixNode = self.root
         for char in word:
-            found = False
-            if char in node.children:
-                node = node.children[char]
+            found: bool = False
+            if node.has(char):
+                node = node.get(char)
                 found = True
             if not found:
-                new_node = CharNode(char)
-                node.children[char] = new_node
+                new_node: PrefixNode = PrefixNode(char)
+                node.set(char, new_node)
                 node = new_node
 
-    def find(self, word: str):
-        node: CharNode = self.root
+    def find(self, word: str) -> bool:
+        node: PrefixNode = self.root
         if not node.children:
             return False
         for char in word:
-            found = False
-            if char in node.children:
+            found: bool = False
+            if node.has(char):
                 found = True
-                node = node.children[char]
+                node = node.get(char)
             if not found:
                 return False
-
         return True
 
-def main():
-    root = WordTree()
+def main() -> None:
+    root: WordTree = WordTree()
     root.add("OR")
     root.add('OU')
 

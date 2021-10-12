@@ -104,7 +104,7 @@ class LogicParser:
         """Função principal para conversão da entrada em Tokens e depois para Operandos"""
         setup_result: SetupResult = setup(self.expr)
         tokens: list[Token] = setup_result.tokens
-        print(tokens)
+        # print(tokens)
         variables: dict[str, bool] = setup_result.variables
 
         expect_operand: bool = True
@@ -205,9 +205,10 @@ class LogicParser:
                 return False
         return True
 
-    def calculate(self) -> tuple:
+    def calculate(self) -> tuple[list, list]:
         """Gera a tabela a partir dos resultados do parse."""
         op: Operand = self.operand
+        # print(op)
         v: dict[str, bool] = self.variables
         truth: list[dict] = gen_variables(v)
 
