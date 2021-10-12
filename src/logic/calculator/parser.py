@@ -104,6 +104,7 @@ class LogicParser:
         """Função principal para conversão da entrada em Tokens e depois para Operandos"""
         setup_result: SetupResult = setup(self.expr)
         tokens: list[Token] = setup_result.tokens
+        print(tokens)
         variables: dict[str, bool] = setup_result.variables
 
         expect_operand: bool = True

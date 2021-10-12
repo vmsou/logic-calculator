@@ -10,7 +10,7 @@ def header() -> None:
     print("NOT = '!', '~'")
     print("Operadores Binários: ")
     print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'")
-    print("Variáveis: p, q, r, A, B e C")
+    print("Variáveis: p, q, r")
     print("-" * size)
 
 def show_errors(errors: list[Exception]) -> None:

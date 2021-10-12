@@ -11,9 +11,6 @@ class Expression:
     def __repr__(self):
         return f"{type(self).__name__}()"
 
-    def __str__(self):
-        return self.stringify(dict())
-
     def evaluate(self, assign: dict):
         """Calcula o resultado de forma encadeada"""
         return None

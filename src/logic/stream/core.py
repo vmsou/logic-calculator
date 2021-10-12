@@ -49,7 +49,7 @@ logicMap: dict[Logic, list[str]] = {
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r', 'A', 'B', 'C'],
+    Logic.VAR: ['p', 'q', 'r'],
 }
 
 logicMap[Logic.CONSTANT] = logicMap[Logic.TRUE] + logicMap[Logic.FALSE]
@@ -179,13 +179,13 @@ class TokenStream:
 
         ch: str = self.source.get()
 
-        if ch in logicMap[Logic.CONSTANT]:
-            if ch in logicMap[Logic.TRUE]:
-                return Token(equivalent[ch], "V")
-            elif ch in logicMap[Logic.FALSE]:
-                return Token(equivalent[ch], "F")
+        if ch in logicMap[Logic.TRUE]:
+            return Token(equivalent[ch], "V")
 
-        elif ch in word_tree.root.children:
+        elif ch in logicMap[Logic.FALSE]:
+            return Token(equivalent[ch], "F")
+
+        elif word_tree.root.has(ch):
             match: str = self.match(ch)
             if match in equivalent:
                 return Token(equivalent[match], match)
