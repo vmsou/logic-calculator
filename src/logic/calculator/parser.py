@@ -19,7 +19,7 @@ operator_map = {
     Logic.NAND: operator.NAND,
 }
 
-fbf_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
+canon_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
 
 
 def to_operand(token: Token) -> Operand:
@@ -202,20 +202,22 @@ class LogicParser:
 
     def last(self) -> Token:
         """Retorna o último operador Token sem removê-lo."""
+        assert len(self.operators)
         return self.operators[-1]
 
     def penult(self) -> Token:
         """Retorna o penúltimo operador Token sem removê-lo."""
+        assert len(self.operators) > 1
         return self.operators[-2]
 
     def is_valid(self) -> bool:
         """Indica se não houve problemas durante o parse."""
         return self.valid
 
-    def is_fbf(self) -> bool:
-        """Verifica se os tokens constroem uma Fórmula Bem Formada."""
+    def is_canon(self) -> bool:
+        """Verifica se os tokens constroem uma Fórmula canônica."""
         for i in self.tokens:
-            if i.kind not in fbf_permitted:
+            if i.kind not in canon_permitted:
                 return False
         return True
 

@@ -1,5 +1,7 @@
 from logic.calculator.parser import LogicParser
 
+ONLY_CANON: bool = True
+
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
     size: int = 60
@@ -10,7 +12,7 @@ def header() -> None:
     print("NOT = '!', '~'")
     print("Operadores Binários: ")
     print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'")
-    print("Variáveis: p, q, r")
+    print("Variáveis: p, q e r")
     print("-" * size)
 
 def show_errors(errors: list[Exception]) -> None:
@@ -32,8 +34,12 @@ def main() -> None:
 
         print(f"Fórmula Válida: {parser.is_valid()}")
         if parser.is_valid():
-            print(f"Fórmula Bem Formada (FBF): {parser.is_fbf()}")
-            parser.show_table()
+            print(f"Fórmula Canônica: {parser.is_canon()}")
+            if ONLY_CANON:
+                if parser.is_canon():
+                    parser.show_table()
+            else:
+                parser.show_table()
 
         show_errors(errors)
         print(flush=True)
