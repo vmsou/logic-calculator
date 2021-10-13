@@ -1,19 +1,29 @@
 from logic.calculator.parser import LogicParser
 from logic.calculator.table import TruthTable
+from logic.stream.core import logic_map, Logic
 
-ONLY_CANON: bool = False
+ONLY_CANON: bool = True
 
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
     size: int = 60
     print("[ Calculadora Lógica ]".center(size, '-'))
     print("Constantes: ")
-    print("True = 'V', False = 'F'")
+    print(f"TRUE = {logic_map[Logic.TRUE]}\nFALSE = {logic_map[Logic.FALSE]}")
+    print(f"VAR = {logic_map[Logic.VAR]}")
+    print("-" * 20)
     print("Operadores Unários: ")
-    print("NOT = '!', '~'")
+    print(f"NOT = {logic_map[Logic.NOT]}")
+    print("-" * 20)
     print("Operadores Binários: ")
-    print("AND = '&', OR = '|', IMPLICATION = '->', EQUIVALENCE = '<->'")
-    print("Variáveis: p, q e r")
+    print(f"AND = {logic_map[Logic.AND]}")
+    print(f"OR = {logic_map[Logic.OR]}")
+    if not ONLY_CANON:
+        print(f"IMPLIES = {logic_map[Logic.IMPLICATION]}")
+        print(f"EQUIVALENCE = {logic_map[Logic.EQUIVALENCE]}")
+        print(f"XOR = {logic_map[Logic.XOR]}")
+        print(f"NOR = {logic_map[Logic.NOR]}")
+        print(f"NAND = {logic_map[Logic.NAND]}")
     print("-" * size)
 
 def show_errors(errors: list[Exception]) -> None:

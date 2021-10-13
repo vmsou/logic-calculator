@@ -36,12 +36,12 @@ class Logic(Enum):
 
 
 """Mapeia os Tokens com suas representações."""
-logicMap: dict[Logic, list[str]] = {
+logic_map: dict[Logic, list[str]] = {
     Logic.TRUE: ['V', 'T'],
     Logic.FALSE: ['F'],
     Logic.NOT: ['NOT', 'NÃO', '!', '~', '¬'],
-    Logic.AND: ['AND', 'E', '&&', '&', '.', '∧', '^'],
-    Logic.OR: ['OR', 'OU', '||', '|', '+', '∨', 'v'],
+    Logic.AND: ['AND', 'E', '&&', '&', '.', '∩', '∧', '^'],
+    Logic.OR: ['OR', 'OU', '||', '|', '+', '∪', '∨', 'v'],
     Logic.IMPLICATION: ['IMPLIES', 'IMPLICA', '->', '→', '⇒'],
     Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '==', '⇔'],
     Logic.XOR: ['XOR', '⊻', '⊕'],
@@ -52,11 +52,11 @@ logicMap: dict[Logic, list[str]] = {
     Logic.VAR: ['p', 'q', 'r'],
 }
 
-logicMap[Logic.CONSTANT] = logicMap[Logic.TRUE] + logicMap[Logic.FALSE]
+logic_map[Logic.CONSTANT] = logic_map[Logic.TRUE] + logic_map[Logic.FALSE]
 
 # Utilizado para facilitar procuras
 whitespace: tuple = (' ', '\n', '\t')
-equivalent: dict[str, Logic] = reverse_map(logicMap)
+equivalent: dict[str, Logic] = reverse_map(logic_map)
 operators = (key for key, val in equivalent.items() if val != Logic.CONSTANT)
 word_tree: WordTree = WordTree()
 
@@ -182,10 +182,10 @@ class TokenStream:
 
         ch: str = self.source.get()
 
-        if ch in logicMap[Logic.TRUE]:
+        if ch in logic_map[Logic.TRUE]:
             return Token(equivalent[ch], "V")
 
-        elif ch in logicMap[Logic.FALSE]:
+        elif ch in logic_map[Logic.FALSE]:
             return Token(equivalent[ch], "F")
 
         elif word_tree.root.has(ch):
@@ -194,8 +194,7 @@ class TokenStream:
                 return Token(equivalent[match], match)
 
             # Caso não tenha match; retornar string para o buffer
-            for c in match:
-                self.source.putback(c)
+            self.source.putback(match)
 
         elif ch == "":
             return Token()

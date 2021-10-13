@@ -5,7 +5,7 @@ from logic.model import operator, operand
 from logic.model import Expression, Operator, Operand
 from logic.model.exceptions import ParseError
 
-from logic.stream.core import Logic, Token, logicMap
+from logic.stream.core import Logic, Token, logic_map
 from logic.stream.exceptions import BadToken
 
 operator_map = {
@@ -24,9 +24,9 @@ canon_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.V
 def to_operand(token: Token) -> Operand:
     """Converte Token para Operand"""
     if token.kind == Logic.CONSTANT:
-        if token.value in logicMap[Logic.TRUE]:
+        if token.value in logic_map[Logic.TRUE]:
             return operand.TRUE()
-        elif token.value in logicMap[Logic.FALSE]:
+        elif token.value in logic_map[Logic.FALSE]:
             return operand.FALSE()
     elif token.kind == Logic.VAR:
         return operand.VAR(token.value)
