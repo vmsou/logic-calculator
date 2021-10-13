@@ -139,10 +139,20 @@ class LogicParser:
                             # Consequência/Conclusão aparecer primeiro à direita até a esquerda
                             if self.last().priority <= t.priority:
                                 break
-                        else:
-                            # Primeiro na leitura da esquerda para a direita
-                            if self.last().priority < t.priority:
-                                break
+
+                        if self.last().priority < t.priority:
+                            break
+
+                        if len(self.operators) > 1 and self.penult().kind == Logic.IMPLICATION and self.last().priority >= self.penult().priority:
+                            while True:
+                                if len(self.operators) == 0:
+                                    break
+                                op: Token = self.operators.pop()
+                                right: Operand = self.operands.pop()
+                                left: Operand = self.operands.pop()
+
+                                self.append(to_operator(left, op, right))
+                            break
 
                         op: Token = self.operators.pop()
                         right: Operand = self.operands.pop()
@@ -191,8 +201,12 @@ class LogicParser:
         self.variables = variables
 
     def last(self) -> Token:
-        """Retorna o último operador Token sem removê-lo"""
+        """Retorna o último operador Token sem removê-lo."""
         return self.operators[-1]
+
+    def penult(self) -> Token:
+        """Retorna o penúltimo operador Token sem removê-lo."""
+        return self.operators[-2]
 
     def is_valid(self) -> bool:
         """Indica se não houve problemas durante o parse."""
