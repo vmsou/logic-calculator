@@ -5,10 +5,12 @@ from logic.model import Operand
 
 def gen_variables(expr_vars: dict[str, bool]) -> list[dict]:
     """Gera árvore verdade a partir de variaveis"""
+    vars_table: list[dict] = []
+    if not expr_vars:
+        return vars_table
     variables: list = sorted(expr_vars.keys())
     length: int = len(variables)
     size: int = 2 ** length - 1
-    vars_table: list[dict] = []
 
     for i in range(size, -1, -1):
         row: dict = {}
@@ -47,6 +49,9 @@ class TruthTable:
             row: list[str] = [bool_to_str(var_dict[key]) for key in sorted(var_dict)]
             row.append(bool_to_str(self.operand.evaluate(var_dict)))
             table.append(row)
+
+        if not truth:
+            table.append([bool_to_str(self.operand.evaluate(dict()))])
 
         return header, table
 

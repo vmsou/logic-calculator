@@ -11,8 +11,8 @@ from logic.stream.exceptions import BadToken
 operator_map = {
     Logic.AND: operator.AND,
     Logic.OR: operator.OR,
-    Logic.EQUIVALENCE: operator.EQUIVALENCE,
-    Logic.IMPLICATION: operator.IMPLIES,
+    Logic.EQUAL: operator.EQUAL,
+    Logic.IMPLY: operator.IMPLY,
     Logic.XOR: operator.XOR,
     Logic.NOR: operator.NOR,
     Logic.NAND: operator.NAND,
@@ -103,13 +103,13 @@ class LogicParser:
                     raise ParseError(f"Esperava variável ou constante. {t}")
             else:
                 # Caso ja tenha um operando, buscar um operador
-                if t.kind in (Logic.AND, Logic.OR, Logic.IMPLICATION, Logic.EQUIVALENCE, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
+                if t.kind in (Logic.AND, Logic.OR, Logic.IMPLY, Logic.EQUAL, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     # Se a lista de operandos estiver vazias quebrar loop, e adicionar token atual para operadores.
                     while len(self.operators):
                         if self.last().kind == Logic.OPEN:
                             break
 
-                        if t.kind == Logic.IMPLICATION:
+                        if t.kind == Logic.IMPLY:
                             # Consequência/Conclusão aparecer primeiro à direita até a esquerda
                             if self.last().priority <= t.priority:
                                 break
@@ -122,7 +122,7 @@ class LogicParser:
                         left: Operand = self.operands.pop()
                         self.append(to_operator(left, op, right))
 
-                        if len(self.operators) and self.last().kind == Logic.IMPLICATION and op.priority > self.last().priority:
+                        if len(self.operators) and self.last().kind == Logic.IMPLY and op.priority > self.last().priority:
                             self.stack_all()
                             break
 

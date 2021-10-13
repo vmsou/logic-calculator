@@ -2,7 +2,7 @@ from logic.calculator.parser import LogicParser
 from logic.calculator.table import TruthTable
 from logic.stream.core import logic_map, Logic
 
-ONLY_CANON: bool = True
+ONLY_CANON: bool = False
 
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
@@ -19,8 +19,8 @@ def header() -> None:
     print(f"AND = {logic_map[Logic.AND]}")
     print(f"OR = {logic_map[Logic.OR]}")
     if not ONLY_CANON:
-        print(f"IMPLIES = {logic_map[Logic.IMPLICATION]}")
-        print(f"EQUIVALENCE = {logic_map[Logic.EQUIVALENCE]}")
+        print(f"IMPLY = {logic_map[Logic.IMPLY]}")
+        print(f"EQUAL = {logic_map[Logic.EQUAL]}")
         print(f"XOR = {logic_map[Logic.XOR]}")
         print(f"NOR = {logic_map[Logic.NOR]}")
         print(f"NAND = {logic_map[Logic.NAND]}")
@@ -33,6 +33,11 @@ def show_errors(errors: list[Exception]) -> None:
     errors.clear()
 
 def main() -> None:
+    global ONLY_CANON
+
+    if input("Permitir somente canônicas (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
+        ONLY_CANON = True
+
     errors: list[Exception] = []
     parser: LogicParser = LogicParser()
     header()

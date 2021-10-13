@@ -18,8 +18,8 @@ class Logic(Enum):
     """Elementos lógicos e parte de suas precedências"""
     EOF = -1
     # Operators --------
-    EQUIVALENCE = 0
-    IMPLICATION = 1
+    EQUAL = 0
+    IMPLY = 1
     OR = 2
     NOR = 3
     XOR = 4
@@ -37,13 +37,13 @@ class Logic(Enum):
 
 """Mapeia os Tokens com suas representações."""
 logic_map: dict[Logic, list[str]] = {
-    Logic.TRUE: ['V', 'T'],
-    Logic.FALSE: ['F'],
+    Logic.TRUE: ['V', 'T', '1'],
+    Logic.FALSE: ['F', '0'],
     Logic.NOT: ['NOT', 'NÃO', '!', '~', '¬'],
     Logic.AND: ['AND', 'E', '&&', '&', '.', '∩', '∧', '^'],
     Logic.OR: ['OR', 'OU', '||', '|', '+', '∪', '∨', 'v'],
-    Logic.IMPLICATION: ['IMPLIES', 'IMPLICA', '->', '→', '⇒'],
-    Logic.EQUIVALENCE: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '==', '⇔'],
+    Logic.IMPLY: ['IMPLIES', 'IMPLICA', '->', '→', '⇒'],
+    Logic.EQUAL: ['EQUAL', 'IGUAL', 'EQUIVALE', '<->', '⟷', '≡', '=', '⇔'],
     Logic.XOR: ['XOR', '⊻', '⊕'],
     Logic.NAND: ['NAND', '↑'],
     Logic.NOR: ['NOR', '↓'],

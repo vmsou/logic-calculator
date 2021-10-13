@@ -113,7 +113,7 @@ class OR(Binary):
         return self
 
 
-class IMPLIES(Binary):
+class IMPLY(Binary):
     """Representa um Operador binário de implicação."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -135,7 +135,7 @@ class IMPLIES(Binary):
         ]
 
 
-class EQUIVALENCE(Binary):
+class EQUAL(Binary):
     """Representa um Operador binário de equivalência."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -149,7 +149,7 @@ class EQUIVALENCE(Binary):
 
     def equivalences(self) -> list:
         return [
-            AND(EQUIVALENCE(self.left, self.right), EQUIVALENCE(self.right, self.left)),
+            AND(EQUAL(self.left, self.right), EQUAL(self.right, self.left)),
         ]
 
 
@@ -205,13 +205,13 @@ class XOR(Binary):
 
     def equivalences(self) -> list:
         return [
-            NOT(EQUIVALENCE(self.left, self.right)),
+            NOT(EQUAL(self.left, self.right)),
             AND(OR(self.left, self.right), NOT(AND(self.left, self.right)))
         ]
 
 
 def main() -> None:
-    op: Expression = IMPLIES(AND(VAR('p'), VAR('q')), FALSE())
+    op: Expression = IMPLY(AND(VAR('p'), VAR('q')), FALSE())
     print(op.stringify(dict()))
     print(op.evaluate(dict(p=False, q=False)))
 

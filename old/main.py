@@ -43,12 +43,12 @@ def term():
     t = ts.get()
 
     while True:
-        if t.kind == Logic.IMPLICATION:
+        if t.kind == Logic.IMPLY:
             right = primary()
             left = not left or right
             t = ts.get()
 
-        elif t.kind == Logic.EQUIVALENCE:
+        elif t.kind == Logic.EQUAL:
             left = left == primary()
             t = ts.get()
         else:
