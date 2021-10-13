@@ -143,7 +143,12 @@ class LogicParser:
                         if self.last().priority < t.priority:
                             break
 
-                        if len(self.operators) > 1 and self.penult().kind == Logic.IMPLICATION and self.last().priority >= self.penult().priority:
+                        op: Token = self.operators.pop()
+                        right: Operand = self.operands.pop()
+                        left: Operand = self.operands.pop()
+                        self.append(to_operator(left, op, right))
+
+                        if len(self.operators) and self.last().kind == Logic.IMPLICATION and op.priority > self.last().priority:
                             while True:
                                 if len(self.operators) == 0:
                                     break
@@ -153,12 +158,6 @@ class LogicParser:
 
                                 self.append(to_operator(left, op, right))
                             break
-
-                        op: Token = self.operators.pop()
-                        right: Operand = self.operands.pop()
-                        left: Operand = self.operands.pop()
-
-                        self.append(to_operator(left, op, right))
 
                     self.operators.append(t)
                     expect_operand = True
@@ -204,11 +203,6 @@ class LogicParser:
         """Retorna o último operador Token sem removê-lo."""
         assert len(self.operators)
         return self.operators[-1]
-
-    def penult(self) -> Token:
-        """Retorna o penúltimo operador Token sem removê-lo."""
-        assert len(self.operators) > 1
-        return self.operators[-2]
 
     def is_valid(self) -> bool:
         """Indica se não houve problemas durante o parse."""

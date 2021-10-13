@@ -134,7 +134,10 @@ class InputStream:
             while index < size and self.buffer[index] in whitespace:
                 index += 1
 
-            value = self.buffer[index]
+            while index < size and self.buffer[index] not in whitespace:
+                value = self.buffer[index]
+                self.buffer = self.buffer[index + 1:]
+                return value
             self.buffer = self.buffer[index + 1:]
 
         return value

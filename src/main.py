@@ -1,6 +1,6 @@
 from logic.calculator.parser import LogicParser
 
-ONLY_CANON: bool = True
+ONLY_CANON: bool = False
 
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
