@@ -1,4 +1,5 @@
 from logic.calculator.parser import LogicParser
+from logic.calculator.table import TruthTable
 
 ONLY_CANON: bool = False
 
@@ -34,12 +35,13 @@ def main() -> None:
 
         print(f"Fórmula Válida: {parser.is_valid()}")
         if parser.is_valid():
+            table: TruthTable = parser.get_table()
             print(f"Fórmula Canônica: {parser.is_canon()}")
             if ONLY_CANON:
                 if parser.is_canon():
-                    parser.show_table()
+                    table.show()
             else:
-                parser.show_table()
+                table.show()
 
         show_errors(errors)
         print(flush=True)

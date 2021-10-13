@@ -1,6 +1,5 @@
-import tabulate
-
 from logic.calculator.setup import setup, SetupResult
+from logic.calculator.table import TruthTable
 
 from logic.model import operator, operand
 from logic.model import Expression, Operator, Operand
@@ -39,29 +38,6 @@ def to_operator(left: Operand, token: Token, right: Operand) -> Operator:
     if token.kind in operator_map:
         return operator_map[token.kind](left, right)
     raise BadToken(f"{token} não é um operador.")
-
-
-def bool_to_str(boolean: bool) -> str:
-    """Converte um elemento booleano em uma string 'V' ou 'F'"""
-    if boolean:
-        return "V"
-    return "F"
-
-
-def gen_variables(expr_vars: dict[str, bool]) -> list[dict]:
-    """Gera árvore verdade a partir de variaveis"""
-    variables: list = sorted(expr_vars.keys())
-    length: int = len(variables)
-    size: int = 2 ** length - 1
-    vars_table: list[dict] = []
-
-    for i in range(size, -1, -1):
-        row: dict = {}
-        b: str = format(i, f'#0{length + 2}b')[2:]  # Remove '0b'
-        for c in range(0, len(b)):
-            row[variables[c]] = (bool(int(b[c])))
-        vars_table.append(row)
-    return vars_table
 
 
 class LogicParser:
@@ -214,28 +190,9 @@ class LogicParser:
                 return False
         return True
 
-    def calculate(self) -> tuple[list, list]:
-        """Gera a tabela a partir dos resultados do parse."""
-        op: Operand = self.operand
-        # print(op)
-        v: dict[str, bool] = self.variables
-        truth: list[dict] = gen_variables(v)
-
-        header: list[str] = [k for k in sorted(v)]
-        header.append(op.stringify(dict()))
-        table: list[list] = []
-
-        for var in truth:
-            row: list[str] = [bool_to_str(var[key]) for key in sorted(var)]
-            row.append(bool_to_str(op.evaluate(var)))
-            table.append(row)
-
-        return header, table
-
-    def show_table(self) -> None:
-        """Usa o módulo tabulate para mostrar a tabela."""
-        header, data = self.calculate()
-        print(tabulate.tabulate(data, headers=header, tablefmt='fancy_grid', stralign='center'))
+    def get_table(self) -> TruthTable:
+        """Prepara uma tabela com o operando e suas variaveis"""
+        return TruthTable(self.operand, self.variables)
 
     def append(self, expr: Expression) -> None:
         """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
