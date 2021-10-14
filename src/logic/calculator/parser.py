@@ -93,7 +93,7 @@ class LogicParser:
                 elif t.kind in (Logic.OPEN, Logic.NOT):
                     self.operators.append(t)
                 elif t.kind == Logic.EOF:
-                    if len(self.operators) == 0:
+                    if not self.operators:
                         raise ParseError("Erro de Parse")
                     elif self.last().kind == Logic.OPEN:
                         raise ParseError(f"Parêntese aberto não possui fechamento {t}.")
@@ -105,7 +105,7 @@ class LogicParser:
                 # Caso ja tenha um operando, buscar um operador
                 if t.kind in (Logic.AND, Logic.OR, Logic.IMPLY, Logic.EQUAL, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     # Se a lista de operandos estiver vazias quebrar loop, e adicionar token atual para operadores.
-                    while len(self.operators):
+                    while self.operators:
                         if self.last().kind == Logic.OPEN:
                             break
 
@@ -122,7 +122,7 @@ class LogicParser:
                         left: Operand = self.operands.pop()
                         self.append(to_operator(left, op, right))
 
-                        if len(self.operators) and self.last().kind == Logic.IMPLY and op.priority > self.last().priority:
+                        if self.operators and self.last().kind == Logic.IMPLY and op.priority > self.last().priority:
                             self.stack_all()
                             break
 
@@ -133,7 +133,7 @@ class LogicParser:
 
                 elif t.kind == Logic.CLOSE:
                     while True:
-                        if not len(self.operators):
+                        if not self.operators:
                             raise ParseError(f"Não possui parêntese de abertura. {t}")
                         curr: Token = self.operators.pop()
 
@@ -152,11 +152,11 @@ class LogicParser:
                 else:
                     raise ParseError(f"Esperava operador ou parêntese de fechada. {t}")
 
-        assert len(self.operators) != 0
+        assert self.operators
         should_eof = self.operators.pop()
         assert should_eof.kind == Logic.EOF
 
-        if len(self.operators) != 0:
+        if self.operators:
             lone_open: Token = self.operators.pop()
             assert lone_open.kind == Logic.OPEN
             raise ParseError(f"Nenhum parêntese de fechamento. {lone_open}.")
@@ -168,12 +168,12 @@ class LogicParser:
 
     def last(self) -> Token:
         """Retorna o último operador Token sem removê-lo."""
-        assert len(self.operators)
+        assert self.operators
         return self.operators[-1]
 
     def stack_all(self) -> None:
         """Junta todos operadores e operandos guardados."""
-        while len(self.operators):
+        while self.operators:
             op: Token = self.operators.pop()
             right: Operand = self.operands.pop()
             left: Operand = self.operands.pop()
@@ -195,9 +195,13 @@ class LogicParser:
         return TruthTable(self.operand, self.variables)
 
     def append(self, expr: Expression) -> None:
-        """Adiciona um operando para os membros da classe. Enquanto o último operando é uma Negação - converte a expressão."""
-        while len(self.operators) and self.last().kind == Logic.NOT:
+        """Adiciona um operando para os operandos da classe. Enquanto o último operando é uma Negação - converte a expressão."""
+        negates: int = 0
+        while self.operators and self.last().kind == Logic.NOT:
             self.operators.pop()
+            negates += 1
+
+        if negates & 1:
             expr = operator.NOT(expr)
 
         self.operands.append(expr)
