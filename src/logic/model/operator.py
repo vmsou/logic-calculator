@@ -21,6 +21,9 @@ class Unary(Operator):
     def stringify(self, variables: dict) -> str:
         return self.operand.stringify(variables)
 
+    def normalize(self):
+        return type(self)(self.operand.normalize())
+
 
 class NOT(Unary):
     """Representa um Operador unário de negação."""
@@ -60,6 +63,9 @@ class Binary(Operator):
 
     def equivalences(self) -> list:
         return []
+
+    def normalize(self):
+        return type(self)(self.left.normalize(), self.right.normalize())
 
 
 class AND(Binary):
@@ -134,6 +140,9 @@ class IMPLY(Binary):
             NOT(AND(self.left, NOT(self.right)))
         ]
 
+    def normalize(self):
+        return OR(NOT(self.left), self.right).normalize()
+
 
 class EQUAL(Binary):
     """Representa um Operador binário de equivalência."""
@@ -149,8 +158,11 @@ class EQUAL(Binary):
 
     def equivalences(self) -> list:
         return [
-            AND(EQUAL(self.left, self.right), EQUAL(self.right, self.left)),
+            AND(IMPLY(self.left, self.right), IMPLY(self.right, self.left)),
         ]
+
+    def normalize(self):
+        return AND(IMPLY(self.left, self.right), IMPLY(self.right, self.left)).normalize()
 
 
 class NAND(Binary):
@@ -214,6 +226,14 @@ def main() -> None:
     op: Expression = IMPLY(AND(VAR('p'), VAR('q')), FALSE())
     print(op.stringify(dict()))
     print(op.evaluate(dict(p=False, q=False)))
+
+    canon_op = op.normalize()
+    print(canon_op.stringify(dict()))
+
+    op2: Expression = EQUAL(VAR('A'), VAR('B'))
+    canon_op2 = op2.normalize()
+    print(op2.stringify(dict()))
+    print(canon_op2.stringify(dict()))
 
 
 if __name__ == '__main__':

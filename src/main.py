@@ -3,6 +3,7 @@ from logic.calculator.table import TruthTable
 from logic.stream.core import logic_map, Logic
 
 ONLY_CANON: bool = False
+SIMPLIFY_NOT: bool = True
 
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
@@ -38,9 +39,11 @@ def main() -> None:
     if input("Permitir somente canônicas (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
         ONLY_CANON = True
 
+    if input("Mostrar simbolos permitidos (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
+        header()
+
     errors: list[Exception] = []
-    parser: LogicParser = LogicParser()
-    header()
+    parser: LogicParser = LogicParser(only_canon=ONLY_CANON, simplify_not=SIMPLIFY_NOT)
     while True:
         parser.expr = input("> ")
         try:
@@ -52,11 +55,7 @@ def main() -> None:
         if parser.is_valid():
             table: TruthTable = parser.get_table()
             print(f"Fórmula Canônica: {parser.is_canon()}")
-            if ONLY_CANON:
-                if parser.is_canon():
-                    table.show()
-            else:
-                table.show()
+            table.show()
 
         show_errors(errors)
         print(flush=True)

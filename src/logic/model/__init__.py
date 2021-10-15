@@ -25,6 +25,9 @@ class Expression:
         """TODO: Encontrar padrões de simplificação."""
         return self
 
+    def normalize(self):
+        return self
+
 
 class Operand(Expression):
     """Representa um operando."""
