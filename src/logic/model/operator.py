@@ -183,6 +183,9 @@ class NAND(Binary):
             OR(NOT(self.left), NOT(self.right))
         ]
 
+    def normalize(self):
+        return NOT(AND(self.left, self.right)).normalize()
+
 
 class NOR(Binary):
     """Representa um Operador binário de negação de disjunção."""
@@ -201,6 +204,9 @@ class NOR(Binary):
             NOT(OR(self.left, self.right)),
             AND(NOT(self.left), NOT(self.right))
         ]
+
+    def normalize(self):
+        return NOT(OR(self.left, self.right)).normalize()
 
 
 class XOR(Binary):
@@ -221,19 +227,26 @@ class XOR(Binary):
             AND(OR(self.left, self.right), NOT(AND(self.left, self.right)))
         ]
 
+    def normalize(self):
+        # return NOT(EQUAL(self.left, self.right)).normalize()
+        return AND(OR(self.left, self.right), NOT(AND(self.left, self.right))).normalize()
+
 
 def main() -> None:
-    op: Expression = IMPLY(AND(VAR('p'), VAR('q')), FALSE())
-    print(op.stringify(dict()))
-    print(op.evaluate(dict(p=False, q=False)))
-
-    canon_op = op.normalize()
-    print(canon_op.stringify(dict()))
-
+    op1: Expression = IMPLY(AND(VAR('A'), VAR('B')), FALSE())
     op2: Expression = EQUAL(VAR('A'), VAR('B'))
-    canon_op2 = op2.normalize()
-    print(op2.stringify(dict()))
-    print(canon_op2.stringify(dict()))
+    op3: Expression = XOR(VAR('A'), VAR('B'))
+
+    ops = [op1, op2, op3]
+
+    for op in ops:
+        print(op.stringify(dict()), end=' = ')
+        print(op.evaluate(dict()))
+        print("Normalized")
+        canon_op = op.normalize()
+        print(canon_op.stringify(dict()), end=' = ')
+        print(canon_op.evaluate(dict()))
+        print()
 
 
 if __name__ == '__main__':

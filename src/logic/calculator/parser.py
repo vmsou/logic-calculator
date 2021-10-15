@@ -46,13 +46,13 @@ class LogicParser:
     Essa classe transforma a entrada em Tokens e depois converte os Tokens em Operandos
     """
 
-    def __init__(self, only_canon: bool = False, simplify_not: bool = True):
+    def __init__(self, expr: str = "", *, only_canon: bool = False, simplify_not: bool = True):
         # flags
         self.only_canon = only_canon
         self.simplify_not = simplify_not
 
         # Usado para o parse
-        self.expr: str = ""
+        self.expr: str = expr
         self.operators: list[Token] = []
         self.operands: list = []
 
