@@ -11,16 +11,21 @@ Realiza operações de uma fórmula lógica, no formato de tabela-verdade.
 Essa é uma lista dos recursos utilizados para realizar esse projeto
 
 ## Principais Funcionalidades
-### Cálculo
-- [X] VARIABLES
+### Simbolos
+- [x] VARIABLES
 - [x] NOT
 - [x] AND
 - [x] OR
 - [x] IMPLICATION
 - [x] EQUIVALENCE
-- [X] XOR
-- [X] NOR
-- [X] NAND
+- [x] XOR
+- [x] NOR
+- [x] NAND
+  
+### Funções
+- [x] Converter para canônica
+- [x] Agrupamento em parentêses
+- [x] Precedência
 
 ## Pastas
 
@@ -46,7 +51,7 @@ python main.py
 
 ## Status
 <h4 align="center"> 
-	✔️ 🚧️ Funcionando (Em desenvolvimento) 🚧️ ✔️
+	✔️ Finalizado (funcionalidades extras em desenvolvimento) ✔️
 </h4>
 
 ## Para fazer:
