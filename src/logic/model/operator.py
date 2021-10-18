@@ -6,7 +6,7 @@ from logic.model import Operator, Expression
 from logic.model.operand import TRUE, FALSE, VAR
 
 """Operadores unários"""
-class Unary(Operator):
+class UNARY(Operator):
     """Representa um Operador unário."""
 
     def __init__(self, operand: Expression):
@@ -14,6 +14,11 @@ class Unary(Operator):
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.operand})"
+
+    def __eq__(self, other: Expression):
+        if issubclass(type(other), UNARY):
+            return super().__eq__(other) and self.operand == other.operand
+        return False
 
     def evaluate(self, assign: dict) -> bool:
         return True
@@ -28,7 +33,7 @@ class Unary(Operator):
         return type(self)(self.operand.simplify())
 
 
-class NOT(Unary):
+class NOT(UNARY):
     """Representa um Operador unário de negação."""
 
     def __init__(self, operand: Expression):
@@ -47,13 +52,20 @@ class NOT(Unary):
         ]
 
     def simplify(self) -> Expression:
-        if type(self.operand) == NOT:
+        op_type = type(self.operand)
+
+        if op_type == NOT:
             return self.operand.operand.simplify()
+        elif op_type == TRUE:
+            return FALSE()
+        elif op_type == FALSE:
+            return TRUE()
+
         return self
 
 
 """Operadores binários"""
-class Binary(Operator):
+class BINARY(Operator):
     """Representa um Operador binário."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -62,6 +74,12 @@ class Binary(Operator):
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.left}, {self.right})"
+
+    def __eq__(self, other: Expression):
+        type_other = type(other)
+        if issubclass(type_other, BINARY):
+            return super().__eq__(other) and self.left == other.left and self.right == other.right
+        return False
 
     def evaluate(self, assign: dict) -> bool:
         return True
@@ -79,7 +97,7 @@ class Binary(Operator):
         return type(self)(self.left.simplify(), self.right.simplify())
 
 
-class AND(Binary):
+class AND(BINARY):
     """Representa um Operador binário de conjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -99,7 +117,7 @@ class AND(Binary):
         return super().simplify()
 
 
-class OR(Binary):
+class OR(BINARY):
     """Representa um Operador binário de disjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -118,12 +136,18 @@ class OR(Binary):
         return f"({self.left.stringify(variables)} ∨ {self.right.stringify(variables)})"
 
     def simplify(self) -> Expression:
-        if TRUE in (type(self.left), type(self.right)):
+        left_op = type(self.left)
+        right_op = type(self.right)
+
+        if self.left == self.right:
+            return self.left
+        elif TRUE in (left_op, right_op):
             return TRUE()
+
         return super().simplify()
 
 
-class IMPLY(Binary):
+class IMPLY(BINARY):
     """Representa um Operador binário de implicação."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -148,7 +172,7 @@ class IMPLY(Binary):
         return OR(NOT(self.left), self.right).normalize()
 
 
-class EQUAL(Binary):
+class EQUAL(BINARY):
     """Representa um Operador binário de equivalência."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -169,7 +193,7 @@ class EQUAL(Binary):
         return AND(IMPLY(self.left, self.right), IMPLY(self.right, self.left)).normalize()
 
 
-class NAND(Binary):
+class NAND(BINARY):
     """Representa um Operador binário de negação de conjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -191,7 +215,7 @@ class NAND(Binary):
         return NOT(AND(self.left, self.right)).normalize()
 
 
-class NOR(Binary):
+class NOR(BINARY):
     """Representa um Operador binário de negação de disjunção."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -213,7 +237,7 @@ class NOR(Binary):
         return NOT(OR(self.left, self.right)).normalize()
 
 
-class XOR(Binary):
+class XOR(BINARY):
     """Representa um Operador binário de disjunção exclusiva."""
 
     def __init__(self, left: Expression, right: Expression):
@@ -254,12 +278,15 @@ def main() -> None:
 
     print("\nSimplificação: ")
     op1: Expression = NOT(NOT(AND(TRUE(), FALSE())))
-    print(op1.stringify(dict()))
-    print(op1.simplify().stringify(dict()))
-
     op2: Expression = IMPLY(NOT(NOT(TRUE())), FALSE())
-    print(op2.stringify(dict()))
-    print(op2.simplify().stringify(dict()))
+
+    ops = [op1, op2]
+
+    for op in ops:
+        print(op.stringify(dict()))
+        print(op.simplify().stringify(dict()))
+        print()
+
 
 
 if __name__ == '__main__':
