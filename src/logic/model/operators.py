@@ -2,7 +2,7 @@
 Nesta seção é modelado os operados unários e binários.
 """
 
-from logic.model import Operator, Expression
+from logic.model import Operator, Expression, simplify
 from logic.model.operands import TRUE, FALSE, VAR
 
 """Operadores unários"""
@@ -148,9 +148,8 @@ class OR(BINARY):
         elif FALSE in (left_op, right_op):
             return self.left.simplify() if left_op != FALSE else self.right.simplify()
         elif left_op in (VAR, NOT) and issubclass(right_op, BINARY):
-            print("oi")
             if type(self.right.right) == VAR and self.left.operand.var == self.right.right.var:
-                return OR(OR(self.left, self.right.right), self.right.left).simplify().simplify()
+                return OR(OR(self.left, self.right.right), self.right.left).simplify()
         elif left_op == NOT and self.left.operand == self.right:
             return TRUE()
 
@@ -313,7 +312,7 @@ def test():
     op = IMPLY(VAR('A'), IMPLY(VAR('B'), VAR('A')))
     op2 = OR(NOT(VAR('A')), OR(NOT(VAR('B')), VAR('A')))
     print(op2.stringify(dict()))
-    print(op2.simplify().stringify(dict()))
+    print(simplify(op2).stringify())
     print()
 
 

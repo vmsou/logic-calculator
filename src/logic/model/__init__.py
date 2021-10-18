@@ -47,3 +47,11 @@ class Operator(Expression):
     Representa um operador.
     Realiza uma operação com base em operadores/operandos atribuidos
     """
+
+
+def simplify(expr: Expression):
+    old = None
+    while expr != old:
+        old = expr
+        expr = expr.simplify()
+    return expr
