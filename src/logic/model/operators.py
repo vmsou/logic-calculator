@@ -113,6 +113,11 @@ class AND(BINARY):
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
+    def __eq__(self, other):
+        if self.type == type(other):
+            return (self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left)
+        return False
+
     def evaluate(self, assign: dict) -> bool:
         return self.left.evaluate(assign) and self.right.evaluate(assign)
 
@@ -122,22 +127,49 @@ class AND(BINARY):
         return f"({self.left.stringify(variables)} ∧ {self.right.stringify(variables)})"
 
     def simplify(self) -> Expression:
+        # Idempotentes
         if self.left == self.right:
             return self.left.simplify()
 
-        if TRUE in (self.left.type, self.right.type):
+        elif TRUE in (self.left.type, self.right.type):
             return self.left.simplify() if self.left.type != TRUE else self.right.simplify()
 
-        if FALSE in (self.left.type, self.right.type):
+        elif self.is_false():
             return FALSE()
 
-        elif self.left.type == VAR and self.right.type == NOT and self.left == self.right.operand:
-            return FALSE()
+        # Absorção
+        if self.right.type == OR and self.left in (self.right.left, self.right.right):
+            return self.left
 
-        elif self.left.type == NOT and self.right.type == VAR and self.left.operand == self.right:
-            return FALSE()
+        elif self.left.type == OR and self.right in (self.left.left, self.left.right):
+            return self.right
+
+        # Associativa + Idempotentes
+        elif self.left.type == AND:
+            if self.right == self.left.left:
+                return AND(self.right, self.left.right).simplify()
+            elif self.right == self.left.right:
+                return AND(self.right, self.left.left).simplify()
+
+        elif self.right.type == AND:
+            if self.left == self.right.left:
+                return AND(self.left, self.right.right).simplify()
+            elif self.left == self.right.right:
+                return AND(self.left, self.right.left).simplify()
 
         return super().simplify()
+
+    def is_false(self):
+        if FALSE in (self.left.type, self.right.type):
+            return True
+
+        elif self.right.type == NOT and self.left == self.right.operand:
+            return True
+
+        elif self.left.type == NOT and self.left.operand == self.right:
+            return True
+
+        return False
 
 
 class OR(BINARY):
@@ -145,6 +177,11 @@ class OR(BINARY):
 
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
+
+    def __eq__(self, other):
+        if self.type == type(other):
+            return (self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left)
+        return False
 
     def evaluate(self, assign: dict = None) -> bool:
         if assign is None:
@@ -162,33 +199,51 @@ class OR(BINARY):
         left_op = self.left.type
         right_op = self.right.type
 
+        # Idempotentes
         if self.left == self.right:
             return self.left.simplify()
 
-        elif TRUE in (left_op, right_op):
+        elif self.is_true():
             return TRUE()
 
         elif FALSE in (left_op, right_op):
             return self.left.simplify() if left_op != FALSE else self.right.simplify()
 
-        elif self.left.type == VAR and self.right.type == NOT and self.left == self.right.operand:
-            return TRUE()
+        # Absorção
+        elif self.right.type == AND and self.left in (self.right.left, self.right.right):
+            return self.left.simplify()
 
-        elif self.left.type == NOT and self.right.type == VAR and self.left.operand == self.right:
-            return TRUE()
+        elif self.left.type == AND and self.right in (self.left.left, self.left.right):
+            return self.right.simplify()
 
-        elif right_op == AND:
-            if self.left in (self.right.left, self.right.right):
-                return self.left
+        # Associativa + Idempotentes
+        elif self.right.type == OR:
+            if self.left == self.right.left:
+                return OR(self.left, self.right.right).simplify()
+            elif self.left == self.right.right:
+                return OR(self.left, self.right.left).simplify()
 
-        elif left_op == AND:
-            if self.right in (self.left.left, self.left.right):
-                return self.right
+        elif self.left.type == OR:
+            if self.right == self.left.left:
+                return OR(self.right, self.left.right).simplify()
+            elif self.right == self.left.right:
+                return OR(self.right, self.left.left).simplify()
 
         elif left_op == NOT and self.left.operand == self.right:
             return TRUE()
 
         return super().simplify()
+
+    def is_true(self):
+        if TRUE in (self.left.type, self.right.type):
+            return True
+
+        elif self.right.type == NOT and self.left == self.right.operand:
+            return True
+
+        elif self.left.type == NOT and self.left.operand == self.right:
+            return True
+        return False
 
 
 class IMPLY(BINARY):
@@ -349,6 +404,7 @@ def test():
     op3 = AND(VAR('A'), NOT(NOT(VAR('A'))))
     print(op3.stringify(dict()))
     print(simplify(op3).stringify())
+    print(OR(VAR('A'), VAR('B')) == OR(VAR('A'), VAR('B')))
     print()
 
 

@@ -33,7 +33,7 @@ def show_errors(errors: list[Exception]) -> None:
         print(f"\033[91m[Error] {error}\033[0m")
     errors.clear()
 
-def main() -> None:
+def options():
     global ONLY_CANON, SIMPLIFY
 
     if input("Permitir somente canônicas (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
@@ -42,9 +42,11 @@ def main() -> None:
     if input("Mostrar simbolos permitidos (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
         header()
 
-    if input("Simplificar (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
+    if input("Simplificar (Não completo) (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
         SIMPLIFY = True
 
+def main() -> None:
+    options()
     print()
 
     errors: list[Exception] = []
