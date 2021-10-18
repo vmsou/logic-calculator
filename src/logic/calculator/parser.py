@@ -1,7 +1,7 @@
 from logic.calculator.setup import setup, SetupResult
 from logic.calculator.table import TruthTable
 
-from logic.model import operators, operands
+from logic.model import operators, operands, simplify
 from logic.model import Expression, Operator, Operand
 from logic.model.exceptions import ParseError
 
@@ -174,7 +174,8 @@ class LogicParser:
             self.operand = self.operand.normalize()
 
         if self.simplify:
-            self.operand = self.operand.simplify()
+            self.operand = simplify(self.operand)
+            self.variables = self.operand.variables()
 
     def last(self) -> Token:
         """Retorna o último operador Token sem removê-lo."""

@@ -34,6 +34,9 @@ class Expression:
         """Após canônizar. Encontrar padrões de simplificações"""
         return self
 
+    def variables(self):
+        return {}
+
 
 class Operand(Expression):
     """

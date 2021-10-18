@@ -33,6 +33,9 @@ class UNARY(Operator):
     def simplify(self):
         return type(self)(self.operand.simplify())
 
+    def variables(self):
+        return self.operand.variables()
+
 
 class NOT(UNARY):
     """Representa um Operador unário de negação."""
@@ -96,6 +99,12 @@ class BINARY(Operator):
 
     def simplify(self) -> Expression:
         return type(self)(self.left.simplify(), self.right.simplify())
+
+    def variables(self):
+        t = {}
+        t.update(self.left.variables())
+        t.update(self.right.variables())
+        return t
 
 
 class AND(BINARY):
@@ -168,13 +177,14 @@ class OR(BINARY):
         elif self.left.type == NOT and self.right.type == VAR and self.left.operand == self.right:
             return TRUE()
 
-        elif issubclass(right_op, BINARY):
-            if left_op == NOT:
-                if self.right.right.type == VAR and self.left.operand == self.right.right:
-                    return OR(OR(self.left, self.right.right), self.right.left).simplify()
-            elif left_op == VAR:
-                if self.right.right.type == VAR and self.left.var == self.right.right.var:
-                    return OR(OR(self.left, self.right.right), self.right.left).simplify()
+        elif right_op == AND:
+            if self.left in (self.right.left, self.right.right):
+                return self.left
+
+        elif left_op == AND:
+            if self.right in (self.left.left, self.left.right):
+                return self.right
+
         elif left_op == NOT and self.left.operand == self.right:
             return TRUE()
 

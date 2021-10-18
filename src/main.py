@@ -3,7 +3,7 @@ from logic.calculator.table import TruthTable
 from logic.stream.core import logic_map, Logic
 
 ONLY_CANON: bool = False
-SIMPLIFY: bool = True
+SIMPLIFY: bool = False
 
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
@@ -34,13 +34,18 @@ def show_errors(errors: list[Exception]) -> None:
     errors.clear()
 
 def main() -> None:
-    global ONLY_CANON
+    global ONLY_CANON, SIMPLIFY
 
     if input("Permitir somente canônicas (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
         ONLY_CANON = True
 
     if input("Mostrar simbolos permitidos (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
         header()
+
+    if input("Simplificar (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
+        SIMPLIFY = True
+
+    print()
 
     errors: list[Exception] = []
     parser: LogicParser = LogicParser(only_canon=ONLY_CANON, simplify=SIMPLIFY)

@@ -55,3 +55,6 @@ class VAR(Operand):
         if self.var in variables:
             return variables[self.var]
         return self.var
+
+    def variables(self):
+        return {self.var: True}
