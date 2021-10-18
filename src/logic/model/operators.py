@@ -53,7 +53,7 @@ class NOT(UNARY):
         ]
 
     def simplify(self) -> Expression:
-        op_type = type(self.operand)
+        op_type = self.operand.type
 
         if op_type == NOT:
             return self.operand.operand.simplify()
@@ -78,8 +78,7 @@ class BINARY(Operator):
         return f"{type(self).__name__}({self.left}, {self.right})"
 
     def __eq__(self, other: Expression):
-        type_other = type(other)
-        if issubclass(type_other, BINARY):
+        if issubclass(type(other), BINARY):
             return super().__eq__(other) and self.left == other.left and self.right == other.right
         return False
 
@@ -114,8 +113,21 @@ class AND(BINARY):
         return f"({self.left.stringify(variables)} ∧ {self.right.stringify(variables)})"
 
     def simplify(self) -> Expression:
-        if FALSE in (type(self.left), type(self.right)):
+        if self.left == self.right:
+            return self.left.simplify()
+
+        if TRUE in (self.left.type, self.right.type):
+            return self.left.simplify() if self.left.type != TRUE else self.right.simplify()
+
+        if FALSE in (self.left.type, self.right.type):
             return FALSE()
+
+        elif self.left.type == VAR and self.right.type == NOT and self.left == self.right.operand:
+            return FALSE()
+
+        elif self.left.type == NOT and self.right.type == VAR and self.left.operand == self.right:
+            return FALSE()
+
         return super().simplify()
 
 
@@ -138,18 +150,31 @@ class OR(BINARY):
         return f"({self.left.stringify(variables)} ∨ {self.right.stringify(variables)})"
 
     def simplify(self) -> Expression:
-        left_op = type(self.left)
-        right_op = type(self.right)
+        left_op = self.left.type
+        right_op = self.right.type
 
         if self.left == self.right:
-            return self.left.simplify
+            return self.left.simplify()
+
         elif TRUE in (left_op, right_op):
             return TRUE()
+
         elif FALSE in (left_op, right_op):
             return self.left.simplify() if left_op != FALSE else self.right.simplify()
-        elif left_op in (VAR, NOT) and issubclass(right_op, BINARY):
-            if type(self.right.right) == VAR and self.left.operand.var == self.right.right.var:
-                return OR(OR(self.left, self.right.right), self.right.left).simplify()
+
+        elif self.left.type == VAR and self.right.type == NOT and self.left == self.right.operand:
+            return TRUE()
+
+        elif self.left.type == NOT and self.right.type == VAR and self.left.operand == self.right:
+            return TRUE()
+
+        elif issubclass(right_op, BINARY):
+            if left_op == NOT:
+                if self.right.right.type == VAR and self.left.operand == self.right.right:
+                    return OR(OR(self.left, self.right.right), self.right.left).simplify()
+            elif left_op == VAR:
+                if self.right.right.type == VAR and self.left.var == self.right.right.var:
+                    return OR(OR(self.left, self.right.right), self.right.left).simplify()
         elif left_op == NOT and self.left.operand == self.right:
             return TRUE()
 
@@ -309,10 +334,11 @@ def main() -> None:
         print()
 
 def test():
-    op = IMPLY(VAR('A'), IMPLY(VAR('B'), VAR('A')))
+    op = OR(VAR('A'), NOT(VAR('A')))
     op2 = OR(NOT(VAR('A')), OR(NOT(VAR('B')), VAR('A')))
-    print(op2.stringify(dict()))
-    print(simplify(op2).stringify())
+    op3 = AND(VAR('A'), NOT(NOT(VAR('A'))))
+    print(op3.stringify(dict()))
+    print(simplify(op3).stringify())
     print()
 
 

@@ -17,7 +17,7 @@ class Expression:
         return f"{type(self).__name__}()"
 
     def __eq__(self, other: Expression):
-        return type(self) == type(other)
+        return self.type == type(other)
 
     def evaluate(self, assign: dict) -> bool:
         """Calcula o resultado de forma encadeada"""
