@@ -1,7 +1,7 @@
 from logic.calculator.setup import setup, SetupResult
 from logic.calculator.table import TruthTable
 
-from logic.model import operator, operand
+from logic.model import operators, operands
 from logic.model import Expression, Operator, Operand
 from logic.model.exceptions import ParseError
 
@@ -9,13 +9,13 @@ from logic.stream.core import Logic, Token, logic_map
 from logic.stream.exceptions import BadToken
 
 operator_map = {
-    Logic.AND: operator.AND,
-    Logic.OR: operator.OR,
-    Logic.EQUAL: operator.EQUAL,
-    Logic.IMPLY: operator.IMPLY,
-    Logic.XOR: operator.XOR,
-    Logic.NOR: operator.NOR,
-    Logic.NAND: operator.NAND,
+    Logic.AND: operators.AND,
+    Logic.OR: operators.OR,
+    Logic.EQUAL: operators.EQUAL,
+    Logic.IMPLY: operators.IMPLY,
+    Logic.XOR: operators.XOR,
+    Logic.NOR: operators.NOR,
+    Logic.NAND: operators.NAND,
 }
 
 canon_permitted: list[Logic] = [Logic.OPEN, Logic.CLOSE, Logic.CONSTANT, Logic.VAR, Logic.AND, Logic.OR, Logic.NOT, Logic.EOF]
@@ -25,11 +25,11 @@ def to_operand(token: Token) -> Operand:
     """Converte Token para Operand"""
     if token.kind == Logic.CONSTANT:
         if token.value in logic_map[Logic.TRUE]:
-            return operand.TRUE()
+            return operands.TRUE()
         elif token.value in logic_map[Logic.FALSE]:
-            return operand.FALSE()
+            return operands.FALSE()
     elif token.kind == Logic.VAR:
-        return operand.VAR(token.value)
+        return operands.VAR(token.value)
     raise BadToken(f"{token} não é um operando.")
 
 
@@ -213,10 +213,10 @@ class LogicParser:
                 negates += 1
 
             if negates & 1:
-                expr = operator.NOT(expr)
+                expr = operators.NOT(expr)
         else:
             while self.operators and self.last().kind == Logic.NOT:
                 self.operators.pop()
-                expr = operator.NOT(expr)
+                expr = operators.NOT(expr)
 
         self.operands.append(expr)

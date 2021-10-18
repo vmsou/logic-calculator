@@ -3,7 +3,7 @@ Nesta seção é modelado os operados unários e binários.
 """
 
 from logic.model import Operator, Expression
-from logic.model.operand import TRUE, FALSE, VAR
+from logic.model.operands import TRUE, FALSE, VAR
 
 """Operadores unários"""
 class UNARY(Operator):
@@ -61,7 +61,7 @@ class NOT(UNARY):
         elif op_type == FALSE:
             return TRUE()
 
-        return self
+        return super().simplify()
 
 
 """Operadores binários"""
@@ -140,9 +140,11 @@ class OR(BINARY):
         right_op = type(self.right)
 
         if self.left == self.right:
-            return self.left
+            return self.left.simplify()
         elif TRUE in (left_op, right_op):
             return TRUE()
+        elif FALSE in (left_op, right_op):
+            return self.left.simplify() if left_op != FALSE else self.right.simplify()
 
         return super().simplify()
 
@@ -159,9 +161,6 @@ class IMPLY(BINARY):
     def stringify(self, variables: dict) -> str:
         return f"({self.left.stringify(variables)} → {self.right.stringify(variables)})"
 
-    def simplify(self) -> Expression:
-        return OR(NOT(self.left), self.right).simplify()
-
     def equivalences(self) -> list:
         return [
             OR(NOT(self.left), self.right),
@@ -170,6 +169,9 @@ class IMPLY(BINARY):
 
     def normalize(self):
         return OR(NOT(self.left), self.right).normalize()
+
+    def simplify(self) -> Expression:
+        return self.normalize().simplify()
 
 
 class EQUAL(BINARY):
@@ -287,7 +289,13 @@ def main() -> None:
         print(op.simplify().stringify(dict()))
         print()
 
+def test():
+    op = OR(VAR('q'), FALSE())
+    print(op.stringify(dict()))
+    print(op.simplify().stringify(dict()))
+    print()
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    test()
