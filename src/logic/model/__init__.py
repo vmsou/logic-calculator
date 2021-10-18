@@ -10,6 +10,9 @@ from __future__ import annotations
 class Expression:
     """Expressão que represanta ambos Operadores e Operandos."""
 
+    def __init__(self):
+        self.type = type(self)
+
     def __repr__(self) -> str:
         return f"{type(self).__name__}()"
 

@@ -10,6 +10,7 @@ class UNARY(Operator):
     """Representa um Operador unário."""
 
     def __init__(self, operand: Expression):
+        super().__init__()
         self.operand = operand
 
     def __repr__(self) -> str:
@@ -69,6 +70,7 @@ class BINARY(Operator):
     """Representa um Operador binário."""
 
     def __init__(self, left: Expression, right: Expression):
+        super().__init__()
         self.left = left
         self.right = right
 
@@ -140,11 +142,17 @@ class OR(BINARY):
         right_op = type(self.right)
 
         if self.left == self.right:
-            return self.left.simplify()
+            return self.left.simplify
         elif TRUE in (left_op, right_op):
             return TRUE()
         elif FALSE in (left_op, right_op):
             return self.left.simplify() if left_op != FALSE else self.right.simplify()
+        elif left_op in (VAR, NOT) and issubclass(right_op, BINARY):
+            print("oi")
+            if type(self.right.right) == VAR and self.left.operand.var == self.right.right.var:
+                return OR(OR(self.left, self.right.right), self.right.left).simplify().simplify()
+        elif left_op == NOT and self.left.operand == self.right:
+            return TRUE()
 
         return super().simplify()
 
@@ -302,9 +310,10 @@ def main() -> None:
         print()
 
 def test():
-    op = OR(VAR('q'), VAR('q'))
-    print(op.stringify(dict()))
-    print(op.simplify().stringify(dict()))
+    op = IMPLY(VAR('A'), IMPLY(VAR('B'), VAR('A')))
+    op2 = OR(NOT(VAR('A')), OR(NOT(VAR('B')), VAR('A')))
+    print(op2.stringify(dict()))
+    print(op2.simplify().stringify(dict()))
     print()
 
 

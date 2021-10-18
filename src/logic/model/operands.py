@@ -31,6 +31,7 @@ class VAR(Operand):
     """Representa uma Variável."""
 
     def __init__(self, var):
+        super().__init__()
         self.var = var
 
     def __repr__(self):
