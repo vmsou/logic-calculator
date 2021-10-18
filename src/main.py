@@ -3,7 +3,7 @@ from logic.calculator.table import TruthTable
 from logic.stream.core import logic_map, Logic
 
 ONLY_CANON: bool = False
-SIMPLIFY_NOT: bool = True
+SIMPLIFY: bool = True
 
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
@@ -43,7 +43,7 @@ def main() -> None:
         header()
 
     errors: list[Exception] = []
-    parser: LogicParser = LogicParser(only_canon=ONLY_CANON, simplify_not=SIMPLIFY_NOT)
+    parser: LogicParser = LogicParser(only_canon=ONLY_CANON, simplify=SIMPLIFY)
     while True:
         parser.expr = input("> ")
         try:

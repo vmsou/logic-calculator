@@ -24,6 +24,9 @@ class Unary(Operator):
     def normalize(self):
         return type(self)(self.operand.normalize())
 
+    def simplify(self):
+        return type(self)(self.operand.simplify())
+
 
 class NOT(Unary):
     """Representa um Operador unário de negação."""
@@ -42,6 +45,11 @@ class NOT(Unary):
             NAND(self.operand, self.operand),
             NOR(self.operand, self.operand)
         ]
+
+    def simplify(self) -> Expression:
+        if type(self.operand) == NOT:
+            return self.operand.operand.simplify()
+        return self
 
 
 """Operadores binários"""
@@ -67,6 +75,9 @@ class Binary(Operator):
     def normalize(self):
         return type(self)(self.left.normalize(), self.right.normalize())
 
+    def simplify(self) -> Expression:
+        return type(self)(self.left.simplify(), self.right.simplify())
+
 
 class AND(Binary):
     """Representa um Operador binário de conjunção."""
@@ -82,14 +93,10 @@ class AND(Binary):
             variables = dict()
         return f"({self.left.stringify(variables)} ∧ {self.right.stringify(variables)})"
 
-    def simplify(self, assign: dict = None) -> Expression:
-        if assign is None:
-            assign = dict()
-
+    def simplify(self) -> Expression:
         if FALSE in (type(self.left), type(self.right)):
-
             return FALSE()
-        return self
+        return super().simplify()
 
 
 class OR(Binary):
@@ -110,13 +117,10 @@ class OR(Binary):
 
         return f"({self.left.stringify(variables)} ∨ {self.right.stringify(variables)})"
 
-    def simplify(self, assign: dict = None) -> Expression:
-        if assign is None:
-            assign = dict()
-
+    def simplify(self) -> Expression:
         if TRUE in (type(self.left), type(self.right)):
             return TRUE()
-        return self
+        return super().simplify()
 
 
 class IMPLY(Binary):
@@ -131,8 +135,8 @@ class IMPLY(Binary):
     def stringify(self, variables: dict) -> str:
         return f"({self.left.stringify(variables)} → {self.right.stringify(variables)})"
 
-    def simplify(self, assign: dict) -> Expression:
-        return OR(NOT(self.left), self.right)
+    def simplify(self) -> Expression:
+        return OR(NOT(self.left), self.right).simplify()
 
     def equivalences(self) -> list:
         return [
@@ -247,6 +251,15 @@ def main() -> None:
         print(canon_op.stringify(dict()), end=' = ')
         print(canon_op.evaluate(dict()))
         print()
+
+    print("\nSimplificação: ")
+    op1: Expression = NOT(NOT(AND(TRUE(), FALSE())))
+    print(op1.stringify(dict()))
+    print(op1.simplify().stringify(dict()))
+
+    op2: Expression = IMPLY(NOT(NOT(TRUE())), FALSE())
+    print(op2.stringify(dict()))
+    print(op2.simplify().stringify(dict()))
 
 
 if __name__ == '__main__':

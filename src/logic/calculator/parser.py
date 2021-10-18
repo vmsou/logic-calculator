@@ -46,10 +46,10 @@ class LogicParser:
     Essa classe transforma a entrada em Tokens e depois converte os Tokens em Operandos
     """
 
-    def __init__(self, expr: str = "", *, only_canon: bool = False, simplify_not: bool = True):
+    def __init__(self, expr: str = "", *, only_canon: bool = False, simplify: bool = True):
         # flags
         self.only_canon = only_canon
-        self.simplify_not = simplify_not
+        self.simplify = simplify
 
         # Usado para o parse
         self.expr: str = expr
@@ -173,6 +173,9 @@ class LogicParser:
         if self.only_canon:
             self.operand = self.operand.normalize()
 
+        if self.simplify:
+            self.operand = self.operand.simplify()
+
     def last(self) -> Token:
         """Retorna o último operador Token sem removê-lo."""
         assert self.operators
@@ -203,7 +206,7 @@ class LogicParser:
 
     def append(self, expr: Expression) -> None:
         """Adiciona um operando para os operandos da classe. Enquanto o último operando é uma Negação - converte a expressão."""
-        if self.simplify_not:
+        if self.simplify:
             negates: int = 0
             while self.operators and self.last().kind == Logic.NOT:
                 self.operators.pop()

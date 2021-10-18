@@ -21,7 +21,7 @@ class Expression:
         """Mostra a expressão em forma de string"""
         return "()"
 
-    def simplify(self, assign: dict) -> Expression:
+    def simplify(self) -> Expression:
         """TODO: Encontrar padrões de simplificação."""
         return self
 
