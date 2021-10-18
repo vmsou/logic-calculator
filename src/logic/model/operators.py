@@ -194,6 +194,9 @@ class EQUAL(BINARY):
     def normalize(self):
         return AND(IMPLY(self.left, self.right), IMPLY(self.right, self.left)).normalize()
 
+    def simplify(self) -> Expression:
+        return self.normalize().simplify()
+
 
 class NAND(BINARY):
     """Representa um Operador binário de negação de conjunção."""
@@ -215,6 +218,9 @@ class NAND(BINARY):
 
     def normalize(self):
         return NOT(AND(self.left, self.right)).normalize()
+
+    def simplify(self) -> Expression:
+        return self.normalize().simplify()
 
 
 class NOR(BINARY):
@@ -238,6 +244,9 @@ class NOR(BINARY):
     def normalize(self):
         return NOT(OR(self.left, self.right)).normalize()
 
+    def simplify(self) -> Expression:
+        return self.normalize().simplify()
+
 
 class XOR(BINARY):
     """Representa um Operador binário de disjunção exclusiva."""
@@ -260,6 +269,9 @@ class XOR(BINARY):
     def normalize(self):
         # return NOT(EQUAL(self.left, self.right)).normalize()
         return AND(OR(self.left, self.right), NOT(AND(self.left, self.right))).normalize()
+
+    def simplify(self) -> Expression:
+        return self.normalize().simplify()
 
 
 def main() -> None:
@@ -290,7 +302,7 @@ def main() -> None:
         print()
 
 def test():
-    op = OR(VAR('q'), FALSE())
+    op = OR(VAR('q'), VAR('q'))
     print(op.stringify(dict()))
     print(op.simplify().stringify(dict()))
     print()

@@ -24,31 +24,23 @@ class Expression:
         """Mostra a expressão em forma de string"""
         return "()"
 
-    def simplify(self) -> Expression:
-        """TODO: Encontrar padrões de simplificação."""
+    def normalize(self):
         return self
 
-    def normalize(self):
+    def simplify(self) -> Expression:
+        """Após canônizar. Encontrar padrões de simplificações"""
         return self
 
 
 class Operand(Expression):
-    """Representa um operando."""
-
-    def evaluate(self, assign: dict) -> bool:
-        """Retorna Verdade ou Falso."""
-        return True
-
-    def stringify(self, variables: dict) -> str:
-        return "()"
+    """
+    Representa um operando.
+    Retorna Verdade/Falso ou uma variável que representa um valor booleano.
+    """
 
 
 class Operator(Expression):
-    """Representa um operador."""
-
-    def evaluate(self, assign: dict) -> bool:
-        """Realiza uma operação com base em operadores/operandos atribuidos"""
-        return True
-
-    def stringify(self, variables: dict) -> str:
-        return "()"
+    """
+    Representa um operador.
+    Realiza uma operação com base em operadores/operandos atribuidos
+    """

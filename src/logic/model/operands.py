@@ -36,6 +36,9 @@ class VAR(Operand):
     def __repr__(self):
         return f"{type(self).__name__}({self.var})"
 
+    def __eq__(self, other):
+        return super().__eq__(other) and self.var == other.var
+
     def evaluate(self, assign: dict = None) -> bool:
         """Durante o calculo é atribuido um valor a partir do dicionario. Caso não atribuido retorna Verdade."""
         if assign is None:
