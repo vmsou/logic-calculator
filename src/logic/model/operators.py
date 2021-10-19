@@ -144,18 +144,28 @@ class AND(BINARY):
         elif self.left.type == OR and self.right in (self.left.left, self.left.right):
             return self.right
 
-        # Associativa + Idempotentes
+        # Associativa
+        elif self.right.type == AND:
+            # Idempotentes
+            if self.left == self.right.left:
+                return AND(self.left, self.right.right).simplify()
+            elif self.left == self.right.right:
+                return AND(self.left, self.right.left).simplify()
+            # Contradição
+            elif self.right.left.type == NOT and self.right.left.operand == self.left:
+                return AND(FALSE(), self.right.right).simplify()
+            elif self.right.right.type == NOT and self.right.right.operand == self.left:
+                return AND(FALSE(), self.right.left).simplify()
+
         elif self.left.type == AND:
             if self.right == self.left.left:
                 return AND(self.right, self.left.right).simplify()
             elif self.right == self.left.right:
                 return AND(self.right, self.left.left).simplify()
-
-        elif self.right.type == AND:
-            if self.left == self.right.left:
-                return AND(self.left, self.right.right).simplify()
-            elif self.left == self.right.right:
-                return AND(self.left, self.right.left).simplify()
+            elif self.left.left.type == NOT and self.left.left.operand == self.right:
+                return AND(self.left.right, FALSE()).simplify()
+            elif self.left.right.type == NOT and self.left.right.operand == self.right:
+                return AND(self.left.left, FALSE()).simplify()
 
         return super().simplify()
 
@@ -216,12 +226,18 @@ class OR(BINARY):
         elif self.left.type == AND and self.right in (self.left.left, self.left.right):
             return self.right.simplify()
 
-        # Associativa + Idempotentes
+        # Associativa
         elif self.right.type == OR:
+            # Idempotentes
             if self.left == self.right.left:
                 return OR(self.left, self.right.right).simplify()
             elif self.left == self.right.right:
                 return OR(self.left, self.right.left).simplify()
+            # Tautologia
+            elif self.right.left.type == NOT and self.right.left.operand == self.left:
+                return OR(TRUE(), self.right.right).simplify()
+            elif self.right.right.type == NOT and self.right.right.operand == self.left:
+                return OR(TRUE(), self.right.left).simplify()
 
         elif self.left.type == OR:
             if self.right == self.left.left:
