@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 from logic.calculator.setup import setup, SetupResult
 from logic.calculator.table import TruthTable
 
@@ -7,6 +9,11 @@ from logic.model.exceptions import ParseError
 
 from logic.stream.core import Logic, Token, logic_map
 from logic.stream.exceptions import BadToken
+
+class ParseState(Enum):
+    OPERAND = auto()
+    OPERATOR = auto()
+
 
 operator_map = {
     Logic.AND: operators.AND,
@@ -87,13 +94,13 @@ class LogicParser:
         # print(tokens)
         variables: dict[str, bool] = setup_result.variables
 
-        expect_operand: bool = True
+        state: ParseState = ParseState.OPERAND
         for t in tokens:
             # Espera um operando para juntar com um operador.
-            if expect_operand:
+            if state == ParseState.OPERAND:
                 if t.kind in (Logic.CONSTANT, Logic.VAR):
                     self.append(to_operand(t))
-                    expect_operand = False
+                    state = ParseState.OPERATOR
                 elif t.kind in (Logic.OPEN, Logic.NOT):
                     self.operators.append(t)
                 elif t.kind == Logic.EOF:
@@ -105,7 +112,8 @@ class LogicParser:
                     raise ParseError(f"Falta operandos. {self.last()}")
                 else:
                     raise ParseError(f"Esperava variável ou constante. {t}")
-            else:
+
+            elif state == ParseState.OPERATOR:
                 # Caso ja tenha um operando, buscar um operador
                 if t.kind in (Logic.AND, Logic.OR, Logic.IMPLY, Logic.EQUAL, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     # Se a lista de operandos estiver vazias quebrar loop, e adicionar token atual para operadores.
@@ -131,7 +139,7 @@ class LogicParser:
                             break
 
                     self.operators.append(t)
-                    expect_operand = True
+                    state = ParseState.OPERAND
                     if t.kind == Logic.EOF:
                         break
 
