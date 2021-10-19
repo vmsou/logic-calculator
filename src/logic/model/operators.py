@@ -238,12 +238,28 @@ class OR(BINARY):
                 return OR(TRUE(), self.right.right).simplify()
             elif self.right.right.type == NOT and self.right.right.operand == self.left:
                 return OR(TRUE(), self.right.left).simplify()
+            # Tautologia (NOT)
+            if self.left.type == NOT:
+                if self.right.left.type == NOT and self.right.left.operand == self.left.operand:
+                    return OR(TRUE(), self.right.right).simplify()
+                elif self.right.right.type == NOT and self.right.right.operand == self.left.operand:
+                    return OR(TRUE(), self.right.left).simplify()
+                elif self.right.left == self.left.operand:
+                    return OR(TRUE(), self.right.right).simplify()
+                elif self.right.right == self.left.operand:
+                    return OR(TRUE(), self.right.left).simplify()
 
         elif self.left.type == OR:
+            # Idempotentes
             if self.right == self.left.left:
                 return OR(self.right, self.left.right).simplify()
             elif self.right == self.left.right:
                 return OR(self.right, self.left.left).simplify()
+            # Tautologia
+            elif self.left.left.type == NOT and self.left.left.operand == self.right:
+                return OR(self.left.right, TRUE()).simplify()
+            elif self.left.right.type == NOT and self.left.right.operand == self.right:
+                return OR(self.left.left, TRUE()).simplify()
 
         elif left_op == NOT and self.left.operand == self.right:
             return TRUE()
