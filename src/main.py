@@ -50,7 +50,7 @@ def main() -> None:
     print()
 
     errors: list[Exception] = []
-    parser: LogicParser = LogicParser(only_canon=ONLY_CANON, simplify=SIMPLIFY)
+    parser: LogicParser = LogicParser(normalize=ONLY_CANON, simplify_expression=SIMPLIFY)
     while True:
         parser.expr = input("> ")
         try:

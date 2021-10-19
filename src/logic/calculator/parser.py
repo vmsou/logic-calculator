@@ -13,6 +13,7 @@ from logic.stream.exceptions import BadToken
 class ParseState(Enum):
     OPERAND = auto()
     OPERATOR = auto()
+    EOF = auto()
 
 
 operator_map = {
@@ -53,21 +54,23 @@ class LogicParser:
     Essa classe transforma a entrada em Tokens e depois converte os Tokens em Operandos
     """
 
-    def __init__(self, expr: str = "", *, only_canon: bool = False, simplify: bool = True):
+    def __init__(self, expr: str = "", *, normalize: bool = False, simplify_expression: bool = True):
         # flags
-        self.only_canon = only_canon
-        self.simplify = simplify
+        self.normalize = normalize
+        self.simplify = simplify_expression
 
         # Usado para o parse
-        self.expr: str = expr
+        self.tokens: list = []
+        self.state: ParseState = ParseState.OPERAND
         self.operators: list[Token] = []
         self.operands: list = []
 
         # Usado para calcular
-        self.tokens: list = []
-        self.variables: dict = dict()
+        self.variables: dict[str, bool] = dict()
         self.operand: Operand = Operand()
         self.valid: bool = False
+
+        self.expr: str = expr
 
     @property
     def expr(self) -> str:
@@ -77,30 +80,33 @@ class LogicParser:
     def expr(self, value) -> None:
         """Limpa os recursos quando expressão for escolhida."""
         # parse
+        self.tokens = []
+        self.state = ParseState.OPERAND
         self._expr = value
         self.operators = []
         self.operands = []
 
         # calcular
-        self.tokens = []
         self.variables = dict()
         self.operand = Operand()
         self.valid = False
 
     def parse(self) -> None:
         """Função principal para conversão da entrada em Tokens e depois para Operandos"""
+        if self.state == ParseState.EOF:
+            return
+
         setup_result: SetupResult = setup(self.expr)
         tokens: list[Token] = setup_result.tokens
         # print(tokens)
         variables: dict[str, bool] = setup_result.variables
 
-        state: ParseState = ParseState.OPERAND
         for t in tokens:
             # Espera um operando para juntar com um operador.
-            if state == ParseState.OPERAND:
+            if self.state == ParseState.OPERAND:
                 if t.kind in (Logic.CONSTANT, Logic.VAR):
                     self.append(to_operand(t))
-                    state = ParseState.OPERATOR
+                    self.state = ParseState.OPERATOR
                 elif t.kind in (Logic.OPEN, Logic.NOT):
                     self.operators.append(t)
                 elif t.kind == Logic.EOF:
@@ -113,7 +119,7 @@ class LogicParser:
                 else:
                     raise ParseError(f"Esperava variável ou constante. {t}")
 
-            elif state == ParseState.OPERATOR:
+            elif self.state == ParseState.OPERATOR:
                 # Caso ja tenha um operando, buscar um operador
                 if t.kind in (Logic.AND, Logic.OR, Logic.IMPLY, Logic.EQUAL, Logic.XOR, Logic.NAND, Logic.NOR, Logic.EOF):
                     # Se a lista de operandos estiver vazias quebrar loop, e adicionar token atual para operadores.
@@ -139,7 +145,7 @@ class LogicParser:
                             break
 
                     self.operators.append(t)
-                    state = ParseState.OPERAND
+                    self.state = ParseState.OPERAND
                     if t.kind == Logic.EOF:
                         break
 
@@ -173,12 +179,17 @@ class LogicParser:
             assert lone_open.kind == Logic.OPEN
             raise ParseError(f"Nenhum parêntese de fechamento. {lone_open}.")
 
+        self.state = ParseState.EOF
         self.valid = True
         self.tokens = tokens
         self.operand = self.operands.pop()
         self.variables = variables
 
-        if self.only_canon:
+        self.apply_options()
+
+    def apply_options(self):
+        """Se flag estiver ativa; aplicar modificadores."""
+        if self.normalize:
             self.operand = self.operand.normalize()
 
         if self.simplify:
