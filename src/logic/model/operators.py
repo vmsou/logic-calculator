@@ -42,6 +42,7 @@ class UNARY(Operator):
         return self.operand.variables()
 
     def find(self, expr_type):
+        """Retorna o elemento com tipo igual e um diferente"""
         if self.operand.type == expr_type:
             return self.operand, None
         return None, None
@@ -121,11 +122,12 @@ class BINARY(Operator):
         return t
 
     def find(self, expr_type):
+        """Retorna o elemento com tipo igual e um diferente"""
         if self.left.type == expr_type:
             return self.left, self.right
         elif self.right.type == expr_type:
             return self.right, self.left
-        return None
+        return None, None
 
 
 class AND(BINARY):
@@ -155,49 +157,38 @@ class AND(BINARY):
             return self.left.simplify()
 
         elif TRUE() in self:
-            return self.left.simplify() if self.left.type != TRUE else self.right.simplify()
+            _, not_true = self.find(TRUE)
+            return not_true.simplify()
 
         elif self.is_false():
             return FALSE()
 
         # Absorção
-        if self.right.type == OR and self.left in self.right:
+        elif self == AND(self.left, OR(self.left, ANY())):
             return self.left.simplify()
-
-        elif self.left.type == OR and self.right in self.left:
+        elif self == AND(self.right, OR(self.right, ANY())):
             return self.right.simplify()
 
-        # Associativa
-        elif self.right.type == AND:
-            # Idempotentes
-            if self.left == self.right.left:
-                return AND(self.left, self.right.right).simplify()
-            elif self.left == self.right.right:
-                return AND(self.left, self.right.left).simplify()
-            # Contradição
-            elif self.right.left.type == NOT and self.right.left.operand == self.left:
-                return FALSE()
-            elif self.right.right.type == NOT and self.right.right.operand == self.left:
-                return FALSE()
+        # Associativa  p ^ (p ^ q) -> (p ^ p) ^ q
+        elif self == AND(self.left, AND(self.left, ANY())):
+            found_and, not_and = self.find(AND)
+            _, and_not_left = found_and.find(self.left.type)
+            return AND(not_and, and_not_left).simplify()
 
-        elif self.left.type == AND:
-            if self.right == self.left.left:
-                return AND(self.right, self.left.right).simplify()
-            elif self.right == self.left.right:
-                return AND(self.right, self.left.left).simplify()
-            elif self.left.left.type == NOT and self.left.left.operand == self.right:
-                return FALSE()
-            elif self.left.right.type == NOT and self.left.right.operand == self.right:
-                return FALSE()
+        # Associativa (p ^ q) ^ p -> q ^ (p ^ p)
+        elif self == OR(self.right, OR(self.right, ANY())):
+            found_and, not_and = self.find(AND)
+            _, and_not_right = found_and.find(self.right.type)
+            return AND(and_not_right, not_and).simplify()
 
         return super().simplify()
 
     def is_false(self):
         if FALSE() in self:
             return True
-        elif self.right.type == NOT and self.left == self.right.operand:
+        elif self == AND(NOT(self.left), self.left):
             return True
-        elif self.left.type == NOT and self.left.operand == self.right:
+        elif self == AND(NOT(self.right), self.right):
             return True
 
         return False
@@ -247,18 +238,30 @@ class OR(BINARY):
         elif self == OR(self.right, AND(self.right, ANY())):
             return self.right.simplify()
 
-        # Associativa  p v (p v q) -> (p v p) v q
+        # Associativa  p v (p v q) == (p v p) v q
         elif self == OR(self.left, OR(self.left, ANY())):
             found_or, not_or = self.find(OR)
             _, or_not_left = found_or.find(self.left.type)
 
             return OR(not_or, or_not_left).simplify()
 
-        # Associativa (p v q) v p -> q v (p v p)
+        # Associativa (p v q) v p == q v (p v p)
         elif self == OR(self.right, OR(self.right, ANY())):
             found_or, not_or = self.find(OR)
             _, or_not_right = found_or.find(self.right.type)
             return OR(or_not_right, not_or).simplify()
+
+        # Associativa ~p v (p v q) == (~p v p) v q == V v q == V
+        elif self.left.type == NOT and self == OR(NOT(self.left.operand), OR(self.left.operand, ANY())):
+            found_or, not_or = self.find(OR)
+            _, or_not_left = found_or.find(self.left.type)
+            return TRUE()
+
+        # Associativa (p v q) v ~p == q v (p v ~p) == q v V == V
+        elif self.right.type == NOT and self == OR(OR(self.right.operand, ANY()), NOT(self.right.operand)):
+            found_or, not_or = self.find(OR)
+            _, or_not_right = found_or.find(self.right.type)
+            return TRUE()
 
         return super().simplify()
 
