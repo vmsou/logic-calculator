@@ -237,23 +237,21 @@ class OR(BINARY):
         elif self == OR(self.right, AND(self.right, ANY())):
             return self.right.simplify()
 
-        # Associativa
-        elif self.right.type == OR:
-            if self.left == self.right.left:
-                return OR(OR(self.left, self.right.left), self.right.right).simplify()
-            elif self.left == self.right.right:
-                return OR(OR(self.left, self.right.right), self.right.left).simplify()
-            # Negado (esquerda)
-            elif self.left.type == NOT:
-                if self.left.operand == self.right.left:
-                    return OR(OR(self.left, self.right.left), self.right.right).simplify()
-                if self.left.operand == self.right.right:
-                    return OR(OR(self.left, self.right.right), self.right.left).simplify()
-            # Negado (direita)
-            elif self.right.left.type == NOT and self.left == self.right.left.operand:
-                return OR(OR(self.left, self.right.left), self.right.right).simplify()
-            elif self.right.right.type == NOT and self.left == self.right.right.operand:
-                return OR(OR(self.left, self.right.right), self.right.left).simplify()
+        # Associativa (dentro/fora esquerda)
+        elif self == OR(self.left, OR(self.left, ANY())):
+            if self.right.type == OR:
+                outside_or = self.right.left if self.right.left != self.left else self.right.right
+            else:
+                outside_or = self.left.left if self.left.left != self.right else self.left.right
+            return OR(self.left, outside_or).simplify()
+
+        # Associativa (dentro/fora direita)
+        elif self == OR(self.right, OR(self.right, ANY())):
+            if self.right.type == OR:
+                outside_or = self.right.left if self.right.left != self.left else self.right.right
+            else:
+                outside_or = self.left.left if self.left.left != self.right else self.left.right
+            return OR(outside_or, self.right).simplify()
 
         return super().simplify()
 
@@ -424,6 +422,7 @@ def main() -> None:
 def test():
     print(OR(TRUE(), FALSE()) == OR(ANY(), TRUE()))
     print(VAR('q') == ANY())
+    print(OR(VAR('p'), OR(VAR('p'), VAR('q'))) == OR(OR(VAR('p'), VAR('q')), VAR('p')))
 
 
 if __name__ == '__main__':
