@@ -41,6 +41,11 @@ class UNARY(Operator):
     def variables(self):
         return self.operand.variables()
 
+    def find(self, expr_type):
+        if self.operand.type == expr_type:
+            return self.operand, None
+        return None, None
+
 
 class NOT(UNARY):
     """Representa um Operador unário de negação."""
@@ -61,13 +66,11 @@ class NOT(UNARY):
         ]
 
     def simplify(self) -> Expression:
-        op_type = self.operand.type
-
-        if op_type == NOT:
+        if self.operand.type == NOT:
             return self.operand.operand.simplify()
-        elif op_type == TRUE:
+        elif self.operand.type == TRUE:
             return FALSE()
-        elif op_type == FALSE:
+        elif self.operand.type == FALSE:
             return TRUE()
 
         return super().simplify()
@@ -116,6 +119,13 @@ class BINARY(Operator):
         t.update(self.left.variables())
         t.update(self.right.variables())
         return t
+
+    def find(self, expr_type):
+        if self.left.type == expr_type:
+            return self.left, self.right
+        elif self.right.type == expr_type:
+            return self.right, self.left
+        return None
 
 
 class AND(BINARY):
@@ -237,21 +247,18 @@ class OR(BINARY):
         elif self == OR(self.right, AND(self.right, ANY())):
             return self.right.simplify()
 
-        # Associativa (dentro/fora esquerda)
+        # Associativa (elemento esquerdo dentro/fora)
         elif self == OR(self.left, OR(self.left, ANY())):
-            if self.right.type == OR:
-                outside_or = self.right.left if self.right.left != self.left else self.right.right
-            else:
-                outside_or = self.left.left if self.left.left != self.right else self.left.right
-            return OR(self.left, outside_or).simplify()
+            found_or, not_or = self.find(OR)
+            or_not_left = found_or.left if found_or.left != not_or else found_or.right
 
-        # Associativa (dentro/fora direita)
+            return OR(not_or, or_not_left).simplify()
+
+        # Associativa (elemento direito dentro/fora)
         elif self == OR(self.right, OR(self.right, ANY())):
-            if self.right.type == OR:
-                outside_or = self.right.left if self.right.left != self.left else self.right.right
-            else:
-                outside_or = self.left.left if self.left.left != self.right else self.left.right
-            return OR(outside_or, self.right).simplify()
+            found_or, not_or = self.find(OR)
+            or_not_right = found_or.left if found_or.left != not_or else found_or.right
+            return OR(or_not_right, not_or).simplify()
 
         return super().simplify()
 

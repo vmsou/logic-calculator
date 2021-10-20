@@ -42,6 +42,9 @@ class Expression:
     def variables(self):
         return {}
 
+    def find(self, expr_type):
+        return self, None
+
 
 class Operand(Expression):
     """
