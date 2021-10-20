@@ -21,6 +21,9 @@ class UNARY(Operator):
             return super().__eq__(other) and self.operand == other.operand
         return False
 
+    def __iter__(self):
+        yield self.operand
+
     def evaluate(self, assign: dict) -> bool:
         return True
 
@@ -85,6 +88,10 @@ class BINARY(Operator):
             return super().__eq__(other) and self.left == other.left and self.right == other.right
         return False
 
+    def __iter__(self):
+        yield self.left
+        yield self.right
+
     def evaluate(self, assign: dict) -> bool:
         return True
 
@@ -131,7 +138,7 @@ class AND(BINARY):
         if self.left == self.right:
             return self.left.simplify()
 
-        elif TRUE in (self.left.type, self.right.type):
+        elif TRUE() in self:
             return self.left.simplify() if self.left.type != TRUE else self.right.simplify()
 
         elif self.is_false():
@@ -139,10 +146,10 @@ class AND(BINARY):
 
         # Absorção
         if self.right.type == OR and self.left in (self.right.left, self.right.right):
-            return self.left
+            return self.left.simplify()
 
         elif self.left.type == OR and self.right in (self.left.left, self.left.right):
-            return self.right
+            return self.right.simplify()
 
         # Associativa
         elif self.right.type == AND:
@@ -153,9 +160,9 @@ class AND(BINARY):
                 return AND(self.left, self.right.left).simplify()
             # Contradição
             elif self.right.left.type == NOT and self.right.left.operand == self.left:
-                return AND(FALSE(), self.right.right).simplify()
+                return FALSE()
             elif self.right.right.type == NOT and self.right.right.operand == self.left:
-                return AND(FALSE(), self.right.left).simplify()
+                return FALSE()
 
         elif self.left.type == AND:
             if self.right == self.left.left:
@@ -163,19 +170,17 @@ class AND(BINARY):
             elif self.right == self.left.right:
                 return AND(self.right, self.left.left).simplify()
             elif self.left.left.type == NOT and self.left.left.operand == self.right:
-                return AND(self.left.right, FALSE()).simplify()
+                return FALSE()
             elif self.left.right.type == NOT and self.left.right.operand == self.right:
-                return AND(self.left.left, FALSE()).simplify()
+                return FALSE()
 
         return super().simplify()
 
     def is_false(self):
-        if FALSE in (self.left.type, self.right.type):
+        if FALSE() in self:
             return True
-
         elif self.right.type == NOT and self.left == self.right.operand:
             return True
-
         elif self.left.type == NOT and self.left.operand == self.right:
             return True
 
@@ -238,15 +243,15 @@ class OR(BINARY):
                     return OR(OR(self.left, self.right.right), self.right.left).simplify()
             # Negado (direita)
             elif self.right.left.type == NOT and self.left == self.right.left.operand:
-                return OR(OR(self.left, self.right.left), self.right.right)
+                return OR(OR(self.left, self.right.left), self.right.right).simplify()
             elif self.right.right.type == NOT and self.left == self.right.right.operand:
-                return OR(OR(self.left, self.right.right), self.right.left)
+                return OR(OR(self.left, self.right.right), self.right.left).simplify()
 
         return super().simplify()
 
     def is_true(self):
         # Tautologia
-        if TRUE in (self.left.type, self.right.type):
+        if TRUE() in self:
             return True
         elif self.left.type == NOT and self.left.operand == self.right:
             return True
@@ -418,6 +423,8 @@ def test():
     print(simplify(op3).stringify())
     print(OR(VAR('A'), VAR('B')) == OR(VAR('A'), VAR('B')))
     print()
+
+    print(FALSE in NOT(FALSE()))
 
 
 if __name__ == '__main__':

@@ -19,6 +19,9 @@ class Expression:
     def __eq__(self, other: Expression):
         return self.type == type(other)
 
+    def __iter__(self):
+        yield None
+
     def evaluate(self, assign: dict) -> bool:
         """Calcula o resultado de forma encadeada"""
         return True
