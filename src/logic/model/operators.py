@@ -232,10 +232,9 @@ class OR(BINARY):
             return self.left.simplify() if self.left.type != FALSE else self.right.simplify()
 
         # Absorção
-        elif self.right.type == AND and self.left in self.right:
+        elif self == OR(self.left, AND(self.left, ANY())):
             return self.left.simplify()
-
-        elif self.left.type == AND and self.right in self.left:
+        elif self == OR(self.right, AND(self.right, ANY())):
             return self.right.simplify()
 
         # Associativa
@@ -424,6 +423,7 @@ def main() -> None:
 
 def test():
     print(OR(TRUE(), FALSE()) == OR(ANY(), TRUE()))
+    print(VAR('q') == ANY())
 
 
 if __name__ == '__main__':

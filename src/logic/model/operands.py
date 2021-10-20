@@ -2,7 +2,7 @@
 Essa seção modelas os operandos, indicando seus resultados como Verdade, Falso ou uma Variável.
 """
 
-from logic.model import Operand
+from logic.model import Operand, ANY
 
 """Constantes"""
 class TRUE(Operand):
@@ -38,6 +38,8 @@ class VAR(Operand):
         return f"{type(self).__name__}({self.var})"
 
     def __eq__(self, other):
+        if type(other) == ANY:
+            return True
         return super().__eq__(other) and self.var == other.var
 
     def evaluate(self, assign: dict = None) -> bool:
