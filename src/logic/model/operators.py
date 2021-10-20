@@ -247,17 +247,17 @@ class OR(BINARY):
         elif self == OR(self.right, AND(self.right, ANY())):
             return self.right.simplify()
 
-        # Associativa (elemento esquerdo dentro/fora)
+        # Associativa  p v (p v q) -> (p v p) v q
         elif self == OR(self.left, OR(self.left, ANY())):
             found_or, not_or = self.find(OR)
-            or_not_left = found_or.left if found_or.left != not_or else found_or.right
+            _, or_not_left = found_or.find(self.left.type)
 
             return OR(not_or, or_not_left).simplify()
 
-        # Associativa (elemento direito dentro/fora)
+        # Associativa (p v q) v p -> q v (p v p)
         elif self == OR(self.right, OR(self.right, ANY())):
             found_or, not_or = self.find(OR)
-            or_not_right = found_or.left if found_or.left != not_or else found_or.right
+            _, or_not_right = found_or.find(self.right.type)
             return OR(or_not_right, not_or).simplify()
 
         return super().simplify()
