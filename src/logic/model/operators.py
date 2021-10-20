@@ -2,7 +2,7 @@
 Nesta seção é modelado os operados unários e binários.
 """
 
-from logic.model import Operator, Expression, simplify
+from logic.model import Operator, Expression, ANY, simplify
 from logic.model.operands import TRUE, FALSE, VAR
 
 """Operadores unários"""
@@ -17,7 +17,9 @@ class UNARY(Operator):
         return f"{type(self).__name__}({self.operand})"
 
     def __eq__(self, other: Expression):
-        if issubclass(type(other), UNARY):
+        if type(other) == ANY:
+            return True
+        elif issubclass(type(other), UNARY):
             return super().__eq__(other) and self.operand == other.operand
         return False
 
@@ -84,7 +86,9 @@ class BINARY(Operator):
         return f"{type(self).__name__}({self.left}, {self.right})"
 
     def __eq__(self, other: Expression):
-        if issubclass(type(other), BINARY):
+        if type(other) == ANY:
+            return True
+        elif issubclass(type(other), BINARY):
             return super().__eq__(other) and self.left == other.left and self.right == other.right
         return False
 
@@ -121,7 +125,9 @@ class AND(BINARY):
         super().__init__(left, right)
 
     def __eq__(self, other):
-        if self.type == type(other):
+        if type(other) == ANY:
+            return True
+        elif self.type == type(other):
             return (self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left)
         return False
 
@@ -145,10 +151,10 @@ class AND(BINARY):
             return FALSE()
 
         # Absorção
-        if self.right.type == OR and self.left in (self.right.left, self.right.right):
+        if self.right.type == OR and self.left in self.right:
             return self.left.simplify()
 
-        elif self.left.type == OR and self.right in (self.left.left, self.left.right):
+        elif self.left.type == OR and self.right in self.left:
             return self.right.simplify()
 
         # Associativa
@@ -194,7 +200,9 @@ class OR(BINARY):
         super().__init__(left, right)
 
     def __eq__(self, other):
-        if self.type == type(other):
+        if type(other) == ANY:
+            return True
+        elif self.type == type(other):
             return (self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left)
         return False
 
@@ -211,22 +219,23 @@ class OR(BINARY):
         return f"({self.left.stringify(variables)} ∨ {self.right.stringify(variables)})"
 
     def simplify(self) -> Expression:
-
         # Idempotentes
         if self.left == self.right:
             return self.left.simplify()
 
+        # Tautologia
         elif self.is_true():
             return TRUE()
 
-        elif FALSE in (self.left.type, self.right.type):
+        # Neutro
+        elif FALSE() in self:
             return self.left.simplify() if self.left.type != FALSE else self.right.simplify()
 
         # Absorção
-        elif self.right.type == AND and self.left in (self.right.left, self.right.right):
+        elif self.right.type == AND and self.left in self.right:
             return self.left.simplify()
 
-        elif self.left.type == AND and self.right in (self.left.left, self.left.right):
+        elif self.left.type == AND and self.right in self.left:
             return self.right.simplify()
 
         # Associativa
@@ -253,11 +262,9 @@ class OR(BINARY):
         # Tautologia
         if TRUE() in self:
             return True
-        elif self.left.type == NOT and self.left.operand == self.right:
+        elif self == OR(NOT(self.right), self.right):
             return True
-        elif self.right.type == NOT and self.left == self.right.operand:
-            return True
-        elif self.left.type == NOT and self.left.operand == self.right:
+        elif self == OR(NOT(self.left), self.left):
             return True
 
         return False
@@ -416,15 +423,7 @@ def main() -> None:
         print()
 
 def test():
-    op = OR(VAR('A'), NOT(VAR('A')))
-    op2 = OR(NOT(VAR('A')), OR(NOT(VAR('B')), VAR('A')))
-    op3 = AND(VAR('A'), NOT(NOT(VAR('A'))))
-    print(op3.stringify(dict()))
-    print(simplify(op3).stringify())
-    print(OR(VAR('A'), VAR('B')) == OR(VAR('A'), VAR('B')))
-    print()
-
-    print(FALSE in NOT(FALSE()))
+    print(OR(TRUE(), FALSE()) == OR(ANY(), TRUE()))
 
 
 if __name__ == '__main__':

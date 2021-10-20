@@ -17,6 +17,8 @@ class Expression:
         return f"{type(self).__name__}()"
 
     def __eq__(self, other: Expression):
+        if type(other) == ANY:
+            return True
         return self.type == type(other)
 
     def __iter__(self):
@@ -53,6 +55,11 @@ class Operator(Expression):
     Representa um operador.
     Realiza uma operação com base em operadores/operandos atribuidos
     """
+
+
+class ANY(Expression):
+    def __eq__(self, other):
+        return True
 
 
 def simplify(expr: Expression):
