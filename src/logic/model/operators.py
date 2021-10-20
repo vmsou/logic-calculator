@@ -76,6 +76,9 @@ class NOT(UNARY):
 
         return super().simplify()
 
+    def negated(self) -> Expression:
+        return self.operand.negated()
+
 
 """Operadores binários"""
 class BINARY(Operator):
@@ -114,6 +117,9 @@ class BINARY(Operator):
 
     def simplify(self) -> Expression:
         return type(self)(self.left.simplify(), self.right.simplify())
+
+    def negated(self) -> Expression:
+        return type(self)(self.left.negated(), self.right.negated())
 
     def variables(self):
         t = {}
@@ -169,19 +175,22 @@ class AND(BINARY):
         elif self == AND(self.right, OR(self.right, ANY())):
             return self.right.simplify()
 
-        # Associativa  p ^ (p ^ q) -> (p ^ p) ^ q
+        # Associativa p ^ (p ^ q) == (p ^ p) ^ q
         elif self == AND(self.left, AND(self.left, ANY())):
-            found_and, not_and = self.find(AND)
-            _, and_not_left = found_and.find(self.left.type)
-            return AND(not_and, and_not_left).simplify()
+            found_and, not_or = self.find(AND)
+            and_not_left = found_and.left if found_and.left != not_or else found_and.right
+            return AND(not_or, and_not_left).simplify()
 
-        # Associativa (p ^ q) ^ p -> q ^ (p ^ p)
-        elif self == OR(self.right, OR(self.right, ANY())):
-            found_and, not_and = self.find(AND)
-            _, and_not_right = found_and.find(self.right.type)
-            return AND(and_not_right, not_and).simplify()
+        # Associativa (p ^ q) ^ q == p ^ (q ^ q)
+        elif self == AND(self.right, AND(self.right, ANY())):
+            found_and, not_or = self.find(AND)
+            and_not_right = found_and.left if found_and.left != not_or else found_and.right
+            return AND(and_not_right, not_or).simplify()
 
         return super().simplify()
+
+    def negated(self) -> Expression:
+        return OR(self.left.negated(), self.right.negated())
 
     def is_false(self):
         if FALSE() in self:
@@ -238,17 +247,16 @@ class OR(BINARY):
         elif self == OR(self.right, AND(self.right, ANY())):
             return self.right.simplify()
 
-        # Associativa  p v (p v q) == (p v p) v q
+        # Associativa p v (p v q) == (p v p) v q
         elif self == OR(self.left, OR(self.left, ANY())):
             found_or, not_or = self.find(OR)
-            _, or_not_left = found_or.find(self.left.type)
-
+            or_not_left = found_or.left if found_or.left != not_or else found_or.right
             return OR(not_or, or_not_left).simplify()
 
-        # Associativa (p v q) v p == q v (p v p)
+        # Associativa (p v q) v q == p v (q v q)
         elif self == OR(self.right, OR(self.right, ANY())):
             found_or, not_or = self.find(OR)
-            _, or_not_right = found_or.find(self.right.type)
+            or_not_right = found_or.left if found_or.left != not_or else found_or.right
             return OR(or_not_right, not_or).simplify()
 
         # Associativa ~p v (p v q) == (~p v p) v q == V v q == V
@@ -264,6 +272,9 @@ class OR(BINARY):
             return TRUE()
 
         return super().simplify()
+
+    def negated(self) -> Expression:
+        return AND(self.left.negated(), self.right.negated())
 
     def is_true(self):
         # Tautologia
@@ -433,6 +444,10 @@ def test():
     print(OR(TRUE(), FALSE()) == OR(ANY(), TRUE()))
     print(VAR('q') == ANY())
     print(OR(VAR('p'), OR(VAR('p'), VAR('q'))) == OR(OR(VAR('p'), VAR('q')), VAR('p')))
+    not_negated = NOT(OR(NOT(VAR('A')), VAR('B')))
+    negated = not_negated.negated()
+    print(not_negated.stringify(dict()))
+    print(negated.stringify(dict()))
 
 
 if __name__ == '__main__':

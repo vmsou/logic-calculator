@@ -2,7 +2,7 @@
 Essa seção modelas os operandos, indicando seus resultados como Verdade, Falso ou uma Variável.
 """
 
-from logic.model import Operand, ANY
+from logic.model import Expression, Operand, ANY
 
 """Constantes"""
 class TRUE(Operand):
@@ -15,6 +15,9 @@ class TRUE(Operand):
     def stringify(self, variables: dict = None) -> str:
         return "V"
 
+    def negated(self) -> Expression:
+        return FALSE()
+
 
 class FALSE(Operand):
     """Representa uma constante Falso."""
@@ -25,6 +28,9 @@ class FALSE(Operand):
 
     def stringify(self, variables: dict = None) -> str:
         return "F"
+
+    def negated(self) -> Expression:
+        return TRUE()
 
 
 class VAR(Operand):

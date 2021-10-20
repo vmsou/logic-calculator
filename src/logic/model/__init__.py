@@ -39,6 +39,10 @@ class Expression:
         """Após canônizar. Encontrar padrões de simplificações"""
         return self
 
+    def negated(self) -> Expression:
+        """Retorna forma negada da expressão."""
+        return self
+
     def variables(self):
         return {}
 
