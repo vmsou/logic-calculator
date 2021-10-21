@@ -6,6 +6,8 @@ from logic.model import Operator, Expression, ANY
 from logic.model.operands import TRUE, FALSE, VAR
 
 """Operadores unários"""
+
+
 class UNARY(Operator):
     """Representa um Operador unário."""
 
@@ -26,10 +28,12 @@ class UNARY(Operator):
     def __iter__(self):
         yield self.operand
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
         return True
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return self.operand.stringify(variables)
 
     def normalize(self):
@@ -54,10 +58,14 @@ class NOT(UNARY):
     def __init__(self, operand: Expression):
         super().__init__(operand)
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
+        if assign is None:
+            assign = dict()
         return not self.operand.evaluate(assign)
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return f"¬{self.operand.stringify(variables)}"
 
     def equivalences(self) -> list:
@@ -81,6 +89,8 @@ class NOT(UNARY):
 
 
 """Operadores binários"""
+
+
 class BINARY(Operator):
     """Representa um Operador binário."""
 
@@ -103,10 +113,12 @@ class BINARY(Operator):
         yield self.left
         yield self.right
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
         return True
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return f"({self.left.stringify(variables)} {self.right.stringify(variables)})"
 
     def equivalences(self) -> list:
@@ -147,7 +159,9 @@ class AND(BINARY):
             return (self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left)
         return False
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
+        if assign is None:
+            assign = dict()
         return self.left.evaluate(assign) and self.right.evaluate(assign)
 
     def stringify(self, variables: dict = None) -> str:
@@ -181,13 +195,13 @@ class AND(BINARY):
         # Associativa p ^ (p ^ q) == (p ^ p) ^ q
         elif self == AND(self.left, AND(self.left, ANY())):
             found_AND, not_AND = self.find(lambda x: x.type == AND)
-            AND_not_left = next(filter(lambda x: x != not_AND, found_AND))
+            AND_not_left, _ = found_AND.find(lambda x: x != not_AND)
             return AND(not_AND, AND_not_left).simplify()
 
         # Associativa (p ^ q) ^ q == p ^ (q ^ q)
         elif self == AND(self.right, AND(self.right, ANY())):
             found_AND, not_AND = self.find(lambda x: x.type == AND)
-            AND_not_right = next(filter(lambda x: x != not_AND, found_AND))
+            AND_not_right, _ = found_AND.find(lambda x: x != not_AND)
             return AND(AND_not_right, not_AND).simplify()
 
         return super().simplify()
@@ -235,13 +249,11 @@ class OR(BINARY):
     def evaluate(self, assign: dict = None) -> bool:
         if assign is None:
             assign = dict()
-
         return self.left.evaluate(assign) or self.right.evaluate(assign)
 
     def stringify(self, variables: dict = None) -> str:
         if variables is None:
             variables = dict()
-
         return f"({self.left.stringify(variables)} ∨ {self.right.stringify(variables)})"
 
     def simplify(self) -> Expression:
@@ -271,14 +283,14 @@ class OR(BINARY):
         # Associativa p v (p v q) == (p v p) v q
         elif self == OR(self.left, OR(self.left, ANY())):
             found_or, not_or = self.find(lambda x: x.type == OR)
-            or_not_left = next(filter(lambda x: x != not_or, found_or))
+            or_not_left, _ = found_or.find(lambda x: x != not_or)
             return OR(not_or, or_not_left).simplify()
 
         # Associativa (p v q) v q == p v (q v q)
         elif self == OR(self.right, OR(self.right, ANY())):
             found_or, not_or = self.find(lambda x: x.type == OR)
-            or_not_right = next(filter(lambda x: x != not_or, found_or))
-            return OR(or_not_right, not_or).simplify()
+            or_not_left, _ = found_or.find(lambda x: x != not_or)
+            return OR(or_not_left, not_or).simplify()
 
         return super().simplify()
 
@@ -317,10 +329,14 @@ class IMPLY(BINARY):
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
+        if assign is None:
+            assign = dict()
         return not self.left.evaluate(assign) or self.right.evaluate(assign)
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return f"({self.left.stringify(variables)} → {self.right.stringify(variables)})"
 
     def equivalences(self) -> list:
@@ -342,10 +358,14 @@ class EQUAL(BINARY):
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
+        if assign is None:
+            assign = dict()
         return self.left.evaluate(assign) == self.right.evaluate(assign)
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return f"({self.left.stringify(variables)} ⟷ {self.right.stringify(variables)})"
 
     def equivalences(self) -> list:
@@ -366,10 +386,14 @@ class NAND(BINARY):
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
+        if assign is None:
+            assign = dict()
         return not (self.left.evaluate(assign) and self.right.evaluate(assign))
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return f"({self.left.stringify(variables)} ↑ {self.right.stringify(variables)})"
 
     def equivalences(self) -> list:
@@ -391,10 +415,14 @@ class NOR(BINARY):
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
+        if assign is None:
+            assign = dict()
         return not (self.left.evaluate(assign) or self.right.evaluate(assign))
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return f"({self.left.stringify(variables)} ↓ {self.right.stringify(variables)})"
 
     def equivalences(self) -> list:
@@ -416,10 +444,14 @@ class XOR(BINARY):
     def __init__(self, left: Expression, right: Expression):
         super().__init__(left, right)
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
+        if assign is None:
+            assign = dict()
         return not (self.left.evaluate(assign) == self.right.evaluate(assign))
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
+        if variables is None:
+            variables = dict()
         return f"({self.left.stringify(variables)} ⊻ {self.right.stringify(variables)})"
 
     def equivalences(self) -> list:
@@ -437,9 +469,10 @@ class XOR(BINARY):
 
 
 def main() -> None:
-   op1: Expression = OR(VAR('p'), VAR('q'))
-   print(op1.stringify(dict()))
-   print(op1.negated().simplify().stringify(dict()))
+    op1: Expression = OR(VAR('p'), VAR('q'))
+    print(op1.stringify())
+    print(op1.negated().simplify().stringify())
+    print(op1.evaluate())
 
 
 if __name__ == '__main__':

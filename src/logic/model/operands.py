@@ -60,6 +60,7 @@ class VAR(Operand):
         """Retorna em forma de string o valor atribuido no dicionario ou sua chave interna."""
         if variables is None:
             variables = dict()
+
         if self.var in variables:
             return variables[self.var]
         return self.var

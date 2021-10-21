@@ -24,11 +24,11 @@ class Expression:
     def __iter__(self):
         yield None
 
-    def evaluate(self, assign: dict) -> bool:
+    def evaluate(self, assign: dict = None) -> bool:
         """Calcula o resultado de forma encadeada"""
         return True
 
-    def stringify(self, variables: dict) -> str:
+    def stringify(self, variables: dict = None) -> str:
         """Mostra a expressão em forma de string"""
         return "()"
 
