@@ -2,7 +2,7 @@
 Nesta seção é modelado os operados unários e binários.
 """
 
-from logic.model import Operator, Expression, ANY, simplify
+from logic.model import Operator, Expression, ANY
 from logic.model.operands import TRUE, FALSE, VAR
 
 """Operadores unários"""
@@ -58,7 +58,7 @@ class NOT(UNARY):
         return not self.operand.evaluate(assign)
 
     def stringify(self, variables: dict) -> str:
-        return f"(¬{self.operand.stringify(variables)})"
+        return f"¬{self.operand.stringify(variables)}"
 
     def equivalences(self) -> list:
         return [
@@ -118,9 +118,6 @@ class BINARY(Operator):
     def simplify(self) -> Expression:
         return type(self)(self.left.simplify(), self.right.simplify())
 
-    def negated(self) -> Expression:
-        return type(self)(self.left.negated(), self.right.negated())
-
     def variables(self):
         t = {}
         t.update(self.left.variables())
@@ -162,8 +159,13 @@ class AND(BINARY):
         if self.left == self.right:
             return self.left.simplify()
 
+        elif self.left == NOT(self.right.negated().simplify()):
+            return self.right.simplify()
+        elif self.right == NOT(self.left.negated().simplify()):
+            return self.left.simplify()
+
         elif TRUE() in self:
-            _, not_true = self.find(TRUE)
+            not_true = next(filter(lambda x: x != TRUE(), self))
             return not_true.simplify()
 
         elif self.is_false():
@@ -189,9 +191,6 @@ class AND(BINARY):
 
         return super().simplify()
 
-    def negated(self) -> Expression:
-        return OR(self.left.negated(), self.right.negated())
-
     def is_false(self):
         if FALSE() in self:
             return True
@@ -213,8 +212,10 @@ class AND(BINARY):
             for i in self.right:
                 if NOT(i) == self.left:
                     return True
-
         return False
+
+    def negated(self) -> Expression:
+        return OR(NOT(self.left), NOT(self.right))
 
 
 class OR(BINARY):
@@ -247,6 +248,11 @@ class OR(BINARY):
         if self.left == self.right:
             return self.left.simplify()
 
+        elif self.left == NOT(self.right.negated().simplify()):
+            return self.right.simplify()
+        elif self.right == NOT(self.left.negated().simplify()):
+            return self.left.simplify()
+
         # Tautologia
         elif self.is_true():
             return TRUE()
@@ -275,9 +281,6 @@ class OR(BINARY):
 
         return super().simplify()
 
-    def negated(self) -> Expression:
-        return AND(self.left.negated(), self.right.negated())
-
     def is_true(self):
         # Tautologia
         if TRUE() in self:
@@ -302,6 +305,9 @@ class OR(BINARY):
                     return True
 
         return False
+
+    def negated(self) -> Expression:
+        return AND(NOT(self.left), NOT(self.right))
 
 
 class IMPLY(BINARY):
@@ -430,42 +436,10 @@ class XOR(BINARY):
 
 
 def main() -> None:
-    op1: Expression = IMPLY(AND(VAR('A'), VAR('B')), FALSE())
-    op2: Expression = EQUAL(VAR('A'), VAR('B'))
-    op3: Expression = XOR(VAR('A'), VAR('B'))
-
-    ops = [op1, op2, op3]
-
-    for op in ops:
-        print(op.stringify(dict()), end=' = ')
-        print(op.evaluate(dict()))
-        print("Normalized")
-        canon_op = op.normalize()
-        print(canon_op.stringify(dict()), end=' = ')
-        print(canon_op.evaluate(dict()))
-        print()
-
-    print("\nSimplificação: ")
-    op1: Expression = NOT(NOT(AND(TRUE(), FALSE())))
-    op2: Expression = IMPLY(NOT(NOT(TRUE())), FALSE())
-
-    ops = [op1, op2]
-
-    for op in ops:
-        print(op.stringify(dict()))
-        print(op.simplify().stringify(dict()))
-        print()
-
-def test():
-    print(OR(TRUE(), FALSE()) == OR(ANY(), TRUE()))
-    print(VAR('q') == ANY())
-    print(OR(VAR('p'), OR(VAR('p'), VAR('q'))) == OR(OR(VAR('p'), VAR('q')), VAR('p')))
-    not_negated = NOT(OR(NOT(VAR('A')), VAR('B')))
-    negated = not_negated.negated()
-    print(not_negated.stringify(dict()))
-    print(negated.stringify(dict()))
+   op1: Expression = OR(VAR('p'), VAR('q'))
+   print(op1.stringify(dict()))
+   print(op1.negated().simplify().stringify(dict()))
 
 
 if __name__ == '__main__':
-    # main()
-    test()
+    main()
