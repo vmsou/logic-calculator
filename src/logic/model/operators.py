@@ -41,9 +41,9 @@ class UNARY(Operator):
     def variables(self):
         return self.operand.variables()
 
-    def find(self, expr_type):
+    def find(self, predicate):
         """Retorna o elemento com tipo igual e um diferente"""
-        if self.operand.type == expr_type:
+        if predicate(self.operand.type):
             return self.operand, None
         return None, None
 
@@ -124,13 +124,14 @@ class BINARY(Operator):
         t.update(self.right.variables())
         return t
 
-    def find(self, expr_type):
+    def find(self, predicate):
         """Retorna o elemento com tipo igual e um diferente"""
-        if self.left.type == expr_type:
-            return self.left, self.right
-        elif self.right.type == expr_type:
-            return self.right, self.left
-        return None, None
+        found, not_found = None, None
+        found = next(filter(predicate, self))
+        for i in self:
+            if not predicate(i):
+                not_found = i
+        return found, not_found
 
 
 class AND(BINARY):
@@ -179,14 +180,14 @@ class AND(BINARY):
 
         # Associativa p ^ (p ^ q) == (p ^ p) ^ q
         elif self == AND(self.left, AND(self.left, ANY())):
-            found_AND, not_AND = self.find(AND)
-            AND_not_left = found_AND.left if found_AND.left != not_AND else found_AND.right
+            found_AND, not_AND = self.find(lambda x: x.type == AND)
+            AND_not_left = next(filter(lambda x: x != not_AND, found_AND))
             return AND(not_AND, AND_not_left).simplify()
 
         # Associativa (p ^ q) ^ q == p ^ (q ^ q)
         elif self == AND(self.right, AND(self.right, ANY())):
-            found_AND, not_AND = self.find(AND)
-            AND_not_right = found_AND.left if found_AND.left != not_AND else found_AND.right
+            found_AND, not_AND = self.find(lambda x: x.type == AND)
+            AND_not_right = next(filter(lambda x: x != not_AND, found_AND))
             return AND(AND_not_right, not_AND).simplify()
 
         return super().simplify()
@@ -269,14 +270,14 @@ class OR(BINARY):
 
         # Associativa p v (p v q) == (p v p) v q
         elif self == OR(self.left, OR(self.left, ANY())):
-            found_or, not_or = self.find(OR)
-            or_not_left = found_or.left if found_or.left != not_or else found_or.right
+            found_or, not_or = self.find(lambda x: x.type == OR)
+            or_not_left = next(filter(lambda x: x != not_or, found_or))
             return OR(not_or, or_not_left).simplify()
 
         # Associativa (p v q) v q == p v (q v q)
         elif self == OR(self.right, OR(self.right, ANY())):
-            found_or, not_or = self.find(OR)
-            or_not_right = found_or.left if found_or.left != not_or else found_or.right
+            found_or, not_or = self.find(lambda x: x.type == OR)
+            or_not_right = next(filter(lambda x: x != not_or, found_or))
             return OR(or_not_right, not_or).simplify()
 
         return super().simplify()
