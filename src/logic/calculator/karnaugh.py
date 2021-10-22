@@ -39,6 +39,12 @@ def karnaugh3(header, data):
 
     v = ('V', 'V')
 
+    # Linhas
+    if (s0, s2) == v:
+        a = NOT(VAR(header[0]))
+        b = NOT(VAR(header[2]))
+        found.append(AND(a, b))
+
     if (s1, s3) == v:
         a = NOT(VAR(header[0]))
         b = VAR(header[2])
@@ -49,9 +55,30 @@ def karnaugh3(header, data):
         b = NOT(VAR(header[2]))
         found.append(AND(a, b))
 
+    if (s5, s7) == v:
+        a = VAR(header[0])
+        b = VAR(header[1])
+        found.append(AND(a, b))
+
+    # Colunas
+    if (s0, s4) == v:
+        a = NOT(VAR(header[1]))
+        b = NOT(VAR(header[2]))
+        found.append(AND(a, b))
+
     if (s1, s5) == v:
         a = NOT(VAR(header[1]))
         b = VAR(header[2])
+        found.append(AND(a, b))
+
+    if (s3, s7) == v:
+        a = VAR(header[1])
+        b = VAR(header[2])
+        found.append(AND(a, b))
+
+    if (s2, s6) == v:
+        a = VAR(header[1])
+        b = NOT(VAR(header[2]))
         found.append(AND(a, b))
 
     return found
@@ -79,7 +106,7 @@ def karnaugh(table: TruthTable):
 
 
 def main() -> None:
-    parser: LogicParser = LogicParser()
+    parser: LogicParser = LogicParser(simplify_expression=True)
 
     expr1 = "(A ∧ B) ∨ A"
     expr2 = "(¬A ∧ ¬B ∧ C) ∨ (¬A ∧ B ∧ C) ∨ (A ∧ ¬B ∧ ¬C) ∨ (A ∧ ¬B ∧ C) ∨ (A ∧ B ∧ ¬C)"
@@ -88,11 +115,10 @@ def main() -> None:
     parser.parse()
 
     table: TruthTable = TruthTable(parser.expression)
-
     table.show()
 
-    table2: TruthTable = TruthTable(karnaugh(table))
-    table2.show()
+    table.expression = karnaugh(table)
+    table.show()
 
 
 if __name__ == '__main__':
