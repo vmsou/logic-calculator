@@ -56,8 +56,8 @@ class LogicParser:
 
     def __init__(self, expr: str = "", *, normalize: bool = False, simplify_expression: bool = True):
         # flags
-        self.normalize = normalize
-        self.simplify = simplify_expression
+        self.normalize: bool = normalize
+        self.simplify: bool = simplify_expression
 
         # Usado para o parse
         self.tokens: list = []
@@ -67,7 +67,7 @@ class LogicParser:
 
         # Usado para calcular
         self.variables: dict[str, bool] = dict()
-        self.operand: Operand = Operand()
+        self.expression: Expression = Expression()
         self.valid: bool = False
 
         self.expr: str = expr
@@ -88,7 +88,7 @@ class LogicParser:
 
         # calcular
         self.variables = dict()
-        self.operand = Operand()
+        self.expression = Operand()
         self.valid = False
 
     def parse(self) -> None:
@@ -182,7 +182,7 @@ class LogicParser:
         self.state = ParseState.EOF
         self.valid = True
         self.tokens = tokens
-        self.operand = self.operands.pop()
+        self.expression = self.operands.pop()
         self.variables = variables
 
         self.apply_options()
@@ -190,11 +190,11 @@ class LogicParser:
     def apply_options(self):
         """Se flag estiver ativa; aplicar modificadores."""
         if self.normalize:
-            self.operand = self.operand.normalize()
+            self.expression = self.expression.normalize()
 
         if self.simplify:
-            self.operand = simplify(self.operand)
-            self.variables = self.operand.variables()
+            self.expression = simplify(self.expression)
+            self.variables = self.expression.variables()
 
     def last(self) -> Token:
         """Retorna o último operador Token sem removê-lo."""
@@ -222,7 +222,7 @@ class LogicParser:
 
     def get_table(self) -> TruthTable:
         """Prepara uma tabela com o operando e suas variaveis"""
-        return TruthTable(self.operand, self.variables)
+        return TruthTable(self.expression, self.variables)
 
     def append(self, expr: Expression) -> None:
         """Adiciona um operando para os operandos da classe. Enquanto o último operando é uma Negação - converte a expressão."""

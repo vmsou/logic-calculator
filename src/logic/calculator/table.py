@@ -1,6 +1,6 @@
 import tabulate
 
-from logic.model import Operand
+from logic.model import Expression
 
 
 def gen_variables(expr_vars: dict[str, bool]) -> list[dict]:
@@ -29,14 +29,16 @@ def bool_to_str(boolean: bool) -> str:
 
 
 class TruthTable:
-    def __init__(self, operand: Operand, variables: dict[str, bool]):
-        self.operand: Operand = operand
+    def __init__(self, operand: Expression, variables: dict[str, bool] = None):
+        self.expression: Expression = operand
+        if variables is None:
+            variables = self.expression.variables()
         self.variables: dict[str, bool] = variables
 
     def header(self) -> list[str]:
         """Constroi o cabeçalho da tabela."""
         header: list[str] = [k for k in sorted(self.variables)]
-        header.append(self.operand.stringify(dict()))
+        header.append(self.expression.stringify(dict()))
         return header
 
     def generate(self) -> tuple[list, list]:
@@ -47,11 +49,11 @@ class TruthTable:
 
         for var_dict in truth:
             row: list[str] = [bool_to_str(var_dict[key]) for key in sorted(var_dict)]
-            row.append(bool_to_str(self.operand.evaluate(var_dict)))
+            row.append(bool_to_str(self.expression.evaluate(var_dict)))
             table.append(row)
 
         if not truth:
-            table.append([bool_to_str(self.operand.evaluate(dict()))])
+            table.append([bool_to_str(self.expression.evaluate(dict()))])
 
         return header, table
 
