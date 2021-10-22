@@ -5,7 +5,7 @@ from logic.calculator.table import TruthTable
 
 from logic.model import operators, operands, simplify
 from logic.model import Expression, Operator, Operand
-from logic.model.exceptions import ParseError
+from logic.calculator.exceptions import ParseError
 
 from logic.stream.core import Logic, Token, logic_map
 from logic.stream.exceptions import BadToken

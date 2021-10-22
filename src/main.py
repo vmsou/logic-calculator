@@ -1,6 +1,7 @@
 from logic.calculator.parser import LogicParser
 from logic.calculator.table import TruthTable
 from logic.stream.core import logic_map, Logic
+from logic.calculator.exceptions import ParseError
 
 ONLY_CANON: bool = False
 SIMPLIFY: bool = False
@@ -55,7 +56,7 @@ def main() -> None:
         parser.expr = input("> ")
         try:
             parser.parse()
-        except Exception as e:
+        except ParseError as e:
             errors.append(e)
 
         print(f"Fórmula Válida: {parser.is_valid()}")

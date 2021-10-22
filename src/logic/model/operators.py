@@ -469,10 +469,12 @@ class XOR(BINARY):
 
 
 def main() -> None:
+    keys = dict(p='A', q='B')
+    values = dict(p=False, q=False)
     op1: Expression = OR(VAR('p'), VAR('q'))
-    print(op1.stringify())
-    print(op1.negated().simplify().stringify())
-    print(op1.evaluate())
+    print(op1.stringify(keys))
+    print(op1.negated().simplify().stringify(keys))
+    print(op1.evaluate(values))
 
 
 if __name__ == '__main__':
