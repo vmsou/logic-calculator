@@ -1,7 +1,9 @@
 from logic.calculator.parser import LogicParser
 from logic.calculator.table import TruthTable
 from logic.stream.core import logic_map, Logic
+
 from logic.calculator.exceptions import ParseError
+from logic.stream.exceptions import BadToken
 
 ONLY_CANON: bool = False
 SIMPLIFY: bool = False
@@ -31,7 +33,7 @@ def header() -> None:
 def show_errors(errors: list[Exception]) -> None:
     """Imprime uma lista de erros e depois limpa a lista."""
     for error in errors:
-        print(f"\033[91m[Error] {error}\033[0m")
+        print(f"\033[91m[{type(error).__name__}] {error}\033[0m")
     errors.clear()
 
 def options():
@@ -56,7 +58,7 @@ def main() -> None:
         parser.expr = input("> ")
         try:
             parser.parse()
-        except ParseError as e:
+        except (ParseError, BadToken) as e:
             errors.append(e)
 
         print(f"Fórmula Válida: {parser.is_valid()}")

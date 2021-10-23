@@ -199,7 +199,7 @@ class TokenStream:
         elif ch == "":
             return Token()
 
-        raise BadToken(f"Bad Token: char='{ch}'")
+        raise BadToken(f"char='{ch}'")
 
     def putback(self, t: Token) -> None:
         """Retorna um Token para o buffer."""

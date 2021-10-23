@@ -57,7 +57,7 @@ def karnaugh3(header, data):
 
     if (s5, s7) == v:
         a = VAR(header[0])
-        b = VAR(header[1])
+        b = VAR(header[2])
         found.append(AND(a, b))
 
     # Colunas
