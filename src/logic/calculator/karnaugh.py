@@ -13,14 +13,20 @@ def karnaugh2(header, data):
 
     v = ('V', 'V')
 
+    a = VAR(header[0])
+    b = VAR(header[1])
+
+    # Linhas
     if (s0, s1) == v:
-        found.append(NOT(VAR(header[1])))
+        found.append(NOT(a))
     if (s2, s3) == v:
-        found.append(VAR(header[0]))
-    if (s0, s1) == v:
-        found.append(NOT(VAR(header[0])))
+        found.append(a)
+
+    # Colunas
+    if (s0, s2) == v:
+        found.append(NOT(b))
     if (s1, s3) == v:
-        found.append(VAR(header[1]))
+        found.append(b)
     return found
 
 
@@ -39,47 +45,51 @@ def karnaugh3(header, data):
 
     v = ('V', 'V')
 
+    a = VAR(header[0])
+    b = VAR(header[1])
+    c = VAR(header[2])
+
     # Linhas
     if (s0, s2) == v:
-        a = NOT(VAR(header[0]))
-        b = NOT(VAR(header[2]))
-        found.append(AND(a, b))
+        x = NOT(a)
+        y = NOT(c)
+        found.append(AND(x, y))
 
     if (s1, s3) == v:
-        a = NOT(VAR(header[0]))
-        b = VAR(header[2])
-        found.append(AND(a, b))
+        x = NOT(a)
+        y = c
+        found.append(AND(x, y))
 
     if (s4, s6) == v:
-        a = VAR(header[0])
-        b = NOT(VAR(header[2]))
-        found.append(AND(a, b))
+        x = a
+        y = NOT(c)
+        found.append(AND(x, y))
 
     if (s5, s7) == v:
-        a = VAR(header[0])
-        b = VAR(header[2])
-        found.append(AND(a, b))
+        x = a
+        y = c
+        found.append(AND(x, y))
 
     # Colunas
     if (s0, s4) == v:
-        a = NOT(VAR(header[1]))
-        b = NOT(VAR(header[2]))
-        found.append(AND(a, b))
+        x = NOT(b)
+        y = NOT(c)
+        found.append(AND(x, y))
 
     if (s1, s5) == v:
-        a = NOT(VAR(header[1]))
-        b = VAR(header[2])
-        found.append(AND(a, b))
+        x = NOT(b)
+        y = c
+        found.append(AND(x, y))
 
     if (s3, s7) == v:
-        a = VAR(header[1])
-        b = VAR(header[2])
-        found.append(AND(a, b))
+        x = b
+        y = c
+        found.append(AND(x, y))
 
     if (s2, s6) == v:
-        a = VAR(header[1])
-        b = NOT(VAR(header[2]))
-        found.append(AND(a, b))
+        x = b
+        y = NOT(c)
+        found.append(AND(x, y))
 
     return found
 
