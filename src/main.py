@@ -8,6 +8,7 @@ from logic.stream.exceptions import BadToken
 ONLY_CANON: bool = False
 SIMPLIFY: bool = False
 
+
 def header() -> None:
     """Imprime o cabeçalho do programa. Mostra simbolos permitidos."""
     size: int = 60
@@ -30,13 +31,15 @@ def header() -> None:
         print(f"NAND = {logic_map[Logic.NAND]}")
     print("-" * size)
 
+
 def show_errors(errors: list[Exception]) -> None:
     """Imprime uma lista de erros e depois limpa a lista."""
     for error in errors:
         print(f"\033[91m[{type(error).__name__}] {error}\033[0m")
     errors.clear()
 
-def options():
+
+def options() -> None:
     global ONLY_CANON, SIMPLIFY
 
     if input("Permitir somente canônicas (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
@@ -47,6 +50,7 @@ def options():
 
     if input("Simplificar (Não completo) (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
         SIMPLIFY = True
+
 
 def main() -> None:
     options()

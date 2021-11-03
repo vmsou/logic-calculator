@@ -44,10 +44,12 @@ class Expression:
         return self
 
     def variables(self):
+        """Retorna todas as varíavies em uma expressão"""
         return {}
 
-    def find(self, expr_type):
-        return self, None
+    def equivalences(self):
+        """Retorna uma lista com todas as expressões equivalentes a mesma."""
+        return []
 
 
 class Operand(Expression):

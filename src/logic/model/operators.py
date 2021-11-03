@@ -122,7 +122,7 @@ class BINARY(Operator):
         return f"({self.left.stringify(variables)} {self.right.stringify(variables)})"
 
     def equivalences(self) -> list:
-        return []
+        return [NOT(self.negated())]
 
     def normalize(self):
         return type(self)(self.left.normalize(), self.right.normalize())
@@ -174,17 +174,25 @@ class AND(BINARY):
         if self.left == self.right:
             return self.left.simplify()
 
-        elif self.left == NOT(self.right.negated().simplify()):
+        elif self.left in self.right.equivalences():
             return self.right.simplify()
-        elif self.right == NOT(self.left.negated().simplify()):
+
+        elif self.right in self.left.equivalences():
             return self.left.simplify()
 
+        # Contradição
+        elif self.is_false():
+            return FALSE()
+
+        # Neutro
         elif TRUE() in self:
             not_true = next(filter(lambda x: x != TRUE(), self))
             return not_true.simplify()
 
-        elif self.is_false():
-            return FALSE()
+        elif self.left == NOT(self.right.negated().simplify()):
+            return self.right.simplify()
+        elif self.right == NOT(self.left.negated().simplify()):
+            return self.left.simplify()
 
         # Absorção
         elif self == AND(self.left, OR(self.left, ANY())):
@@ -232,6 +240,11 @@ class AND(BINARY):
     def negated(self) -> Expression:
         return OR(NOT(self.left), NOT(self.right))
 
+    def equivalences(self) -> list:
+        return [
+            NOT(OR(NOT(self.left), NOT(self.right)))
+        ]
+
 
 class OR(BINARY):
     """Representa um Operador binário de disjunção."""
@@ -261,14 +274,20 @@ class OR(BINARY):
         if self.left == self.right:
             return self.left.simplify()
 
-        elif self.left == NOT(self.right.negated().simplify()):
+        elif self.left in self.right.equivalences():
             return self.right.simplify()
-        elif self.right == NOT(self.left.negated().simplify()):
+
+        elif self.right in self.left.equivalences():
             return self.left.simplify()
 
         # Tautologia
         elif self.is_true():
             return TRUE()
+
+        elif self.left == NOT(self.right.negated().simplify()):
+            return self.right.simplify()
+        elif self.right == NOT(self.left.negated().simplify()):
+            return self.left.simplify()
 
         # Neutro
         elif FALSE() in self:
@@ -321,6 +340,11 @@ class OR(BINARY):
 
     def negated(self) -> Expression:
         return AND(NOT(self.left), NOT(self.right))
+
+    def equivalences(self) -> list:
+        return [
+            NOT(AND(NOT(self.left), NOT(self.right)))
+        ]
 
 
 class IMPLY(BINARY):
