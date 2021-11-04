@@ -49,7 +49,8 @@ cd src
 python main.py
 ```
 
-![example-img1](imgs/example1.png)
+## Exemplos
+![example-img1](imgs/example1.png)  
 ![example-img2](imgs/example2.png)
 
 ## Status
