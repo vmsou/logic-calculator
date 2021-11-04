@@ -49,6 +49,9 @@ cd src
 python main.py
 ```
 
+![example-img1](imgs/example1.png)
+![example-img2](imgs/example2.png)
+
 ## Status
 <h4 align="center"> 
 	✔️ Finalizado (funcionalidades extras em desenvolvimento) ✔️
