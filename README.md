@@ -2,7 +2,9 @@
 Trabalho Prático com o objetivo de desenvolver um gerador de Tabela Verdade de fórmulas proposicionais.
 
 # Grupo
-* Vinicius Marques da Silva Oliveira
+* Vinícius Marques da Silva Oliveira
+* Henrique Marques da Silva Oliveira
+* Leonardo Matthew Knight
 
 ## Sobre o Projeto
 Desenvolvimento de uma ferramenta para resolver problemas de Lógica Proposicional.
