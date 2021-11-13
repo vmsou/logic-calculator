@@ -50,7 +50,7 @@ def to_operator(left: Operand, token: Token, right: Operand) -> Operator:
 
 class LogicParser:
     """
-    Utilizado para ser intermediario entre as entradas do úsuario e seus retornos.
+    Utilizado para ser intermediario entre as entradas do usuário e seus retornos.
     Essa classe transforma a entrada em Tokens e depois converte os Tokens em Operandos
     """
 

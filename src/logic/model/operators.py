@@ -6,8 +6,6 @@ from logic.model import Operator, Expression, ANY
 from logic.model.operands import TRUE, FALSE, VAR
 
 """Operadores unários"""
-
-
 class UNARY(Operator):
     """Representa um Operador unário."""
 
@@ -89,8 +87,6 @@ class NOT(UNARY):
 
 
 """Operadores binários"""
-
-
 class BINARY(Operator):
     """Representa um Operador binário."""
 

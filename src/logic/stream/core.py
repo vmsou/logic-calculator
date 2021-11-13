@@ -49,7 +49,7 @@ logic_map: dict[Logic, list[str]] = {
     Logic.NOR: ['NOR', '↓'],
     Logic.OPEN: ['('],
     Logic.CLOSE: [')'],
-    Logic.VAR: ['p', 'q', 'r', 'A', 'B', 'C'],
+    Logic.VAR: ['p', 'q', 'r'],
 }
 
 logic_map[Logic.CONSTANT] = logic_map[Logic.TRUE] + logic_map[Logic.FALSE]

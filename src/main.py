@@ -40,6 +40,7 @@ def show_errors(errors: list[Exception]) -> None:
 
 
 def options() -> None:
+    """Imprime as opções da calculadora."""
     global ONLY_CANON, SIMPLIFY
 
     if input("Permitir somente canônicas (s/n): ").lower() in ('s', 'sim', 'si', 'y', 'yes'):
